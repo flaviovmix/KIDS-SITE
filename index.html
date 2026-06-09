@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Kaco — Histórias do Macaquinho</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="menu" id="menu">
+    <a href="#" class="menu-logo">KACO</a>
+    <button class="menu-burger" id="menuBurger" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menuList">
+        <span></span><span></span><span></span>
+    </button>
+    <ul class="menu-list" id="menuList">
+        <li><a href="#inicio" class="menu-link active">Início</a></li>
+        <li><a href="#sobre" class="menu-link">Sobre o Projeto</a></li>
+        <li><a href="#personagens" class="menu-link">Personagens</a></li>
+        <li><a href="#emocoes" class="menu-link">Emoções</a></li>
+        <li><a href="#rotina" class="menu-link">Ser Criança</a></li>
+        <li><a href="#cantinho" class="menu-link">Cantinho</a></li>
+        <li><a href="#familia" class="menu-link">Família</a></li>
+    </ul>
+</nav>
+
+<header class="hero">
+    <!-- Bolhinhas/elementos flutuando no fundo -->
+    <div class="floaters">
+        <span class="floater f1">★</span>
+        <span class="floater f2">✦</span>
+        <span class="floater f3">★</span>
+        <span class="floater f4">✧</span>
+        <span class="floater f5">★</span>
+        <span class="floater f6">⋆</span>
+        <span class="floater f7">✩</span>
+        <span class="floater f8">★</span>
+        <span class="floater f9">✦</span>
+        <span class="floater f10">★</span>
+        <span class="floater f11 emoji">☀️</span>
+        <span class="floater f12 emoji">☁️</span>
+        <span class="floater f13 emoji">🌈</span>
+        <span class="floater f14 emoji">🍌</span>
+        <span class="floater f15 emoji">🎈</span>
+        <span class="floater f16 emoji">⚡</span>
+        <span class="floater f17 emoji">🌟</span>
+        <span class="floater f18 emoji">🪐</span>
+        <span class="floater f19">♥</span>
+        <span class="floater f20">✿</span>
+    </div>
+
+    <!-- Estrelas cadentes — 3 camadas de profundidade -->
+    <div class="shooting-stars back" aria-hidden="true">
+        <span class="shooting-star ss1"></span>
+    </div>
+    <div class="shooting-stars mid" aria-hidden="true">
+        <span class="shooting-star ss2"></span>
+    </div>
+    <div class="shooting-stars front" aria-hidden="true">
+        <span class="shooting-star ss3"></span>
+    </div>
+
+
+    <!-- Personagem (lado esquerdo do hero) -->
+    <img class="hero-character" src="img/img-cabecalho.png" alt="Kaco">
+
+    <!-- Carrossel no lado direito do hero -->
+    <section class="hero-carousel" id="heroCarousel" aria-label="Galeria de cenas">
+      <h3 class="carousel-title" id="carouselTitle" aria-live="polite"></h3>
+      <div class="carousel-viewport">
+        <div class="carousel-track" id="carouselTrack">
+            <a class="slide-wrap" href="#historia-1">
+                <img class="slide" src="img-slide/0 (1).png" alt="O Passeio Feliz">
+                <img class="slide-reflection" src="img-slide/0 (1).png" alt="" aria-hidden="true">
+            </a>
+            <a class="slide-wrap" href="#historia-2">
+                <img class="slide" src="img-slide/0 (2).png" alt="A Mochila Esquecida">
+                <img class="slide-reflection" src="img-slide/0 (2).png" alt="" aria-hidden="true">
+            </a>
+            <a class="slide-wrap" href="#historia-3">
+                <img class="slide" src="img-slide/0 (3).png" alt="Brincando no Parque">
+                <img class="slide-reflection" src="img-slide/0 (3).png" alt="" aria-hidden="true">
+            </a>
+            <a class="slide-wrap" href="#historia-4">
+                <img class="slide" src="img-slide/0 (4).png" alt="Aniversário Surpresa">
+                <img class="slide-reflection" src="img-slide/0 (4).png" alt="" aria-hidden="true">
+            </a>
+            <a class="slide-wrap" href="#historia-5">
+                <img class="slide" src="img-slide/0 (5).png" alt="Dia de Chuva">
+                <img class="slide-reflection" src="img-slide/0 (5).png" alt="" aria-hidden="true">
+            </a>
+            <a class="slide-wrap" href="#historia-6">
+                <img class="slide" src="img-slide/0 (6).png" alt="A Lua Cheia">
+                <img class="slide-reflection" src="img-slide/0 (6).png" alt="" aria-hidden="true">
+            </a>
+        </div>
+      </div>
+
+      <button class="carousel-arrow left"  id="carouselLeft"  type="button" aria-label="Mover para a esquerda">‹</button>
+      <button class="carousel-arrow right" id="carouselRight" type="button" aria-label="Mover para a direita">›</button>
+    </section>
+
+    <!-- Onda branca opaca (atrás do macaco) -->
+    <div class="wave-wrap back" aria-hidden="true">
+        <svg class="wave" viewBox="0 24 150 28" preserveAspectRatio="none">
+            <defs>
+                <path id="wave-path-back" d="M-160 44c30 0 58-18 88-18s58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+            </defs>
+            <g class="wave-parallax">
+                <use href="#wave-path-back" x="48" y="-3" fill="#ffffff" />
+            </g>
+        </svg>
+    </div>
+
+    <!-- Seta de scroll pra próxima sessão -->
+    <a class="scroll-down" href="#sobre" aria-label="Rolar para próxima seção">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </a>
+
+    <!-- 3 ondas translúcidas (na frente do macaco) -->
+    <div class="wave-wrap front" aria-hidden="true">
+        <svg class="wave" viewBox="0 24 150 28" preserveAspectRatio="none">
+            <defs>
+                <path id="wave-path-front" d="M-160 44c30 0 58-18 88-18s58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+            </defs>
+            <g class="wave-parallax">
+                <use href="#wave-path-front" x="48" y="0" fill="rgba(255,255,255,0.4)" />
+                <use href="#wave-path-front" x="48" y="3" fill="rgba(255,255,255,0.6)" />
+                <use href="#wave-path-front" x="48" y="5" fill="rgba(255,255,255,0.8)" />
+            </g>
+        </svg>
+    </div>
+</header>
+
+<!-- (resto da página vem depois) -->
+<main class="content">
+
+    <section id="sobre" class="section section-light">
+        <div class="section-inner">
+            <h2 class="section-title">Sobre o Projeto</h2>
+            <p class="section-text">
+                O Kaco nasceu pequeno e cheio de afeto. No começo era só um experimento de um pai pro próprio
+                filho autista. Histórias curtas, ilustradas, no ritmo dele, com personagens que ele aprendeu
+                a reconhecer e amar.
+            </p>
+            <p class="section-text">
+                No meio do caminho a gente percebeu que o que funcionava pro nosso filho funcionava também
+                pra muitas outras crianças. Então o projeto abriu a porta: hoje o Kaco é pra qualquer criança
+                com alguma necessidade especial. TEA, TDAH, atraso de fala, ansiedade, deficiência visual,
+                deficiência auditiva. E pras famílias e terapeutas que caminham junto.
+            </p>
+            <p class="section-text">
+                A gente continua fazendo no ritmo da vida real: devagar, com carinho, escutando quem usa.
+                Cada história, cada personagem, cada ferramenta nasce de uma conversa.
+            </p>
+        </div>
+    </section>
+
+    <section id="personagens" class="section section-tint">
+        <div class="section-inner">
+            <h2 class="section-title">Personagens</h2>
+            <p class="section-text section-intro">
+                Conhece a turma do Kaco. Cada um com seu jeito de ser.
+            </p>
+        </div>
+        <div class="char-grid">
+            <a class="char-card" href="#personagem-kaco">
+                <div class="char-avatar">
+                    <img src="img/personagens/KACO.jpeg" alt="Kaco">
+                </div>
+                <div class="char-info">
+                    <h3 class="char-name">Kaco</h3>
+                    <p class="char-desc">O macaquinho curioso, protagonista das histórias.</p>
+                </div>
+            </a>
+
+            <a class="char-card" href="#personagem-mae">
+                <div class="char-avatar">
+                    <img src="img/personagens/MAE.jpeg" alt="Mamãe">
+                </div>
+                <div class="char-info">
+                    <h3 class="char-name">Mamãe</h3>
+                    <p class="char-desc">Cuidadosa e paciente, sempre por perto pra acolher.</p>
+                </div>
+            </a>
+
+            <a class="char-card" href="#personagem-pato">
+                <div class="char-avatar">
+                    <img src="img/personagens/PATO.jpeg" alt="Pato">
+                </div>
+                <div class="char-info">
+                    <h3 class="char-name">Pato</h3>
+                    <p class="char-desc">Brincalhão e cheio de ideias pra inventar aventura.</p>
+                </div>
+            </a>
+
+            <a class="char-card" href="#personagem-rato">
+                <div class="char-avatar">
+                    <img src="img/personagens/RATO.jpeg" alt="Rato">
+                </div>
+                <div class="char-info">
+                    <h3 class="char-name">Rato</h3>
+                    <p class="char-desc">O curioso da turma. Gosta de investigar tudo.</p>
+                </div>
+            </a>
+
+            <a class="char-card" href="#personagem-gato">
+                <div class="char-avatar">
+                    <img src="img/personagens/GATO.jpeg" alt="Gato">
+                </div>
+                <div class="char-info">
+                    <h3 class="char-name">Gato</h3>
+                    <p class="char-desc">Tranquilo e observador, fala pouco mas vê muito.</p>
+                </div>
+            </a>
+
+            <a class="char-card" href="#personagem-sapo">
+                <div class="char-avatar">
+                    <img src="img/personagens/SAPO.jpeg" alt="Sapo">
+                </div>
+                <div class="char-info">
+                    <h3 class="char-name">Sapo</h3>
+                    <p class="char-desc">Animado, adora pular e contar piadas.</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <section id="emocoes" class="section section-light">
+        <div class="section-inner">
+            <h2 class="section-title">Emoções</h2>
+            <p class="section-text section-intro">
+                Reconhecer o que a gente sente é o primeiro passo. O Kaco ajuda a dar nome.
+            </p>
+        </div>
+        <div class="emocao-grid">
+            <article class="emocao-card">
+                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Alegria"></div>
+                <h3 class="emocao-nome">Alegria</h3>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">EMOÇÃO</span>
+                    <p>Aparece quando algo bom acontece. O corpo fica leve, dá vontade de pular e contar pra todo mundo.</p>
+                </div>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">COMO LIDAR?</span>
+                    <p>Aproveitar o momento. Dividir com alguém querido. Guardar essa sensação pra lembrar nos dias difíceis.</p>
+                </div>
+                <a class="btn-saiba-mais" href="#emocao-alegria">Saiba mais</a>
+            </article>
+
+            <article class="emocao-card">
+                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Tristeza"></div>
+                <h3 class="emocao-nome">Tristeza</h3>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">EMOÇÃO</span>
+                    <p>Vem quando perdemos algo importante, quando sentimos falta de alguém, ou quando o dia não foi como esperávamos.</p>
+                </div>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">COMO LIDAR?</span>
+                    <p>Falar com quem confia. Pedir um abraço. Desenhar ou ouvir música. Tudo bem ficar triste, isso vai passar.</p>
+                </div>
+                <a class="btn-saiba-mais" href="#emocao-tristeza">Saiba mais</a>
+            </article>
+
+            <article class="emocao-card">
+                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Raiva"></div>
+                <h3 class="emocao-nome">Raiva</h3>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">EMOÇÃO</span>
+                    <p>É aquela energia quente no peito quando alguma coisa nos parece injusta ou quando não conseguimos fazer o que queríamos.</p>
+                </div>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">COMO LIDAR?</span>
+                    <p>Respirar fundo. Contar até dez. Sair do lugar e voltar quando o corpo esfriar. Conversar depois, com calma.</p>
+                </div>
+                <a class="btn-saiba-mais" href="#emocao-raiva">Saiba mais</a>
+            </article>
+
+            <article class="emocao-card">
+                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Medo"></div>
+                <h3 class="emocao-nome">Medo</h3>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">EMOÇÃO</span>
+                    <p>Aparece diante do que é novo, do escuro, do barulho alto, ou de alguma situação que parece grande demais.</p>
+                </div>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">COMO LIDAR?</span>
+                    <p>Lembrar que não está sozinho. Segurar a mão de quem cuida. Falar o que está sentindo. Ir devagar, no seu ritmo.</p>
+                </div>
+                <a class="btn-saiba-mais" href="#emocao-medo">Saiba mais</a>
+            </article>
+
+            <article class="emocao-card">
+                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Surpresa"></div>
+                <h3 class="emocao-nome">Surpresa</h3>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">EMOÇÃO</span>
+                    <p>É o susto de algo inesperado. Pode ser bom (presente, visita) ou difícil (mudança de plano).</p>
+                </div>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">COMO LIDAR?</span>
+                    <p>Parar um instante e respirar. Perguntar o que está acontecendo. Pedir tempo se precisar entender melhor.</p>
+                </div>
+                <a class="btn-saiba-mais" href="#emocao-surpresa">Saiba mais</a>
+            </article>
+
+            <article class="emocao-card">
+                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Calma"></div>
+                <h3 class="emocao-nome">Calma</h3>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">EMOÇÃO</span>
+                    <p>O corpo solto, a respiração tranquila. É quando nada está apertando por dentro e dá pra escutar tudo com mais clareza.</p>
+                </div>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">COMO LIDAR?</span>
+                    <p>Aproveitar. Olhar com atenção pra um lugar, um som, um objeto. Lembrar como se chega aqui pra voltar quando precisar.</p>
+                </div>
+                <a class="btn-saiba-mais" href="#emocao-calma">Saiba mais</a>
+            </article>
+        </div>
+    </section>
+
+    <section id="rotina" class="section section-tint">
+        <div class="section-inner">
+            <h2 class="section-title">Criança tem que ser Criança</h2>
+            <p class="section-text">
+                Sequência de cards (acordar → escovar dente → café → escola...) que pais e terapeutas podem
+                adaptar. Previsibilidade reduz ansiedade.
+            </p>
+        </div>
+    </section>
+
+    <section id="audios" class="section section-light">
+        <div class="section-inner">
+            <h2 class="section-title">Áudio-histórias</h2>
+            <p class="section-text">
+                Modo de escutar pra quem cansa visualmente, está aprendendo a ler, ou prefere ouvir.
+                Transcrição sempre visível pra acompanhar.
+            </p>
+        </div>
+    </section>
+
+    <section id="cantinho" class="section section-tint">
+        <div class="section-inner">
+            <h2 class="section-title">Cantinho Calmo</h2>
+            <p class="section-text">
+                Tela única com som suave, animação lenta (chuva, ondas, respiração guiada) pra quando o
+                mundo fica intenso demais.
+            </p>
+        </div>
+    </section>
+
+    <section id="familia" class="section section-light">
+        <div class="section-inner">
+            <h2 class="section-title">Pra Família</h2>
+            <p class="section-text">
+                Texto pros adultos: como usar cada parte do site, por que cada coisa foi pensada assim,
+                links pros podcasts do projeto e pras referências.
+            </p>
+        </div>
+    </section>
+
+</main>
+
+
+<script src="script.js"></script>
+</body>
+</html>
