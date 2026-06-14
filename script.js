@@ -8,8 +8,7 @@
  * Diferente do original: sem dots, sem labels, sem click pra centralizar.
  */
 (function () {
-    let sliderContainer, viewport, track, leftButton, rightButton, titleEl;
-    let lastTitle = '';
+    let sliderContainer, viewport, track, leftButton, rightButton;
     let sequenceWidth = 0;
     let originalSlideCount = 0;
     let currentOffset = 0;
@@ -181,31 +180,8 @@
         }
 
         track.style.transform = `translateX(${normalizeOffset(currentOffset)}px)`;
-        updateActiveTitle();
         lastFrameTime = time;
         requestAnimationFrame(animateSlider);
-    }
-
-    function updateActiveTitle() {
-        if (!titleEl) return;
-        const viewportRect = viewport.getBoundingClientRect();
-        const viewportCenter = viewportRect.left + viewportRect.width / 2;
-        let closestTitle = null;
-        let closestDist = Infinity;
-        track.querySelectorAll('.slide-wrap').forEach(wrap => {
-            const rect = wrap.getBoundingClientRect();
-            const center = rect.left + rect.width / 2;
-            const dist = Math.abs(viewportCenter - center);
-            if (dist < closestDist) {
-                closestDist = dist;
-                const img = wrap.querySelector('.slide');
-                closestTitle = (img && img.alt) ? img.alt : '';
-            }
-        });
-        if (closestTitle !== null && closestTitle !== lastTitle) {
-            titleEl.textContent = closestTitle;
-            lastTitle = closestTitle;
-        }
     }
 
     function init() {
@@ -214,7 +190,6 @@
         track = document.getElementById('carouselTrack');
         leftButton = document.getElementById('carouselLeft');
         rightButton = document.getElementById('carouselRight');
-        titleEl = document.getElementById('carouselTitle');
         if (!sliderContainer || !track || !leftButton || !rightButton) return;
 
         tripleSequence();
@@ -284,35 +259,101 @@
     }
 })();
 
-/* ===== Menu hamburger ===== */
+/* ===== Parallax suave da faixa do Kaco ===== */
 (function () {
     function init() {
-        const menu = document.getElementById('menu');
-        const burger = document.getElementById('menuBurger');
-        const list = document.getElementById('menuList');
-        if (!menu || !burger || !list) return;
+        const strip = document.getElementById('parallaxStrip');
+        const bg = strip && strip.querySelector('.parallax-bg');
+        if (!strip || !bg) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-        function setOpen(open) {
-            menu.classList.toggle('open', open);
-            burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-            burger.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+        const maxShift = 200;   // dentro da sangria de 220px do .parallax-bg
+        let ticking = false;
+
+        function update() {
+            ticking = false;
+            const rect = strip.getBoundingClientRect();
+            if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+            // -1 (faixa saindo por cima) .. +1 (faixa entrando por baixo)
+            const progress = (rect.top + rect.height / 2 - window.innerHeight / 2)
+                           / (window.innerHeight / 2 + rect.height / 2);
+            const clamped = Math.max(-1, Math.min(1, progress));
+            bg.style.transform = `translateY(${(-clamped * maxShift).toFixed(1)}px)`;
         }
 
-        burger.addEventListener('click', () => {
-            setOpen(!menu.classList.contains('open'));
-        });
+        function onScroll() {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(update);
+        }
 
-        list.addEventListener('click', (e) => {
-            if (e.target.closest('.menu-link')) setOpen(false);
-        });
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll);
+        update();
+    }
 
-        document.addEventListener('click', (e) => {
-            if (!menu.classList.contains('open')) return;
-            if (!menu.contains(e.target)) setOpen(false);
-        });
+    if (document.readyState === 'loading') {
+        window.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
 
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 700) setOpen(false);
+/* Menu hamburger virou componente reutilizável em components/kids-menu.js
+   (injeta o <nav>, marca o link ativo e cuida do toggle). */
+
+/* Showcase de personagens: miniatura no hover/clique -> painel desliza embaixo */
+(function () {
+    function init() {
+        document.querySelectorAll('[data-char-showcase]').forEach((showcase) => {
+            const track = showcase.querySelector('[data-char-track]');
+            const thumbs = showcase.querySelectorAll('.char-thumb');
+            const float = showcase.querySelector('[data-char-float]');
+            const frame = showcase.querySelector('[data-char-float-frame]');
+            const videos = showcase.querySelectorAll('[data-char-videos] .char-stage-video');
+            if (!track || !thumbs.length) return;
+
+            function select(index) {
+                track.style.marginLeft = '-' + (index * 100) + '%';
+                thumbs.forEach((t, i) => {
+                    const active = i === index;
+                    t.classList.toggle('is-active', active);
+                    t.setAttribute('aria-selected', active ? 'true' : 'false');
+                });
+                if (frame) frame.classList.toggle('is-sticker', thumbs[index].dataset.sticker === '1');
+                videos.forEach((v, i) => v.classList.toggle('is-active', i === index));
+                const thumbImg = thumbs[index].querySelector('img');
+                // imagem grande do flutuante: data-full do botão, ou o src da miniatura
+                const fullSrc = thumbs[index].dataset.full || (thumbImg && thumbImg.src);
+                if (float && fullSrc && !float.src.endsWith(fullSrc)) {
+                    float.src = fullSrc;
+                    float.alt = thumbImg ? thumbImg.alt : '';
+                    // reinicia o fade mesmo em hovers rápidos
+                    float.classList.remove('is-swapping');
+                    void float.offsetWidth;
+                    float.classList.add('is-swapping');
+                }
+            }
+
+            // delay no hover: só troca se o mouse parar ~300ms na miniatura,
+            // pra não mudar quando você só passa de raspão indo pra baixo
+            let hoverTimer = null;
+            const HOVER_DELAY = 300;
+            thumbs.forEach((thumb, i) => {
+                thumb.setAttribute('role', 'tab');
+                thumb.addEventListener('mouseenter', () => {
+                    clearTimeout(hoverTimer);
+                    hoverTimer = setTimeout(() => select(i), HOVER_DELAY);
+                });
+                thumb.addEventListener('mouseleave', () => clearTimeout(hoverTimer));
+                thumb.addEventListener('focus', () => select(i));
+                thumb.addEventListener('click', () => {
+                    clearTimeout(hoverTimer);
+                    select(i);
+                });
+            });
+
+            select(0);
         });
     }
 
@@ -322,3 +363,5 @@
         init();
     }
 })();
+
+/* Page TOC virou componente reutilizável em components/kids-toc.js */

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Pra Família — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Hero (componente kids-hero) renderiza aqui -->
+<div id="kidsHero"></div>
+
+<main class="content">
+    <section class="section section-light">
+        <div class="carta">
+            <span class="carta-kicker">De pai pra família</span>
+            <p>O Kaco nasceu pequeno e cheio de afeto. No começo era só um experimento de um pai pro próprio filho autista: histórias curtas, no ritmo dele, com personagens que ele aprendeu a reconhecer e amar.</p>
+            <p>No meio do caminho a gente percebeu que o que funcionava pro nosso filho funcionava também pra muitas outras crianças. Então o projeto abriu a porta: hoje o Kaco é pra qualquer criança com alguma necessidade especial, e pras famílias e terapeutas que caminham junto.</p>
+            <p>A gente continua fazendo no ritmo da vida real: devagar, com carinho, escutando quem usa. Se algo aqui ajudar a sua criança a entender o mundo um pouquinho melhor, já valeu a pena.</p>
+            <p class="assinatura">— A família do Kaco 💛</p>
+        </div>
+
+        <div class="fam-grid">
+            <a class="fam-card" href="#" style="--c:var(--c-blue)">
+                <span class="fam-emoji">🧭</span>
+                <h3>Como usar o site</h3>
+                <p>Histórias curtas, áudio com transcrição e desenhos pra colorir. Use no ritmo da criança, sem pressa.</p>
+            </a>
+            <a class="fam-card" href="#" style="--c:var(--c-amber)">
+                <span class="fam-emoji">💡</span>
+                <h3>Por que foi pensado assim</h3>
+                <p>Cada parte nasceu de uma necessidade real: previsibilidade, baixo estímulo e repetição que acolhe.</p>
+            </a>
+            <a class="fam-card" href="#" style="--c:var(--c-pink)">
+                <span class="fam-emoji">🖨️</span>
+                <h3>Rotina pra imprimir</h3>
+                <p>Baixe a sequência do dia em cartões pra montar e adaptar junto com a criança.</p>
+            </a>
+            <a class="fam-card" href="#" style="--c:var(--c-purple)">
+                <span class="fam-emoji">🎙️</span>
+                <h3>Podcasts do projeto</h3>
+                <p>Conversas sobre como o Kaco é feito e as decisões por trás de cada ferramenta.</p>
+            </a>
+            <a class="fam-card" href="#" style="--c:var(--c-green)">
+                <span class="fam-emoji">📚</span>
+                <h3>Referências</h3>
+                <p>Materiais e leituras que embasam o projeto: TEA, TDAH, comunicação e afeto.</p>
+            </a>
+            <a class="fam-card" href="#" style="--c:var(--c-indigo)">
+                <span class="fam-emoji">✉️</span>
+                <h3>Fale com a gente</h3>
+                <p>Sugestões, dúvidas ou parcerias de terapeutas e famílias são muito bem-vindas.</p>
+            </a>
+            <a class="fam-card" href="#" style="--c:var(--c-green)">
+                <span class="fam-emoji">🥗</span>
+                <h3>Alimentação e obesidade</h3>
+                <p>Histórias e ideias pra apoiar hábitos alimentares e uma relação tranquila com a comida.</p>
+            </a>
+            <a class="fam-card" href="#" style="--c:var(--c-blue)">
+                <span class="fam-emoji">🗣️</span>
+                <h3>Atraso na fala</h3>
+                <p>Recursos que estimulam a comunicação no ritmo da criança, sem cobrança.</p>
+            </a>
+            <a class="fam-card" href="#" style="--c:var(--c-red)">
+                <span class="fam-emoji">🌋</span>
+                <h3>Agressividade</h3>
+                <p>Como acolher a raiva e os momentos difíceis com calma, limites e previsibilidade.</p>
+            </a>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script>
+    window.kidsHeroConfig = {
+        kicker: 'PARA PAIS E TERAPEUTAS',
+        titulo: 'Pra Família',
+        sub: 'De onde o Kaco veio, pra onde ele vai e como caminhar junto.',
+        emojis: ['💛', '🤝'],
+    };
+</script>
+<script src="components/kids-hero.js"></script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>

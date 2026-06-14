@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Histórias — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Componente kids-historias (hero + filtros + grid) renderiza aqui -->
+<div id="kidsHistorias"></div>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script src="components/kids-stories.js"></script>
+<script>
+    // Só os textos dos cards desta página; título/categoria/capa vêm de
+    // kids-stories.js (fonte única).
+    const DESCS = {
+        'passeio-feliz':        'Kaco sai pra passear com a mamãe e descobre que o caminho também é brincadeira.',
+        'mochila-esquecida':    'A mochila ficou em casa! Kaco aprende que esquecer faz parte e tem solução.',
+        'brincando-no-parque':  'Um dia de parque com a turma: esperar a vez, dividir o balanço, brincar junto.',
+        'aniversario-surpresa': 'Uma festa inesperada! Kaco sente a surpresa e aprende a respirar e aproveitar.',
+        'dia-de-chuva':         'O passeio foi cancelado pela chuva. E agora? Kaco lida com a mudança de plano.',
+        'a-lua-cheia':          'Uma noite tranquila olhando a lua, do jeitinho calmo que o Kaco gosta.',
+    };
+    window.kidsHistoriasConfig = {
+        kicker: 'AS AVENTURAS DO KACO',
+        titulo: 'Histórias',
+        sub: 'Cada história é curtinha, ilustrada e no ritmo de quem lê.',
+        hint: 'Clique numa história pra ler ↗',
+        acaoLabel: 'Ler →',
+        categorias: window.KIDS_CATEGORIAS,
+        itens: window.KIDS_STORIES.map(function (s) {
+            return { t: s.t, cat: s.cat, img: s.img, link: 'historia.html?id=' + s.id, status: 'no ar', desc: DESCS[s.id] };
+        }),
+    };
+</script>
+<script src="components/kids-hero.js"></script>
+<script src="components/kids-historias.js"></script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>
