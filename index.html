@@ -6,28 +6,12 @@
     <title>Kaco — Histórias do Macaquinho</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<nav class="menu" id="menu">
-    <a href="#" class="menu-logo">KACO</a>
-    <button class="menu-burger" id="menuBurger" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menuList">
-        <span></span><span></span><span></span>
-    </button>
-    <ul class="menu-list" id="menuList">
-        <li><a href="#inicio" class="menu-link active">Início</a></li>
-        <li><a href="#sobre" class="menu-link">Sobre o Projeto</a></li>
-        <li><a href="#personagens" class="menu-link">Personagens</a></li>
-        <li><a href="#emocoes" class="menu-link">Emoções</a></li>
-        <li><a href="#rotina" class="menu-link">Ser Criança</a></li>
-        <li><a href="#cantinho" class="menu-link">Cantinho</a></li>
-        <li><a href="#familia" class="menu-link">Família</a></li>
-    </ul>
-</nav>
-
-<header class="hero">
+<header class="hero" id="inicio">
     <!-- Bolhinhas/elementos flutuando no fundo -->
     <div class="floaters">
         <span class="floater f1">★</span>
@@ -69,7 +53,6 @@
 
     <!-- Carrossel no lado direito do hero -->
     <section class="hero-carousel" id="heroCarousel" aria-label="Galeria de cenas">
-      <h3 class="carousel-title" id="carouselTitle" aria-live="polite"></h3>
       <div class="carousel-viewport">
         <div class="carousel-track" id="carouselTrack">
             <a class="slide-wrap" href="#historia-1">
@@ -141,23 +124,35 @@
 <main class="content">
 
     <section id="sobre" class="section section-light">
-        <div class="section-inner">
-            <h2 class="section-title">Sobre o Projeto</h2>
-            <p class="section-text">
-                O Kaco nasceu pequeno e cheio de afeto. No começo era só um experimento de um pai pro próprio
-                filho autista. Histórias curtas, ilustradas, no ritmo dele, com personagens que ele aprendeu
-                a reconhecer e amar.
-            </p>
-            <p class="section-text">
-                No meio do caminho a gente percebeu que o que funcionava pro nosso filho funcionava também
-                pra muitas outras crianças. Então o projeto abriu a porta: hoje o Kaco é pra qualquer criança
-                com alguma necessidade especial. TEA, TDAH, atraso de fala, ansiedade, deficiência visual,
-                deficiência auditiva. E pras famílias e terapeutas que caminham junto.
-            </p>
-            <p class="section-text">
-                A gente continua fazendo no ritmo da vida real: devagar, com carinho, escutando quem usa.
-                Cada história, cada personagem, cada ferramenta nasce de uma conversa.
-            </p>
+        <div class="sobre-layout">
+            <!-- Trocar img/sobre.png depois (cópia de img-cabecalho.png) -->
+            <div class="sobre-img">
+                <img src="img/sobre.png" alt="Kaco, o macaquinho do projeto">
+            </div>
+            <div class="sobre-text">
+                <h2 class="section-title">Sobre o Projeto</h2>
+                <p class="section-text">
+                    O <strong>Kaco</strong> nasceu pequeno e cheio de afeto. No começo era só um experimento de um pai pro próprio
+                    filho autista. <strong>Histórias</strong> curtas, ilustradas, no ritmo dele, com personagens que ele aprendeu
+                    a reconhecer e amar.
+                </p>
+                <p class="section-text">
+                    No meio do caminho a gente percebeu que o que funcionava pro nosso filho funcionava também
+                    pra muitas outras crianças. Então o projeto abriu a porta: hoje o Kaco é pra qualquer criança
+                    com alguma necessidade especial. <strong>TEA</strong>, <strong>TDAH</strong>, atraso de fala, ansiedade, deficiência visual,
+                    deficiência auditiva. E pras <strong>famílias</strong> e <strong>terapeutas</strong> que caminham junto.
+                </p>
+                <p class="section-text">
+                    A gente continua fazendo no ritmo da vida real: devagar, com carinho, escutando quem usa.
+                    Cada história, cada personagem, cada ferramenta nasce de uma conversa.
+                </p>
+                <p class="section-text">
+                    Aqui nada é apressado. Se uma criança se sentir mais segura, mais entendida ou só um
+                    pouquinho mais feliz por causa do Kaco, então já <strong>valeu a pena</strong>. E é por elas que a gente
+                    segue, um passinho de cada vez.
+                </p>
+                <p class="section-text sobre-assinatura"><strong>Flávio Passos</strong></p>
+            </div>
         </div>
     </section>
 
@@ -168,72 +163,100 @@
                 Conhece a turma do Kaco. Cada um com seu jeito de ser.
             </p>
         </div>
-        <div class="char-grid">
-            <a class="char-card" href="#personagem-kaco">
-                <div class="char-avatar">
-                    <img src="img/personagens/KACO.jpeg" alt="Kaco">
-                </div>
-                <div class="char-info">
-                    <h3 class="char-name">Kaco</h3>
-                    <p class="char-desc">O macaquinho curioso, protagonista das histórias.</p>
-                </div>
-            </a>
+        <div class="char-showcase" data-char-showcase>
+            <!-- fileira de miniaturas (passe o mouse / toque) -->
+            <div class="char-thumbs" role="tablist" aria-label="Escolha um personagem">
+                <button class="char-thumb is-active" type="button" data-index="0" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/mae.png" style="--accent:#e0729e;--accent2:#f7d9e8;">
+                    <span class="char-thumb-pic"><img src="img/icone-mae.png" alt="Mãe"></span>
+                    <span class="char-thumb-name">Mãe</span>
+                </button>
+                <button class="char-thumb" type="button" data-index="1" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/gato.png" style="--accent:#2aa9e0;--accent2:#c7e9f7;">
+                    <span class="char-thumb-pic"><img src="img/icone-gato.png" alt="Gato"></span>
+                    <span class="char-thumb-name">Gato</span>
+                </button>
+                <button class="char-thumb" type="button" data-index="2" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/cao.png" style="--accent:#f0922b;--accent2:#fbe3c4;">
+                    <span class="char-thumb-pic"><img src="img/icone-cao.png" alt="Cão"></span>
+                    <span class="char-thumb-name">Cão</span>
+                </button>
+                <button class="char-thumb" type="button" data-index="3" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/sapo.png" style="--accent:#ec5a5a;--accent2:#fad1d1;">
+                    <span class="char-thumb-pic"><img src="img/icone-sapo.png" alt="Sapo"></span>
+                    <span class="char-thumb-name">Sapo</span>
+                </button>
+                <button class="char-thumb" type="button" data-index="4" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/dino.png" style="--accent:#6f7bd1;--accent2:#d3d8f5;">
+                    <span class="char-thumb-pic"><img src="img/icone-dino.png" alt="Dino"></span>
+                    <span class="char-thumb-name">Dino</span>
+                </button>
+            </div>
 
-            <a class="char-card" href="#personagem-mae">
-                <div class="char-avatar">
-                    <img src="img/personagens/MAE.jpeg" alt="Mamãe">
+            <!-- palco do detalhe (desliza conforme a miniatura ativa) -->
+            <div class="char-stage">
+                <!-- imagem solta do carrossel, posicionada fora do card -->
+                <div class="char-float-frame" data-char-float-frame>
+                    <img class="char-float" data-char-float src="img/mae.png" alt="Mãe">
                 </div>
-                <div class="char-info">
-                    <h3 class="char-name">Mamãe</h3>
-                    <p class="char-desc">Cuidadosa e paciente, sempre por perto pra acolher.</p>
+                <div class="char-viewport">
+                    <div class="char-track" data-char-track>
+                        <article class="char-panel" style="--accent:#e0729e;--accent2:#f7d9e8;">
+                            <div class="char-panel-text">
+                                <h3 class="char-panel-name">Mãe</h3>
+                                <p class="char-panel-desc">Carinhosa e atenta, a Mãe acolhe, dá colo e ajuda o Kaco a entender o mundo no tempo dele. Um abraço seguro pra qualquer hora.</p>
+                                <a class="btn-saiba-mais" href="historias.html">Ver histórias</a>
+                            </div>                        </article>
+                        <article class="char-panel" style="--accent:#2aa9e0;--accent2:#c7e9f7;">
+                            <div class="char-panel-text">
+                                <h3 class="char-panel-name">Gato</h3>
+                                <p class="char-panel-desc">Tranquilo e observador, o Gato fala pouco mas percebe tudo o que acontece à sua volta. Gosta de um cantinho quentinho pra descansar.</p>
+                                <a class="btn-saiba-mais" href="historias.html">Ver histórias</a>
+                            </div>                        </article>
+                        <article class="char-panel" style="--accent:#f0922b;--accent2:#fbe3c4;">
+                            <div class="char-panel-text">
+                                <h3 class="char-panel-name">Cão</h3>
+                                <p class="char-panel-desc">Animado e leal, o Cão está sempre pronto pra brincar e fazer companhia. Quando alguém precisa, ele chega abanando o rabo.</p>
+                                <a class="btn-saiba-mais" href="historias.html">Ver histórias</a>
+                            </div>                        </article>
+                        <article class="char-panel" style="--accent:#ec5a5a;--accent2:#fad1d1;">
+                            <div class="char-panel-text">
+                                <h3 class="char-panel-name">Sapo</h3>
+                                <p class="char-panel-desc">Curioso e brincalhão, o Sapo adora dar pulos e descobrir cada cantinho do lago. Topa qualquer aventura perto da água.</p>
+                                <a class="btn-saiba-mais" href="historias.html">Ver histórias</a>
+                            </div>                        </article>
+                        <article class="char-panel" style="--accent:#6f7bd1;--accent2:#d3d8f5;">
+                            <div class="char-panel-text">
+                                <h3 class="char-panel-name">Dino</h3>
+                                <p class="char-panel-desc">Grandão de coração gigante, o Dino parece bravo mas é o maior amigo da turma. Adora histórias e protege todo mundo.</p>
+                                <a class="btn-saiba-mais" href="historias.html">Ver histórias</a>
+                            </div>                        </article>
+                    </div>
                 </div>
-            </a>
+                <!-- vídeo solto do carrossel: vaza pra cima e pra direita; troca por crossfade -->
+                <div class="char-stage-videos" data-char-videos>
+                    <div class="char-stage-video is-active"><iframe src="https://www.youtube.com/embed/zmoG7P3nanM" title="Vídeo do personagem" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+                    <div class="char-stage-video"><iframe src="https://www.youtube.com/embed/zmoG7P3nanM" title="Vídeo do personagem" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+                    <div class="char-stage-video"><iframe src="https://www.youtube.com/embed/zmoG7P3nanM" title="Vídeo do personagem" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+                    <div class="char-stage-video"><iframe src="https://www.youtube.com/embed/zmoG7P3nanM" title="Vídeo do personagem" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+                    <div class="char-stage-video"><iframe src="https://www.youtube.com/embed/zmoG7P3nanM" title="Vídeo do personagem" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            <a class="char-card" href="#personagem-pato">
-                <div class="char-avatar">
-                    <img src="img/personagens/PATO.jpeg" alt="Pato">
-                </div>
-                <div class="char-info">
-                    <h3 class="char-name">Pato</h3>
-                    <p class="char-desc">Brincalhão e cheio de ideias pra inventar aventura.</p>
-                </div>
-            </a>
-
-            <a class="char-card" href="#personagem-rato">
-                <div class="char-avatar">
-                    <img src="img/personagens/RATO.jpeg" alt="Rato">
-                </div>
-                <div class="char-info">
-                    <h3 class="char-name">Rato</h3>
-                    <p class="char-desc">O curioso da turma. Gosta de investigar tudo.</p>
-                </div>
-            </a>
-
-            <a class="char-card" href="#personagem-gato">
-                <div class="char-avatar">
-                    <img src="img/personagens/GATO.jpeg" alt="Gato">
-                </div>
-                <div class="char-info">
-                    <h3 class="char-name">Gato</h3>
-                    <p class="char-desc">Tranquilo e observador, fala pouco mas vê muito.</p>
-                </div>
-            </a>
-
-            <a class="char-card" href="#personagem-sapo">
-                <div class="char-avatar">
-                    <img src="img/personagens/SAPO.jpeg" alt="Sapo">
-                </div>
-                <div class="char-info">
-                    <h3 class="char-name">Sapo</h3>
-                    <p class="char-desc">Animado, adora pular e contar piadas.</p>
-                </div>
-            </a>
+    <!-- Faixa parallax entre Personagens e Emoções -->
+    <section class="parallax-strip" id="parallaxStrip" aria-label="Sobre o Kaco">
+        <div class="parallax-bg" aria-hidden="true"></div>
+        <div class="parallax-content">
+            <span class="parallax-kicker">O PROTAGONISTA</span>
+            <h2 class="parallax-title">Kaco</h2>
+            <p class="parallax-text">
+                Um macaquinho curioso que sente tudo com intensidade. Como toda criança,
+                ele tem dias leves e dias difíceis. E é nas pequenas aventuras do dia a dia
+                que ele aprende, no seu ritmo, a entender o mundo e a si mesmo.
+            </p>
         </div>
     </section>
 
     <section id="emocoes" class="section section-light">
         <div class="section-inner">
-            <h2 class="section-title">Emoções</h2>
+            <h2 class="section-title">Lidando com Emoções</h2>
             <p class="section-text section-intro">
                 Reconhecer o que a gente sente é o primeiro passo. O Kaco ajuda a dar nome.
             </p>
@@ -328,40 +351,177 @@
     <section id="rotina" class="section section-tint">
         <div class="section-inner">
             <h2 class="section-title">Criança tem que ser Criança</h2>
-            <p class="section-text">
-                Sequência de cards (acordar → escovar dente → café → escola...) que pais e terapeutas podem
-                adaptar. Previsibilidade reduz ansiedade.
+            <p class="section-text section-intro">
+                A rotina do dia, passo a passo, do jeitinho do Kaco. Saber o que vem agora deixa
+                tudo mais tranquilo. Pais e terapeutas podem adaptar a sequência pra cada criança.
             </p>
+        </div>
+        <div class="rotina-layout">
+            <div class="rotina-destaques">
+                <div class="destaque-card" style="--rc:var(--c-amber)">
+                    <span class="destaque-emoji">🧸</span>
+                    <span class="destaque-label">Brincar</span>
+                </div>
+                <div class="destaque-card" style="--rc:var(--c-green)">
+                    <span class="destaque-emoji">🧩</span>
+                    <span class="destaque-label">Terapia</span>
+                </div>
+            </div>
+            <div class="rotina-steps">
+                <div class="rotina-card" style="--rc:var(--c-amber)">
+                    <span class="rotina-emoji">🌅</span>
+                    <span class="rotina-step">1</span>
+                    <span class="rotina-label">Acordar</span>
+                </div>
+                <div class="rotina-card" style="--rc:var(--c-blue)">
+                    <span class="rotina-emoji">🪥</span>
+                    <span class="rotina-step">2</span>
+                    <span class="rotina-label">Escovar os dentes</span>
+                </div>
+                <div class="rotina-card" style="--rc:var(--c-green)">
+                    <span class="rotina-emoji">🥣</span>
+                    <span class="rotina-step">3</span>
+                    <span class="rotina-label">Tomar café</span>
+                </div>
+                <div class="rotina-card" style="--rc:var(--c-purple)">
+                    <span class="rotina-emoji">👕</span>
+                    <span class="rotina-step">4</span>
+                    <span class="rotina-label">Se arrumar</span>
+                </div>
+                <div class="rotina-card" style="--rc:var(--c-pink)">
+                    <span class="rotina-emoji">🎒</span>
+                    <span class="rotina-step">5</span>
+                    <span class="rotina-label">Ir pra escola</span>
+                </div>
+                <div class="rotina-card" style="--rc:var(--c-blue)">
+                    <span class="rotina-emoji">🛁</span>
+                    <span class="rotina-step">6</span>
+                    <span class="rotina-label">Tomar banho</span>
+                </div>
+                <div class="rotina-card" style="--rc:#14b8a6">
+                    <span class="rotina-emoji">🧺</span>
+                    <span class="rotina-step">7</span>
+                    <span class="rotina-label">Arrumar os brinquedos</span>
+                </div>
+                <div class="rotina-card" style="--rc:var(--c-red)">
+                    <span class="rotina-emoji">🤝</span>
+                    <span class="rotina-step">8</span>
+                    <span class="rotina-label">Ajudar a mamãe e o papai</span>
+                </div>
+                <div class="rotina-card" style="--rc:var(--c-indigo)">
+                    <span class="rotina-emoji">🌙</span>
+                    <span class="rotina-step">9</span>
+                    <span class="rotina-label">Dormir</span>
+                </div>
+            </div>
         </div>
     </section>
 
     <section id="audios" class="section section-light">
         <div class="section-inner">
             <h2 class="section-title">Áudio-histórias</h2>
-            <p class="section-text">
+            <p class="section-text section-intro">
                 Modo de escutar pra quem cansa visualmente, está aprendendo a ler, ou prefere ouvir.
                 Transcrição sempre visível pra acompanhar.
             </p>
         </div>
-    </section>
-
-    <section id="cantinho" class="section section-tint">
-        <div class="section-inner">
-            <h2 class="section-title">Cantinho Calmo</h2>
-            <p class="section-text">
-                Tela única com som suave, animação lenta (chuva, ondas, respiração guiada) pra quando o
-                mundo fica intenso demais.
-            </p>
+        <div class="home-audio-list">
+            <div class="home-audio-item" style="--c:var(--c-blue)">
+                <img class="home-audio-thumb" src="img-slide/0 (1).png" alt="O Passeio Feliz">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">O Passeio Feliz</a>
+                    <span class="home-audio-desc">Um passeio com a mamãe que vira brincadeira no caminho.</span>
+                    <span class="home-audio-row">
+                        <small>Rotina · 3:12</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/o-passeio-feliz.m4a"></audio>
+            </div>
+            <div class="home-audio-item" style="--c:var(--c-blue)">
+                <img class="home-audio-thumb" src="img-slide/0 (2).png" alt="A Mochila Esquecida">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">A Mochila Esquecida</a>
+                    <span class="home-audio-desc">Esquecer faz parte, e quase tudo tem solução com calma.</span>
+                    <span class="home-audio-row">
+                        <small>Rotina · 2:48</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/a-mochila-esquecida.m4a"></audio>
+            </div>
+            <div class="home-audio-item" style="--c:var(--c-green)">
+                <img class="home-audio-thumb" src="img-slide/0 (3).png" alt="Brincando no Parque">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">Brincando no Parque</a>
+                    <span class="home-audio-desc">Esperar a vez e dividir o balanço com a turma toda.</span>
+                    <span class="home-audio-row">
+                        <small>Aventura · 4:05</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/brincando-no-parque.m4a"></audio>
+            </div>
+            <div class="home-audio-item" style="--c:var(--c-amber)">
+                <img class="home-audio-thumb" src="img-slide/0 (4).png" alt="Aniversário Surpresa">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">Aniversário Surpresa</a>
+                    <span class="home-audio-desc">Uma festa inesperada e o coração batendo forte de surpresa.</span>
+                    <span class="home-audio-row">
+                        <small>Emoções · 3:30</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/aniversario-surpresa.m4a"></audio>
+            </div>
+            <div class="home-audio-item" style="--c:var(--c-amber)">
+                <img class="home-audio-thumb" src="img-slide/0 (5).png" alt="Dia de Chuva">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">Dia de Chuva</a>
+                    <span class="home-audio-desc">O passeio foi cancelado, mas dá pra achar diversão dentro de casa.</span>
+                    <span class="home-audio-row">
+                        <small>Emoções · 2:55</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/dia-de-chuva.m4a"></audio>
+            </div>
+            <a class="home-audio-more" href="audio-historias.html">Ouvir todas →</a>
         </div>
     </section>
 
-    <section id="familia" class="section section-light">
+    <section id="familia" class="section section-tint">
         <div class="section-inner">
             <h2 class="section-title">Pra Família</h2>
-            <p class="section-text">
-                Texto pros adultos: como usar cada parte do site, por que cada coisa foi pensada assim,
-                links pros podcasts do projeto e pras referências.
+            <p class="section-text section-intro">
+                Uma área pros adultos: como usar o site, por que cada coisa foi pensada assim,
+                e onde encontrar os podcasts e referências do projeto.
             </p>
+        </div>
+        <div class="familia-cards">
+            <a class="familia-card" href="familia.html" style="--c:var(--c-blue)">
+                <span class="familia-emoji">🧭</span>
+                <h3>Como usar o site</h3>
+                <p>Histórias curtas, áudio com transcrição e desenhos pra colorir, no ritmo da criança.</p>
+            </a>
+            <a class="familia-card" href="familia.html" style="--c:var(--c-amber)">
+                <span class="familia-emoji">💡</span>
+                <h3>Por que foi pensado assim</h3>
+                <p>Cada parte nasceu de uma necessidade real: previsibilidade, baixo estímulo e afeto.</p>
+            </a>
+            <a class="familia-card" href="familia.html" style="--c:var(--c-purple)">
+                <span class="familia-emoji">🎙️</span>
+                <h3>Podcasts do projeto</h3>
+                <p>Conversas sobre como o Kaco é feito e as decisões por trás de cada ferramenta.</p>
+            </a>
+        </div>
+        <div class="familia-cta">
+            <a class="familia-btn" href="familia.html">Abrir a área da família →</a>
         </div>
     </section>
 
@@ -369,5 +529,32 @@
 
 
 <script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script src="components/kids-toc.js"></script>
+<script>
+    /* Player reduzido dos cards de áudio na home (play/pause + barrinha). */
+    document.querySelectorAll('.home-audio-item').forEach((item) => {
+        const audio = item.querySelector('audio');
+        const btn = item.querySelector('.home-audio-play');
+        const bar = item.querySelector('.home-audio-bar');
+        const fill = item.querySelector('.home-audio-fill');
+        if (!audio || !btn) return;
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.home-audio-item audio').forEach((a) => { if (a !== audio) a.pause(); });
+            audio.paused ? audio.play() : audio.pause();
+        });
+        audio.addEventListener('play', () => { btn.textContent = '⏸'; });
+        audio.addEventListener('pause', () => { btn.textContent = '▶'; });
+        audio.addEventListener('ended', () => { btn.textContent = '▶'; if (fill) fill.style.width = '0'; });
+        audio.addEventListener('timeupdate', () => {
+            if (fill && audio.duration) fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+        });
+        if (bar) bar.addEventListener('click', (e) => {
+            const r = bar.getBoundingClientRect();
+            if (audio.duration) audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+        });
+    });
+</script>
+<script src="components/kids-footer.js"></script>
 </body>
 </html>

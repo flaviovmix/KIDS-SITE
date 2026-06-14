@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Áudio-histórias — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Hero (componente kids-hero) renderiza aqui -->
+<div id="kidsHero"></div>
+
+<main class="content">
+    <section class="section section-light">
+        <!-- Player + playlist (componente kids-player) renderiza aqui -->
+        <div id="kidsPlayer"></div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script>
+    window.kidsHeroConfig = {
+        kicker: 'OUÇA AS AVENTURAS DO KACO',
+        titulo: 'Áudio-histórias',
+        sub: 'Aperte o play e escute. A transcrição fica sempre à vista pra acompanhar.',
+        emojis: ['🎧', '🎵'],
+    };
+</script>
+<script src="components/kids-hero.js"></script>
+<script src="components/kids-stories.js"></script>
+<script src="components/kids-player.js"></script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+# rascunhos, screenshots e arquivos de teste (prefixo _)
+_*
+
+# sistema
+.DS_Store
+Thumbs.db

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Colorir — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Componente kids-historias (hero + filtros + grid) renderiza aqui -->
+<div id="kidsHistorias"></div>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script src="components/kids-stories.js"></script>
+<script>
+    // Só os textos dos desenhos desta página; título/categoria/capa vêm de
+    // kids-stories.js (fonte única).
+    const DESCS = {
+        'passeio-feliz':        'Kaco e a mamãe no passeio: pinte o caminho com as suas cores favoritas.',
+        'mochila-esquecida':    'A mochila do Kaco esperando por cor: que tal um arco-íris nela?',
+        'brincando-no-parque':  'O parque inteiro pra pintar: balanço, escorregador e a turma toda.',
+        'aniversario-surpresa': 'Bolo, balões e surpresa! Capriche nas cores da festa do Kaco.',
+        'dia-de-chuva':         'Nuvens, gotas e botas de chuva esperando as suas cores.',
+        'a-lua-cheia':          'Uma noite estrelada pra pintar bem calminho, igual ao Kaco.',
+    };
+    window.kidsHistoriasConfig = {
+        kicker: 'AS AVENTURAS DO KACO',
+        titulo: 'Colorir',
+        sub: 'Desenhos do Kaco pra imprimir e pintar do seu jeito.',
+        hint: 'Clique num desenho pra colorir ↗',
+        acaoLabel: 'Colorir →',
+        categorias: window.KIDS_CATEGORIAS,
+        itens: window.KIDS_STORIES.map(function (s) {
+            return { t: s.t, cat: s.cat, img: s.img, link: '#', status: 'em breve', desc: DESCS[s.id] };
+        }),
+    };
+</script>
+<script src="components/kids-hero.js"></script>
+<script src="components/kids-historias.js"></script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>

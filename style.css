@@ -1,8 +1,43 @@
+/* ===== Design tokens — fonte única de cor/sombra =====
+   Mude um valor aqui e ele muda no site inteiro. As categorias apontam pros
+   acentos de marca; a sombra navy é um trio RGB pra usar com alpha variável:
+   box-shadow: 0 10px 26px rgba(var(--shadow-rgb), .07). */
+:root {
+    /* Acentos de marca */
+    --c-blue:   #2aa9e0;
+    --c-green:  #22b07d;
+    --c-amber:  #f59e0b;
+    --c-pink:   #ec4899;
+    --c-purple: #a855f7;
+    --c-indigo: #6366f1;
+    --c-red:    #ef4444;
+
+    /* Categorias das histórias → apontam pros acentos */
+    --c-emocoes:  var(--c-amber);
+    --c-rotina:   var(--c-blue);
+    --c-aventura: var(--c-green);
+
+    /* Texto */
+    --c-ink:       #0f2740;  /* títulos / navy forte */
+    --c-text:      #3b5a7a;  /* corpo */
+    --c-text-soft: #56708a;
+    --c-text-2:    #5b6b7c;  /* texto neutro secundário */
+    --c-muted:     #6b86a3;  /* metadados (categoria · duração) */
+
+    /* Superfícies / linhas */
+    --c-surface:   #fff;
+    --c-surface-2: #f6fafd;  /* fundo suave de blocos */
+    --c-line:      #e6eef5;  /* bordas claras */
+
+    /* Sombra navy — usar com alpha: rgba(var(--shadow-rgb), .12) */
+    --shadow-rgb: 15, 39, 64;
+}
+
 /* ===== Reset básico ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: 100%; overflow-x: hidden; }
 body {
-    font-family: 'Atma', 'Comic Sans MS', system-ui, sans-serif;
+    font-family: 'Baloo 2', system-ui, sans-serif;
     color: #1a3a5c;
     background: #fff;
 }
@@ -16,7 +51,7 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 8px 48px;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Baloo 2', system-ui, sans-serif;
     background: rgba(255,255,255,0.72);
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
@@ -27,7 +62,7 @@ body {
     font-size: 16px;
     font-weight: 600;
     letter-spacing: 0.18em;
-    color: #0f2740;
+    color: var(--c-ink);
     text-decoration: none;
     transition: opacity 0.25s ease;
 }
@@ -37,16 +72,20 @@ body {
     display: flex;
     gap: 4px;
     list-style: none;
+    /* Centraliza os links na barra independente da largura do logo. */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .menu-link {
     position: relative;
     display: inline-block;
-    padding: 6px 14px;
-    font-size: 13px;
-    font-weight: 400;
-    letter-spacing: 0.02em;
-    color: rgba(15,39,64,0.65);
+    padding: 6px 16px;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: rgba(var(--shadow-rgb),0.65);
     text-decoration: none;
     transition: color 0.25s ease;
 }
@@ -63,18 +102,161 @@ body {
 }
 
 .menu-link:hover {
-    color: #0f2740;
+    color: var(--c-ink);
 }
 .menu-link:hover::after {
     transform: scaleX(1);
 }
 
 .menu-link.active {
-    color: #0f2740;
+    color: var(--c-ink);
     font-weight: 700;
 }
 .menu-link.active::after {
     transform: scaleX(1);
+}
+
+/* ===== PAGE TOC — Table of Contents lateral ===== */
+.page-toc-toggle {
+    position: fixed;
+    top: 76px;
+    left: 24px;
+    z-index: 61;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.92);
+    box-shadow: 0 10px 30px rgba(var(--shadow-rgb),0.16);
+    color: var(--c-ink);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+.toc-icon-menu,
+.toc-icon-close {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.toc-icon-menu i {
+    position: absolute;
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    transform-origin: left center;
+    animation: tocLineIn 0.35s ease both;
+}
+.toc-icon-menu i:nth-child(1) { --y: -6px; transform: translateY(var(--y)); animation-delay: 0s; }
+.toc-icon-menu i:nth-child(2) { --y: 0; transform: translateY(var(--y)); animation-delay: 0.1s; }
+.toc-icon-menu i:nth-child(3) { --y: 6px; transform: translateY(var(--y)); animation-delay: 0.2s; }
+.toc-icon-close i {
+    position: absolute;
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+}
+.toc-icon-close i:nth-child(1) { transform: rotate(45deg); }
+.toc-icon-close i:nth-child(2) { transform: rotate(-45deg); }
+.page-toc-toggle.active .toc-icon-menu,
+.page-toc-toggle:not(.active) .toc-icon-close {
+    opacity: 0;
+    transform: rotate(-45deg) scale(0.8);
+}
+.page-toc-toggle.active .toc-icon-close,
+.page-toc-toggle:not(.active) .toc-icon-menu {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+}
+
+.page-toc {
+    position: fixed;
+    top: 128px;
+    left: 24px;
+    z-index: 60;
+    width: 220px;
+    padding: 16px;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid rgba(var(--shadow-rgb),0.10);
+    border-radius: 16px;
+    box-shadow: 0 18px 45px rgba(var(--shadow-rgb),0.16);
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.page-toc.collapsed {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(calc(-100% - 40px));
+}
+.page-toc-title {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(var(--shadow-rgb),0.10);
+    color: var(--c-ink);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+.page-toc ul {
+    list-style: none;
+    display: grid;
+    gap: 2px;
+}
+.page-toc li {
+    animation: tocLiIn 0.35s ease both;
+}
+.page-toc a {
+    display: block;
+    padding: 8px 6px;
+    border-radius: 8px;
+    color: rgba(var(--shadow-rgb),0.72);
+    font-size: 0.86rem;
+    font-weight: 600;
+    line-height: 1.25;
+    text-decoration: none;
+    transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+.page-toc a:hover {
+    color: var(--c-ink);
+    background: rgba(42,169,224,0.10);
+    transform: translateX(-2px);
+}
+
+@keyframes tocLineIn {
+    from { transform: translateY(var(--y, 0)) scaleX(0); opacity: 0; }
+    to { transform: translateY(var(--y, 0)) scaleX(1); opacity: 1; }
+}
+@keyframes tocLiIn {
+    from { opacity: 0; transform: translateX(16px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 1440px) {
+    .page-toc {
+        transform: translateX(calc(-100% - 40px));
+        opacity: 0;
+        pointer-events: none;
+    }
+    .page-toc:not(.collapsed) {
+        transform: translateX(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    /* No celular o TOC aparece (começa fechado, só o botão); o painel
+       não passa da largura da tela. */
+    .page-toc { width: min(220px, calc(100vw - 48px)); }
 }
 
 /* ===== Hamburger (escondido por padrão) ===== */
@@ -93,7 +275,7 @@ body {
     left: 7px;
     right: 7px;
     height: 2px;
-    background: #0f2740;
+    background: var(--c-ink);
     border-radius: 2px;
     transition: transform 0.3s ease, opacity 0.2s ease, top 0.3s ease;
 }
@@ -114,6 +296,7 @@ body {
         top: 100%;
         left: 0;
         right: 0;
+        transform: none;
         flex-direction: column;
         align-items: stretch;
         gap: 0;
@@ -121,7 +304,7 @@ body {
         background: rgba(255,255,255,0.92);
         backdrop-filter: saturate(180%) blur(20px);
         -webkit-backdrop-filter: saturate(180%) blur(20px);
-        border-bottom: 1px solid rgba(15,39,64,0.08);
+        border-bottom: 1px solid rgba(var(--shadow-rgb),0.08);
         box-shadow: 0 12px 24px rgba(0,0,0,0.08);
 
         max-height: 0;
@@ -139,11 +322,11 @@ body {
     .menu-link {
         display: block;
         padding: 14px 24px;
-        font-size: 15px;
+        font-size: 18px;
     }
     .menu-link::after { display: none; }
-    .menu-link:hover { background: rgba(15,39,64,0.05); }
-    .menu-link.active { background: rgba(15,39,64,0.06); }
+    .menu-link:hover { background: rgba(var(--shadow-rgb),0.05); }
+    .menu-link.active { background: rgba(var(--shadow-rgb),0.06); }
 }
 
 /* ===== HERO (cabeçalho ocupando 80% da tela) ===== */
@@ -151,7 +334,7 @@ body {
     position: relative;
     height: 80vh;
     min-height: 480px;
-    background: linear-gradient(180deg, #2aa9e0 0%, #1f70a3 100%);
+    background: linear-gradient(180deg, var(--c-blue) 0%, #1f70a3 100%);
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -416,7 +599,7 @@ body {
     width: 52px;
     height: 52px;
     border-radius: 50%;
-    color: #0f2740;
+    color: var(--c-ink);
     background: rgba(255,255,255,0.92);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -471,6 +654,8 @@ body {
 
 .section {
     padding: 80px 24px;
+    /* Âncora (TOC / link vindo de outra página) não fica atrás do menu fixo. */
+    scroll-margin-top: 64px;
 }
 .section-light { background: #ffffff; }
 .section-tint  { background: #f3f8fc; }
@@ -481,28 +666,28 @@ body {
 }
 .section-kicker {
     display: inline-block;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Baloo 2', system-ui, sans-serif;
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #2aa9e0;
+    color: var(--c-blue);
     margin-bottom: 12px;
 }
 .section-title {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Baloo 2', system-ui, sans-serif;
     font-size: clamp(28px, 4vw, 44px);
     font-weight: 700;
     letter-spacing: 0.02em;
-    color: #0f2740;
+    color: var(--c-ink);
     margin-bottom: 24px;
 }
 .section-text {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: clamp(15px, 1.6vw, 17px);
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: clamp(17px, 1.9vw, 20px);
     line-height: 1.7;
-    color: #334a63;
-    margin-bottom: 14px;
+    color: var(--c-text);
+    margin-bottom: 16px;
     text-align: left;
 }
 .section-inner .section-text { max-width: 640px; margin-left: auto; margin-right: auto; }
@@ -521,8 +706,8 @@ body {
     /* break out pra tela toda, ignorando padding/max-width da seção */
     width: 100vw;
     margin-left: calc(50% - 50vw);
-    border-top: 1px solid rgba(15,39,64,0.10);
-    border-left: 1px solid rgba(15,39,64,0.10);
+    border-top: 1px solid rgba(var(--shadow-rgb),0.10);
+    border-left: 1px solid rgba(var(--shadow-rgb),0.10);
     background: #ffffff;
 }
 .char-card {
@@ -534,12 +719,12 @@ body {
     padding: 28px 24px;
     text-decoration: none;
     color: inherit;
-    border-right: 1px solid rgba(15,39,64,0.10);
-    border-bottom: 1px solid rgba(15,39,64,0.10);
+    border-right: 1px solid rgba(var(--shadow-rgb),0.10);
+    border-bottom: 1px solid rgba(var(--shadow-rgb),0.10);
     transition: background 0.2s ease;
 }
 .char-card:hover {
-    background: #f6fafd;
+    background: var(--c-surface-2);
 }
 .char-card:active {
     background: #eaf3fa;
@@ -571,20 +756,376 @@ body {
     min-width: 0;
 }
 .char-name {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Baloo 2', system-ui, sans-serif;
     font-size: 1.1rem;
     font-weight: 700;
-    color: #0f2740;
+    color: var(--c-ink);
     margin-bottom: 4px;
     text-align: left;
 }
 .char-desc {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Baloo 2', system-ui, sans-serif;
     font-size: 0.9rem;
     line-height: 1.5;
-    color: #5b6b7c;
+    color: var(--c-text-2);
     text-align: left;
     margin: 0;
+}
+
+/* Desktop: grid contido e centralizado em vez de full-bleed */
+@media (min-width: 900px) {
+    .char-grid {
+        width: 100%;
+        max-width: 1100px;
+        margin-left: auto;
+        margin-right: auto;
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* ===== Showcase de personagens (miniatura no hover -> detalhe desliza embaixo) ===== */
+.char-showcase {
+    margin-top: 36px;
+}
+/* fileira de miniaturas */
+.char-thumbs {
+    display: flex;
+    justify-content: flex-start;
+    gap: 14px;
+    padding: 4px 16px 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.char-thumbs::-webkit-scrollbar { display: none; }
+.char-thumb {
+    appearance: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 6px;
+    transition: transform 0.25s ease;
+}
+.char-thumb-pic {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #fff;
+    border: 3px solid #fff;
+    box-shadow: 0 6px 14px rgba(0,30,60,0.14);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.char-thumb-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.char-thumb-name {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--c-text-2);
+    transition: color 0.2s ease;
+}
+.char-thumb:hover { transform: translateY(-3px); }
+.char-thumb.is-active .char-thumb-pic {
+    transform: scale(1.12);
+    border-color: var(--accent);
+    box-shadow: 0 10px 22px rgba(0,30,60,0.22);
+}
+.char-thumb.is-active .char-thumb-name { color: var(--c-ink); }
+
+/* palco deslizante */
+.char-stage {
+    position: relative;            /* âncora pra imagem flutuante */
+    isolation: isolate;            /* contém o empilhamento: fundo < personagem < texto */
+    margin: 40px auto 0;
+    max-width: 1100px;
+    overflow: visible;             /* deixa a imagem vazar pra fora do card */
+}
+/* sombra de chão suave (elipse desfocada) — não tem bordas duras como a sombra recortada */
+.char-stage::after {
+    content: '';
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    bottom: 0;
+    height: 40px;
+    z-index: -1;
+    background: rgba(0,30,60,0.13);
+    filter: blur(30px);
+    border-radius: 50%;
+}
+/* viewport: corta só as laterais (o slide), mas libera topo (vídeo vaza) e base */
+.char-viewport {
+    /* overflow:hidden corta as laterais (o slide) SEM criar stacking context.
+       clip-path criava um contexto próprio que prendia o texto (z-5) abaixo do
+       personagem (z-3). vídeo e personagem são irmãos do viewport (vazam pelo
+       char-stage), então não precisam liberar o topo daqui. */
+    overflow: hidden;
+    border-radius: 24px;
+}
+.char-track {
+    display: flex;
+    /* largura fixa: sem isto, o margin-left negativo do slide é absorvido pela
+       largura (width:auto vira containing-block - margens), dobrando os painéis
+       e nunca chegando no 2º. Com width:100% o margin negativo move de fato. */
+    width: 100%;
+    /* slide por margin-left (não por transform) pra NÃO criar stacking context,
+       senão o texto fica preso abaixo da imagem do personagem */
+    transition: margin-left 0.45s cubic-bezier(0.22,0.61,0.36,1);
+}
+.char-panel {
+    flex: 0 0 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    gap: 24px;
+    padding: 36px 28px;
+    border-radius: 24px;          /* arredonda o card (o viewport não corta mais) */
+    /* creme cobre o card inteiro; o claro nunca vira branco puro, então o vídeo fica dentro da área amarela */
+    background: linear-gradient(150deg, var(--accent2) 0%, color-mix(in srgb, var(--accent2) 45%, #ffffff) 100%);
+}
+.char-panel-text { text-align: center; }
+.char-panel-name {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--c-ink);
+    margin: 0 0 8px;
+}
+.char-panel-desc {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--c-text-2);
+    margin: 0 auto 18px;
+    max-width: 44ch;
+    text-shadow: 0 1px 3px rgba(var(--shadow-rgb), 0.25);
+    /* scrim só atrás do parágrafo: começa exatamente na cor do painel naquele ponto
+       (o painel é um degradê diagonal que clareia, ~84% do --accent2 + branco) e
+       some pra transparente à direita, pra destacar o texto sobre o personagem */
+    background: linear-gradient(to right, color-mix(in srgb, var(--accent2) 84%, #ffffff), transparent);
+}
+/* vídeo solto do palco — no mobile fica embaixo do card; no desktop flutua e vaza.
+   Os 7 iframes ficam empilhados no mesmo lugar e trocam por crossfade (sem recarregar). */
+.char-stage-videos {
+    position: relative;
+    width: 100%;
+    margin: 16px auto 0;
+    aspect-ratio: 16 / 9;
+}
+.char-stage-video {
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 18px 40px rgba(0,30,60,0.22);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease;
+}
+.char-stage-video.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+.char-stage-video iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+}
+
+/* moldura redonda do personagem — no mobile fica centralizada acima do card */
+.char-float-frame {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    border: 6px solid #fff;
+    background: #fff;
+    box-shadow: 0 16px 30px rgba(0,30,60,0.24);
+    overflow: hidden;                 /* personagem normal fica recortado no círculo */
+}
+.char-float {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.25s ease;
+}
+/* personagem "sticker" (PNG transparente): sem moldura, vaza livre e desce bastante */
+.char-float-frame.is-sticker {
+    overflow: visible;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+}
+.char-float-frame.is-sticker .char-float {
+    position: absolute;
+    left: 50%;
+    bottom: -240px;
+    transform: translateX(-50%);
+    width: 152%;
+    height: auto;
+    object-fit: contain;
+}
+/* troca da imagem com fade */
+@keyframes char-float-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+.char-float.is-swapping {
+    animation: char-float-fade 0.9s ease;
+}
+
+@media (min-width: 900px) {
+    .char-thumbs {
+        justify-content: flex-end;       /* fileira alinhada à direita */
+        flex-wrap: wrap;
+        overflow: visible;
+        max-width: 1100px;               /* mesma largura do palco */
+        margin-left: auto;
+        margin-right: auto;
+        position: relative;
+        left: 64px;                      /* casa a borda direita com a do vídeo (right:-64px) */
+        padding-right: 0;
+    }
+    .char-panel {
+        grid-template-columns: 0.9fr 1.5fr;   /* duas áreas: texto (livre do gato) | vídeo maior */
+        align-items: center;
+        padding: 40px 44px 28px 56px;
+        gap: 36px;
+        position: relative;
+    }
+    /* divisória sutil entre as duas áreas */
+    .char-panel::before {
+        content: '';
+        position: absolute;
+        top: 30px;
+        bottom: 30px;
+        left: 40%;
+        width: 2px;
+        background: rgba(40, 20, 70, 0.08);
+        border-radius: 2px;
+    }
+    /* vídeo solto: flutua sobre a metade direita do card e vaza pra cima e pra direita */
+    .char-stage-videos {
+        position: absolute;
+        z-index: 4;
+        top: -45px;          /* vaza pra cima do card */
+        right: -64px;        /* vaza pra fora da borda direita do carrossel */
+        width: 60%;          /* maior, ocupa a área direita */
+        margin: 0;
+    }
+    .char-panel-text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-end;                /* bloco encosta na divisória */
+        align-self: center;                   /* grupo (nome+texto+botão) centralizado */
+        text-align: right;
+        padding-top: 0;
+        position: relative;
+        z-index: 5;                           /* texto na frente da imagem do personagem (z-index 3) */
+    }
+    .char-panel-name {
+        font-size: 2.4rem;
+    }
+    .char-panel-desc {
+        margin: 16px 0 18px;                  /* grupo compacto, logo abaixo do nome */
+        max-width: 26ch;                      /* mais estreita: não alcança o gato */
+    }
+    .char-panel .btn-saiba-mais { align-self: flex-end; margin-top: 8px; }
+    /* moldura flutuando no topo e vazando pra fora da borda esquerda */
+    .char-float-frame {
+        position: absolute;
+        z-index: 3;
+        left: -140px;
+        top: 0;
+        transform: translateY(-50%);
+        width: 240px;
+        height: 240px;
+        margin: 0;
+        pointer-events: none;
+    }
+    /* personagem sticker: altura fixa no desktop, largura proporcional */
+    .char-float-frame.is-sticker .char-float {
+        height: 650px;
+        width: auto;
+    }
+}
+
+/* ===== Faixa parallax (entre Personagens e Emoções) ===== */
+.parallax-strip {
+    position: relative;
+    height: 720px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* Imagem com sangria de 220px em cima/embaixo — o JS desloca dentro dessa folga */
+.parallax-bg {
+    position: absolute;
+    left: 0; right: 0;
+    top: -220px; bottom: -220px;
+    z-index: 0;
+    background-image: url('img/personagens/KACO.jpeg');
+    background-size: cover;
+    background-position: center;
+    will-change: transform;
+}
+.parallax-strip::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: rgba(var(--shadow-rgb),0.45);
+}
+.parallax-content {
+    position: relative;
+    z-index: 2;
+    max-width: 640px;
+    padding: 0 24px;
+    text-align: center;
+    color: #fff;
+}
+.parallax-kicker {
+    display: inline-block;
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: #ffd84d;
+    margin-bottom: 12px;
+}
+.parallax-title {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-bottom: 18px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+}
+.parallax-text {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: clamp(15px, 1.6vw, 17px);
+    line-height: 1.7;
+    opacity: 0.95;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.35);
+}
+
+@media (max-width: 900px) {
+    .parallax-strip {
+        height: auto;
+        min-height: 380px;
+        padding: 56px 0;
+    }
 }
 
 /* ===== Grid de emoções ===== */
@@ -594,8 +1135,8 @@ body {
     margin-top: 32px;
     width: 100vw;
     margin-left: calc(50% - 50vw);
-    border-top: 1px solid rgba(15,39,64,0.10);
-    border-left: 1px solid rgba(15,39,64,0.10);
+    border-top: 1px solid rgba(var(--shadow-rgb),0.10);
+    border-left: 1px solid rgba(var(--shadow-rgb),0.10);
     background: #ffffff;
 }
 .emocao-card {
@@ -604,17 +1145,17 @@ body {
     align-items: flex-start;
     gap: 16px;
     padding: 32px 28px;
-    border-right: 1px solid rgba(15,39,64,0.10);
-    border-bottom: 1px solid rgba(15,39,64,0.10);
+    border-right: 1px solid rgba(var(--shadow-rgb),0.10);
+    border-bottom: 1px solid rgba(var(--shadow-rgb),0.10);
 }
 .emocao-card .char-avatar {
     align-self: center;
 }
 .emocao-nome {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Baloo 2', system-ui, sans-serif;
     font-size: 1.5rem;
     font-weight: 700;
-    color: #0f2740;
+    color: var(--c-ink);
     margin: 0;
     align-self: center;
     text-align: center;
@@ -624,19 +1165,30 @@ body {
 }
 .emocao-label {
     display: block;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Baloo 2', system-ui, sans-serif;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.16em;
-    color: #2aa9e0;
+    color: var(--c-blue);
     margin-bottom: 6px;
 }
 .emocao-bloco p {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Baloo 2', system-ui, sans-serif;
     font-size: 0.92rem;
     line-height: 1.55;
     color: #334a63;
     margin: 0;
+}
+
+/* Desktop: grid contido e centralizado em vez de full-bleed */
+@media (min-width: 900px) {
+    .emocao-grid {
+        width: 100%;
+        max-width: 1100px;
+        margin-left: auto;
+        margin-right: auto;
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 .btn-saiba-mais {
@@ -646,12 +1198,12 @@ body {
     margin-top: 8px;
     padding: 10px 22px;
     border-radius: 999px;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Baloo 2', system-ui, sans-serif;
     font-size: 0.85rem;
     font-weight: 600;
     letter-spacing: 0.02em;
     text-decoration: none;
-    background: #2aa9e0;
+    background: var(--c-blue);
     color: #ffffff;
     box-shadow: 0 6px 16px rgba(42,169,224,0.28);
     transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
@@ -697,25 +1249,6 @@ body {
     transform: translateY(-50%);
     width: 65%;             /* começa depois do macaquinho, com respiro à direita */
     z-index: 3;
-}
-
-/* Título do slide central (detectado em JS) */
-.carousel-title {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 24px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: #fff;
-    text-align: center;
-    margin: 0 0 18px 0;
-    height: 30px;
-    line-height: 30px;
-    text-shadow: 0 2px 10px rgba(0,30,60,0.55);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    opacity: 0.95;
-    transition: opacity 0.2s ease;
 }
 
 .carousel-viewport {
@@ -804,7 +1337,7 @@ body {
     border: 0;
     background: rgba(255,255,255,0.85);
     backdrop-filter: blur(8px);
-    color: #0f2740;
+    color: var(--c-ink);
     font-size: 24px;
     line-height: 38px;
     cursor: pointer;
@@ -843,7 +1376,6 @@ body {
     .hero-carousel { top: 10%; }
     .slide-wrap { width: 140px; }
     .slide-reflection { height: 70px; }
-    .carousel-title { font-size: 20px; margin-bottom: 12px; }
 }
 
 /* ===== Animações ===== */
@@ -872,9 +1404,935 @@ body {
     100% { transform: translate3d(  85px, 0, 0); }
 }
 
+/* ===== Página Histórias ===== */
+
+/* Cabeçalho compacto (mesmo gradiente do hero, menor) */
+.page-hero {
+    position: relative;
+    min-height: 320px;
+    padding: 120px 24px 100px;
+    background: linear-gradient(180deg, var(--c-blue) 0%, #1f70a3 100%);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.page-hero-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    color: #fff;
+}
+.page-hero-kicker {
+    display: inline-block;
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: #ffd84d;
+    margin-bottom: 10px;
+}
+.page-hero-title {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: clamp(40px, 6vw, 64px);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+.page-hero-sub {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: clamp(15px, 1.8vw, 18px);
+    margin-top: 12px;
+    opacity: 0.92;
+}
+.page-hero-wave {
+    height: 90px;
+    bottom: 0;
+    z-index: 2;
+}
+
+/* Controles (chips de filtro + dica) */
+.hist-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+.hist-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+.hist-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.chip {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--c-text-2);
+    background: #fff;
+    border: 1px solid rgba(var(--shadow-rgb),0.14);
+    border-radius: 999px;
+    padding: 8px 18px;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+.chip:hover {
+    color: var(--c-ink);
+    border-color: rgba(var(--shadow-rgb),0.3);
+}
+.chip.active {
+    background: var(--c-ink);
+    border-color: var(--c-ink);
+    color: #fff;
+}
+.hist-hint {
+    margin-left: auto;
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 0.82rem;
+    color: var(--c-text-2);
+}
+
+/* Grid de cards das histórias */
+.hist-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+@media (min-width: 640px) {
+    .hist-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 980px) {
+    .hist-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.hist-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid rgba(var(--shadow-rgb),0.10);
+    border-radius: 16px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.hist-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(0,30,60,0.14);
+    border-color: var(--accent);
+}
+.hist-head {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+}
+.hist-head img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 25%;
+    display: block;
+    transition: transform 0.35s ease;
+}
+.hist-card:hover .hist-head img {
+    transform: scale(1.04);
+}
+.hist-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--accent);
+    padding: 5px 10px;
+    border-radius: 8px;
+}
+.hist-status {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: #334a63;
+    background: rgba(255,255,255,0.88);
+    border: 1px solid rgba(var(--shadow-rgb),0.10);
+    padding: 4px 9px;
+    border-radius: 8px;
+}
+.hist-status i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+.hist-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 18px 18px 20px;
+}
+.hist-body h3 {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: var(--c-ink);
+    margin: 0 0 6px;
+}
+.hist-body p {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--c-text-2);
+    margin: 0 0 16px;
+}
+.hist-go {
+    margin-top: auto;
+    align-self: flex-start;
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--accent);
+    transition: transform 0.2s ease;
+}
+.hist-card:hover .hist-go {
+    transform: translateX(4px);
+}
+
+@media (max-width: 600px) {
+    .page-hero { min-height: 260px; padding: 100px 20px 90px; }
+    .page-hero-wave { bottom: 0; height: 70px; }
+    .hist-hint { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation: none !important;
         transition: none !important;
     }
 }
+
+/* ===== Página História — livrinho ===== */
+/* Leitor de uma cena por vez (componente kids-story). O texto de cada cena já
+   vem embutido na imagem (paisagem), então a moldura usa object-fit: contain
+   pra nunca cortar. A cor de acento (--accent) vem da categoria da história. */
+.story-page {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 72px 20px 48px;   /* afasta do menu fixo (subiu) */
+}
+
+.story-head { text-align: center; margin-bottom: 8px; }
+.story-back {
+    display: inline-block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--c-text-2);
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: color .2s ease;
+}
+.story-back:hover { color: var(--c-ink); }
+.story-badge {
+    display: block;
+    width: fit-content;
+    margin: 0 auto 8px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--accent);
+    padding: 5px 12px;
+    border-radius: 8px;
+}
+.story-title {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 700;
+    color: var(--c-ink);
+}
+
+/* Palco: setas laterais + moldura da cena */
+.story-stage { position: relative; display: flex; align-items: center; gap: 12px; }
+.story-frame {
+    flex: 1;
+    aspect-ratio: 43 / 24;   /* = 2752x1536, proporção exata das cenas (sem barras) */
+    display: flex;
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--c-ink);
+    box-shadow: 0 18px 45px rgba(var(--shadow-rgb),0.18);
+}
+.story-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;   /* texto embutido não pode cortar */
+    display: block;
+    opacity: 0;
+    transition: opacity .6s ease;
+}
+.story-img.is-in { opacity: 1; }
+
+.story-nav {
+    flex: none;
+    position: relative;
+    z-index: 5;            /* acima da página que gira (.book3d) */
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: none;
+    background: #fff;
+    color: var(--c-ink);
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(var(--shadow-rgb),0.16);
+    transition: transform .2s ease, background .2s ease, opacity .2s ease;
+}
+.story-nav:hover { background: var(--accent); color: #fff; transform: scale(1.08); }
+.story-nav:disabled {
+    opacity: 0.3; cursor: default; transform: none;
+    background: #fff; color: var(--c-ink);
+}
+
+/* Rodapé: bolinhas + contador */
+.story-foot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 22px;
+}
+.story-dots { display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; }
+.story-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: none; padding: 0;
+    cursor: pointer;
+    background: rgba(var(--shadow-rgb),0.18);
+    transition: background .2s ease, transform .2s ease;
+}
+.story-dot:hover { background: rgba(var(--shadow-rgb),0.4); }
+.story-dot.active { background: var(--accent); transform: scale(1.25); }
+.story-counter { font-size: 0.9rem; font-weight: 600; color: var(--c-text-2); }
+
+/* Aviso (id inválido / história sem cenas) */
+.story-aviso {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 70vh;
+    padding: 120px 20px 60px;
+    text-align: center;
+}
+.story-aviso-box { max-width: 420px; }
+.story-aviso-emoji { font-size: 56px; display: block; margin-bottom: 12px; }
+.story-aviso-box h1 {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: clamp(24px, 4vw, 34px);
+    color: var(--c-ink);
+    margin-bottom: 10px;
+}
+.story-aviso-box p { font-size: 1rem; line-height: 1.6; color: var(--c-text-2); margin-bottom: 20px; }
+.story-aviso-link {
+    display: inline-block;
+    font-weight: 700;
+    color: #fff;
+    background: var(--accent, var(--c-blue));
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 999px;
+    transition: transform .2s ease;
+}
+.story-aviso-link:hover { transform: translateY(-2px); }
+
+@media (max-width: 600px) {
+    .story-page { padding: 84px 14px 48px; }
+    .story-stage { gap: 6px; }
+    .story-nav { width: 40px; height: 40px; font-size: 22px; }
+}
+
+/* Variante livro (StPageFlip) — a lib monta .stf__parent dentro do .flip-wrap.
+   Largura travada < 2 páginas pra lib cair em modo página-única. */
+.flip-wrap { flex: 1; min-width: 0; max-width: 1200px; margin: 0 auto; }
+.flip-wrap .stf__parent { margin: 0 auto; }
+.flip-wrap .stf__block { border-radius: 14px; overflow: hidden; }
+
+/* Flip 3D próprio (kids-story-flip3d) — base estática + clone que gira */
+.book3d {
+    position: relative;
+    perspective: 1800px;
+    overflow: visible;       /* deixa a página sair da moldura ao girar */
+    cursor: grab;
+    touch-action: pan-y;     /* arraste horizontal é nosso; vertical rola a página */
+    user-select: none;
+    -webkit-user-select: none;
+}
+.book3d.dragging { cursor: grabbing; }
+.b3-base {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: contain;   /* texto embutido não pode cortar */
+    border-radius: 18px;   /* cantos arredondados, já que a moldura não corta mais */
+    z-index: 1;
+}
+/* folha que gira: duas faces (frente = cena, verso = papel) pra virar inteira */
+.b3-leaf {
+    position: absolute;
+    inset: 0;
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    z-index: 2;
+    will-change: transform;
+}
+.b3-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 18px;
+    overflow: hidden;
+}
+.b3-face img { width: 100%; height: 100%; object-fit: contain; display: block; }
+/* verso descansa em 0° (os dois 180° se cancelam), então espelho a imagem
+   pra a página virada aparecer invertida de verdade */
+.b3-face.back img { transform: scaleX(-1); }
+.b3-face.back {
+    transform: rotateY(180deg);
+    background: #f5ecd7;                       /* fundo do verso (atrás do letterbox) */
+    filter: blur(3px);                         /* página já virada fica desfocada */
+}
+/* leve escurecido no verso pra ler como "parte de trás" da folha */
+.b3-face.back::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.22);
+    border-radius: 18px;
+}
+
+/* ----- Furos de caderno na margem (borda esquerda) -----
+   Ficam DENTRO de cada página (a base e a frente da folha que gira), então
+   acompanham a imagem quando ela vira. z abaixo das folhas pra a página de cima
+   cobrir os furos da de baixo. */
+.book-holes {
+    position: absolute;
+    top: 10px; bottom: 10px;
+    left: 2px;
+    width: 14px;
+    z-index: 1;
+    pointer-events: none;
+    background-image:
+        radial-gradient(circle, #15151b 0 3px, rgba(0,0,0,0) 4px),
+        radial-gradient(circle, rgba(255,255,255,0.45) 2.5px, rgba(0,0,0,0) 3.5px);
+    background-size: 100% 19px, 100% 19px;
+    background-position: center 0, center -1px;
+    background-repeat: repeat-y, repeat-y;
+}
+
+/* Botão tela cheia (canto do palco) */
+.story-fs {
+    position: absolute;
+    top: 10px; right: 10px;
+    z-index: 4;
+    width: 40px; height: 40px;
+    border: none; border-radius: 50%;
+    background: rgba(255,255,255,0.92);
+    color: var(--c-ink);
+    font-size: 18px; line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(var(--shadow-rgb),0.18);
+    transition: background .2s ease, transform .2s ease, color .2s ease;
+}
+.story-fs:hover { background: var(--accent); color: #fff; transform: scale(1.08); }
+
+/* Contador sobreposto — só aparece em tela cheia (o do rodapé fica fora do palco) */
+.story-fscount {
+    display: none;
+    position: absolute;
+    bottom: 16px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #fff;
+    background: rgba(15,39,64,0.55);
+    padding: 6px 16px;
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+.story-stage:fullscreen .story-fscount { display: block; }
+
+/* Estado tela cheia: imagem cresce ao máximo MANTENDO a proporção (sem barras,
+   cantos arredondados preservados). */
+.story-stage:fullscreen { background: var(--c-ink); padding: 0 12px; gap: 16px; justify-content: center; }
+.story-stage:fullscreen .story-frame {
+    flex: 0 1 auto;
+    height: min(94vh, calc((100vw - 160px) * 24 / 43));
+    width: auto;
+    aspect-ratio: 43 / 24;
+    border-radius: 18px;
+    background: transparent;
+    box-shadow: none;
+}
+.story-stage:fullscreen .flip-wrap { max-width: 1500px; }
+.story-stage:fullscreen .story-fs { top: 18px; right: 18px; }
+
+/* ===== Fontes infantis ===== */
+/* Site todo em Baloo 2 (arredondada e divertida). Títulos com peso 700 pra
+   chamar mais atenção; corpo herda Baloo 2 do body. Bloco no fim do arquivo
+   pra sobrescrever os font-family por seletor. */
+.menu-logo,
+.page-toc-title,
+.hero-title,
+.section-kicker,
+.section-title,
+.char-name,
+.parallax-kicker,
+.parallax-title,
+.emocao-nome,
+.page-hero-kicker,
+.page-hero-title {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-weight: 700;
+}
+
+/* ===== Títulos coloridos por seção (mais alegre/infantil) ===== */
+#sobre      .section-title { color: var(--c-green); }
+#personagens .section-title { color: var(--c-blue); }
+#emocoes    .section-title { color: var(--c-amber); }
+#rotina     .section-title { color: var(--c-pink); }
+#audios     .section-title { color: var(--c-purple); }
+#familia    .section-title { color: var(--c-green); }
+
+/* ===== Sobre o Projeto — imagem + texto ===== */
+/* O texto contorna o DESENHO (alpha do PNG), não o retângulo da imagem:
+   shape-outside só funciona com a imagem flutuada (float), por isso aqui
+   não usamos flex. Precisa ser servido por http (live-server) — em file://
+   o navegador bloqueia a leitura dos pixels e o contorno não aparece. */
+.sobre-layout {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flow-root; /* contém o float */
+}
+.sobre-img {
+    position: relative;
+    float: left;
+    width: 520px;
+    max-width: 44%;
+    /* margin-top negativo sobe o Kaco em relação ao texto/título. */
+    margin: -40px 24px 8px 0;
+    /* Contorno em % da caixa da imagem. Editar AQUI: o texto (shape-outside) e
+       o overlay de depuração (::after) usam a MESMA variável, então o que você
+       vê pintado é exatamente o que o texto enxerga. */
+    --kaco-shape: polygon(
+        42% 2%,    /* tufo de cabelo, esquerda */
+        58% 2%,    /* tufo de cabelo, direita */
+        62% 9%,    /* cabeça, direita */
+        74% 14%,   /* orelha direita, topo */
+        90% 24%,   /* orelha direita, borda externa */
+        78% 34%,   /* orelha direita, base / bochecha */
+        64% 40%,   /* pescoço/ombro, direita (côncavo) */
+        70% 46%,   /* braço direito */
+        96% 52%,   /* ponta da mão direita (mais à direita) */
+        72% 57%,   /* entra sob o braço (côncavo) */
+        72% 66%,   /* cintura, direita */
+        70% 82%,   /* perna direita */
+        66% 97%,   /* pé direito */
+        50% 99%,   /* entre os pés */
+        34% 97%,   /* pé esquerdo */
+        30% 82%,   /* perna esquerda */
+        28% 66%,   /* cintura, esquerda */
+        28% 57%,   /* entra sob o braço esquerdo */
+        4% 52%,    /* ponta da mão esquerda */
+        30% 46%,   /* braço esquerdo */
+        36% 40%,   /* pescoço/ombro, esquerda */
+        22% 34%,   /* orelha esquerda, base */
+        10% 24%,   /* orelha esquerda, borda externa */
+        26% 14%,   /* orelha esquerda, topo */
+        38% 9%
+    );
+    shape-outside: var(--kaco-shape) border-box;
+    shape-margin: 44px;
+}
+/* DEBUG: pinta o contorno por cima do Kaco pra conferir o encaixe.
+   Trocar display:none por block pra ver a mancha de novo. */
+.sobre-img::after {
+    content: "";
+    display: none;
+    position: absolute;
+    inset: 0;
+    clip-path: var(--kaco-shape);
+    background: rgba(255, 0, 80, 0.38);
+    pointer-events: none;
+}
+.sobre-img img {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 16px 30px rgba(var(--shadow-rgb),0.18));
+}
+.sobre-text .section-text {
+    text-align: left;
+}
+.sobre-text .sobre-assinatura {
+    text-align: right;
+    margin-top: 18px;
+    color: var(--c-green);
+}
+/* Título centralizado sobre a coluna do texto (e não na página toda). */
+.sobre-text .section-title {
+    text-align: center;
+}
+@media (max-width: 760px) {
+    .sobre-img {
+        float: none;
+        width: 300px;
+        max-width: 100%;
+        margin: 0 auto 16px;
+        shape-outside: none;
+    }
+}
+
+/* 3 cartões de prévia na seção Pra Família da home. */
+.familia-cards {
+    max-width: 1040px;
+    margin: 28px auto 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+.familia-card {
+    background: #fff;
+    border: 2px solid var(--c);
+    border-radius: 20px;
+    padding: 26px 22px;
+    text-align: left;
+    text-decoration: none;
+    box-shadow: 0 10px 26px rgba(var(--shadow-rgb),.07);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.familia-card:hover { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(var(--shadow-rgb),.14); }
+.familia-emoji { font-size: 42px; line-height: 1; display: block; margin-bottom: 12px; }
+.familia-card h3 { font-size: 20px; font-weight: 700; color: var(--c-ink); margin-bottom: 6px; }
+.familia-card p { font-size: 15px; line-height: 1.6; color: var(--c-text-soft); font-weight: 500; }
+@media (max-width: 860px) { .familia-cards { grid-template-columns: repeat(2, 1fr); max-width: 700px; } }
+@media (max-width: 540px) { .familia-cards { grid-template-columns: 1fr; max-width: 400px; } }
+
+.familia-cta { text-align: center; }
+
+/* Botão da seção Pra Família na home (leva pra página familia.html). */
+.familia-btn {
+    display: inline-block;
+    margin-top: 24px;
+    padding: 12px 26px;
+    border-radius: 999px;
+    background: var(--c-green);
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 10px 24px rgba(34,176,125,.28);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.familia-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 30px rgba(34,176,125,.36); }
+
+/* ===== Áudio-histórias na home — 3 faixas (prévia da página) ===== */
+.home-audio-list {
+    max-width: 1240px;
+    margin: 28px auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+.home-audio-item { flex: 1 1 360px; max-width: 400px; }
+@media (max-width: 760px) {
+    .home-audio-list { max-width: 540px; }
+    .home-audio-item { flex-basis: 100%; max-width: none; }
+}
+.home-audio-item {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 16px;
+    background: #fff;
+    border: 1px solid var(--c-line);
+    box-shadow: 0 8px 22px rgba(var(--shadow-rgb),.06);
+    text-decoration: none;
+    transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.home-audio-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(var(--shadow-rgb),.12);
+    border-color: var(--c);
+}
+/* Miniatura alta: estica pra altura do card (align-items: stretch no item). */
+.home-audio-thumb { width: 84px; align-self: stretch; border-radius: 14px; object-fit: cover; flex-shrink: 0; }
+.home-audio-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+/* Título ocupa a largura toda do card (até o fim), quebrando se precisar. */
+.home-audio-title { font-size: 18px; font-weight: 700; color: var(--c-ink); line-height: 1.25; text-decoration: none; }
+a.home-audio-title:hover { text-decoration: underline; text-decoration-color: var(--c); }
+.home-audio-desc { font-size: 14px; line-height: 1.4; color: var(--c-text-soft); font-weight: 500; }
+.home-audio-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.home-audio-row small { font-size: 14px; color: var(--c-muted); font-weight: 600; }
+.home-audio-play {
+    width: 42px; height: 42px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--c);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+/* Barrinha de progresso reduzida do card da home */
+.home-audio-bar { position: relative; height: 5px; border-radius: 5px; background: var(--c-line); margin-top: 6px; cursor: pointer; }
+.home-audio-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 5px; background: var(--c); transition: width .1s linear; }
+.home-audio-more {
+    flex-basis: 100%;
+    text-align: center;
+    margin-top: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--c-blue);
+    text-decoration: none;
+}
+.home-audio-more:hover { color: var(--c-ink); }
+
+/* Intro mais largo que o padrão (640px) pra dar respiro lateral ao texto. */
+.section-inner .section-intro { max-width: 880px; }
+
+/* ===== Rotina — sequência de passos do dia ===== */
+
+/* Layout: cards grandes (Brincar/Terapia) à esquerda + passos do dia à direita */
+.rotina-layout {
+    max-width: 1100px;
+    margin: 36px auto 0;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 18px;
+    align-items: stretch;
+}
+.rotina-destaques {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 18px;
+}
+.rotina-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+@media (max-width: 900px) {
+    .rotina-layout { grid-template-columns: 1fr; }
+    .rotina-destaques { grid-template-rows: none; grid-template-columns: repeat(2, 1fr); }
+    .rotina-steps { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 420px) {
+    .rotina-destaques { grid-template-columns: 1fr; }
+    .rotina-steps { grid-template-columns: 1fr; }
+}
+.rotina-card {
+    background: #fff;
+    border: 2px solid var(--rc, var(--c-blue));
+    border-radius: 20px;
+    padding: 22px 14px 18px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 10px 24px rgba(var(--shadow-rgb),0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.rotina-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 30px rgba(var(--shadow-rgb),0.14);
+}
+.rotina-emoji {
+    display: block;
+    font-size: 64px;
+    line-height: 1;
+    margin-bottom: 12px;
+}
+.rotina-step {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--rc, var(--c-blue));
+    color: #fff;
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+}
+.rotina-label {
+    display: block;
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 17px;
+    color: #2f4a66;
+}
+/* Cards grandes Brincar/Terapia — preenchem a coluna e centralizam o conteúdo */
+.destaque-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 3px solid var(--rc, var(--c-blue));
+    border-radius: 28px;
+    padding: 28px 20px;
+    box-shadow: 0 16px 36px rgba(var(--shadow-rgb),0.12);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.destaque-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 22px 46px rgba(var(--shadow-rgb),0.18);
+}
+.destaque-emoji {
+    display: block;
+    font-size: 92px;
+    line-height: 1;
+    margin-bottom: 14px;
+}
+.destaque-label {
+    display: block;
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: clamp(32px, 4.4vw, 48px);
+    color: var(--rc, var(--c-blue));
+}
+
+/* ===== Rodapé único (injetado por components/kids-footer.js) ===== */
+.site-footer {
+    background: var(--c-ink);
+    color: #cdd9e6;
+    padding: 48px 24px 28px;
+    margin-top: 80px;
+}
+.site-footer-inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+}
+.footer-brand {
+    max-width: 360px;
+}
+.footer-logo {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 32px;
+    letter-spacing: .04em;
+    color: #fff;
+    text-decoration: none;
+}
+.footer-tagline {
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #9fb2c6;
+}
+.footer-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+}
+.footer-nav a {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: #cdd9e6;
+    text-decoration: none;
+    transition: color .2s ease;
+}
+.footer-nav a:hover {
+    color: #4dd4a0;
+}
+.footer-bottom {
+    max-width: 1040px;
+    margin: 32px auto 0;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,.12);
+    text-align: center;
+    font-size: 13px;
+    color: #7c93a9;
+}
+@media (max-width: 640px) {
+    .site-footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+}
+
+/* ===== Página Áudio-histórias — player em destaque + playlist =====
+   Markup montado pelo componente components/kids-player.js. A cor de acento
+   chega via --c (player) e --ic (item) setados em JS a partir da categoria. */
+.au2-wrap { max-width: 1040px; margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; align-items: start; }
+.au2-player { background: #fff; border: 2px solid var(--c, var(--c-blue)); border-radius: 24px; box-shadow: 0 16px 40px rgba(var(--shadow-rgb), .12); padding: 24px; text-align: center; }
+.au2-cover { width: 240px; height: 240px; border-radius: 20px; object-fit: cover; margin: 0 auto 16px; display: block; box-shadow: 0 12px 28px rgba(var(--shadow-rgb), .18); }
+.au2-title { font-size: 26px; font-weight: 800; color: var(--c-ink); }
+.au2-sub { font-size: 15px; color: var(--c-muted); font-weight: 600; margin-bottom: 16px; }
+.au2-bar { width: 100%; max-width: 420px; height: 8px; border-radius: 8px; background: var(--c-line); position: relative; cursor: pointer; margin: 0 auto; }
+.au2-bar span { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 8px; background: var(--c, var(--c-blue)); transition: width .1s linear; }
+.au2-time { display: block; font-size: 13px; color: var(--c-muted); font-weight: 600; margin: 8px 0 12px; }
+.au2-controls { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+.au2-bigplay { width: 56px; height: 56px; border-radius: 50%; background: var(--c, var(--c-blue)); color: #fff; border: 0; font-size: 22px; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,.15); }
+.au2-ctrl { border: 0; background: #eef4f9; color: var(--c-ink); border-radius: 10px; padding: 8px 12px; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-grid; place-items: center; }
+.au2-ctrl:hover { background: #dde8f1; }
+.au2-speedwrap { position: relative; }
+.au2-speedmenu { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #fff; border: 1px solid var(--c-line); border-radius: 12px; box-shadow: 0 10px 26px rgba(var(--shadow-rgb), .16); padding: 6px; display: none; flex-direction: column; gap: 2px; z-index: 5; }
+.au2-speedmenu.show { display: flex; }
+.au2-speedmenu button { border: 0; background: none; padding: 6px 18px; border-radius: 8px; font-family: inherit; font-weight: 600; font-size: 14px; color: var(--c-text); cursor: pointer; white-space: nowrap; }
+.au2-speedmenu button:hover { background: #f0f5fa; }
+.au2-speedmenu button.active { color: var(--c, var(--c-blue)); font-weight: 800; }
+.au2-volslider { width: 80px; accent-color: var(--c, var(--c-blue)); }
+.au2-tx { font-size: 15px; line-height: 1.7; color: var(--c-text); text-align: left; background: var(--c-surface-2); border-radius: 14px; padding: 14px 16px; }
+.au2-list { display: flex; flex-direction: column; gap: 10px; }
+.au2-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 14px; background: #fff; border: 1px solid var(--c-line); cursor: pointer; text-align: left; font-family: inherit; transition: border-color .2s ease, background .2s ease; }
+.au2-item:hover { background: var(--c-surface-2); }
+.au2-item.active { border-color: var(--ic); background: var(--c-surface-2); }
+.au2-item img { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+.au2-item .meta { flex: 1; min-width: 0; }
+.au2-item strong { display: block; font-size: 16px; color: var(--c-ink); font-weight: 700; }
+.au2-item small { font-size: 13px; color: var(--c-muted); font-weight: 600; }
+.au2-item .dot { width: 30px; height: 30px; border-radius: 50%; background: var(--ic); color: #fff; display: grid; place-items: center; font-size: 12px; flex-shrink: 0; }
+@media (max-width: 780px) { .au2-wrap { grid-template-columns: 1fr; } }
+
+/* ===== Página Pra Família — carta + grid de recursos =====
+   A cor de cada card chega via --c (setado inline no HTML, apontando pros
+   tokens de acento). */
+.carta { max-width: 720px; margin: 0 auto; text-align: left; }
+.carta-kicker { display: block; text-align: center; font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--c-green); margin-bottom: 18px; }
+.carta p { font-size: 18px; line-height: 1.8; color: var(--c-text); margin-bottom: 16px; }
+.carta .assinatura { font-weight: 700; color: var(--c-ink); }
+.fam-grid { max-width: 1040px; margin: 40px auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.fam-card { background: #fff; border: 2px solid var(--c); border-radius: 20px; padding: 26px 22px; text-align: left; text-decoration: none; box-shadow: 0 10px 26px rgba(var(--shadow-rgb), .07); transition: transform .2s ease, box-shadow .2s ease; }
+.fam-card:hover { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(var(--shadow-rgb), .14); }
+.fam-emoji { font-size: 42px; line-height: 1; display: block; margin-bottom: 12px; }
+.fam-card h3 { font-size: 20px; font-weight: 700; color: var(--c-ink); margin-bottom: 6px; }
+.fam-card p { font-size: 15px; line-height: 1.6; color: var(--c-text-soft); font-weight: 500; }
+@media (max-width: 860px) { .fam-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 540px) { .fam-grid { grid-template-columns: 1fr; } }
