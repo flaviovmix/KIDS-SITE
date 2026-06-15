@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>A Raiva — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Hero (componente kids-hero) renderiza aqui -->
+<div id="kidsHero"></div>
+
+<main class="content">
+    <section class="section section-light">
+        <div class="emodet" style="--emo: var(--c-red)">
+
+            <!-- O que é -->
+            <div class="emodet-lead">
+                <div class="emodet-face">😠</div>
+                <div>
+                    <h2 class="emodet-h2">O que é a raiva?</h2>
+                    <p>A raiva é uma energia quente que sobe no meu peito quando alguma coisa parece
+                    injusta, ou quando eu não consigo fazer o que eu queria. Ela não é feia nem errada:
+                    é o meu corpo avisando que algo me incomodou.</p>
+                </div>
+            </div>
+
+            <!-- Sinais no corpo -->
+            <h2 class="emodet-h2">Como o meu corpo fica</h2>
+            <div class="emodet-signs">
+                <span class="sign-chip">✊ Punho fechado</span>
+                <span class="sign-chip">🔥 Rosto quente</span>
+                <span class="sign-chip">💓 Coração acelerado</span>
+                <span class="sign-chip">😤 Vontade de gritar</span>
+                <span class="sign-chip">😣 Barriga apertada</span>
+            </div>
+            <p class="emodet-note">Quando eu percebo esses sinais, já sei: a raiva chegou. E tudo bem.</p>
+
+            <!-- O Kaco também sente -->
+            <h2 class="emodet-h2">O Kaco também sente</h2>
+            <figure class="emodet-scene">
+                <img src="historias/passeio-feliz/4.jpeg" alt="O Kaco está com raiva">
+                <figcaption>O Kaco ficou bravo quando o passeio não saiu como ele queria. Olha como o corpo dele reage!</figcaption>
+            </figure>
+
+            <!-- O que fazer -->
+            <h2 class="emodet-h2">O que eu posso fazer</h2>
+            <ol class="emodet-steps">
+                <li><span class="step-emoji">🫁</span><div><strong>Respiro fundo.</strong> Puxo o ar bem devagar pelo nariz e solto pela boca.</div></li>
+                <li><span class="step-emoji">🔟</span><div><strong>Conto até dez,</strong> bem devagarinho.</div></li>
+                <li><span class="step-emoji">🚶</span><div><strong>Saio um pouquinho</strong> do lugar até o meu corpo esfriar.</div></li>
+                <li><span class="step-emoji">🧸</span><div><strong>Aperto bem forte</strong> um travesseiro ou abraço o meu bichinho.</div></li>
+                <li><span class="step-emoji">💬</span><div><strong>Quando eu acalmo,</strong> eu falo o que senti, com calma.</div></li>
+            </ol>
+
+            <!-- Atividade: respirar -->
+            <div class="emo-respira">
+                <h2 class="emo-respira-titulo">Vamos respirar com o Kaco 🐒</h2>
+                <p class="emo-respira-sub">Siga a bolinha: enche o ar devagar e solta devagar.</p>
+                <div class="breath-circle"><span>respira…</span></div>
+            </div>
+
+            <!-- Fecho acolhedor -->
+            <p class="emodet-fecho">Sentir raiva é normal, todo mundo sente. O que importa é o que a gente faz com ela. E você nunca está sozinho. 💛</p>
+
+            <a class="emodet-back" href="emocoes.html">← Voltar pras Emoções</a>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script>
+    window.kidsHeroConfig = {
+        kicker: 'EMOÇÕES · COMO LIDAR',
+        titulo: 'A Raiva',
+        sub: 'Sentir raiva é normal. O que importa é o que a gente faz com ela.',
+        emojis: ['😠', '🌋'],
+    };
+</script>
+<script src="components/kids-hero.js"></script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>

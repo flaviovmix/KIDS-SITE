@@ -72,6 +72,10 @@
         main.innerHTML =
             '<div class="story-head">' +
                 '<a class="story-back" href="historias.html">← Histórias</a>' +
+                '<div class="story-dl">' +
+                    '<button class="story-dl-btn" data-dl="zip" type="button">⬇ Imagens (ZIP)</button>' +
+                    '<button class="story-dl-btn" data-dl="pdf" type="button">📄 PDF</button>' +
+                '</div>' +
             '</div>' +
             '<div class="story-stage">' +
                 '<button class="story-nav prev" type="button" aria-label="Cena anterior">‹</button>' +
@@ -92,6 +96,8 @@
         var counter = main.querySelector('.story-counter');
         var fscount = main.querySelector('.story-fscount');
         var dotEls = main.querySelectorAll('.story-dot');
+        var dlZip = main.querySelector('[data-dl="zip"]');
+        var dlPdf = main.querySelector('[data-dl="pdf"]');
 
         cenas.forEach(function (src) { var im = new Image(); im.src = src; });
 
@@ -114,7 +120,7 @@
             // espelhada). Pra usar uma arte fixa, troque este src por um asset.
             leaf.innerHTML =
                 '<div class="b3-face front"><img src="' + frontSrc + '" draggable="false" alt=""><div class="book-holes" aria-hidden="true"></div></div>' +
-                '<div class="b3-face back"><img src="' + frontSrc + '" draggable="false" alt=""></div>';
+                '<div class="b3-face back"><img src="' + frontSrc + '" draggable="false" alt=""><div class="book-holes" aria-hidden="true"></div></div>';
             book.appendChild(leaf);
             return leaf;
         }
@@ -264,6 +270,80 @@
             var on = document.fullscreenElement === stage;
             fs.textContent = on ? '✕' : '⛶';
             fs.title = on ? 'Sair da tela cheia' : 'Tela cheia';
+        });
+
+        /* ----- Baixar: ZIP das imagens + PDF (1 cena por página) -----
+           Libs (JSZip / jsPDF) carregadas SÓ no clique, via CDN — nada pesa no load. */
+        function loadScript(src) {
+            return new Promise(function (res, rej) {
+                var sc = document.createElement('script');
+                sc.src = src;
+                sc.onload = res;
+                sc.onerror = function () { rej(new Error('Falha ao carregar ' + src)); };
+                document.head.appendChild(sc);
+            });
+        }
+        function baixarBlob(blob, nome) {
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = nome;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+        }
+        function carregaImg(src) {
+            return new Promise(function (res, rej) {
+                var im = new Image();
+                im.onload = function () { res(im); };
+                im.onerror = function () { rej(new Error('Falha na imagem ' + src)); };
+                im.src = src;
+            });
+        }
+        // roda fn() trocando o rótulo do botão e religando no fim (sucesso ou erro)
+        function comBotao(btn, label, fn) {
+            if (btn.disabled) return;
+            var orig = btn.textContent;
+            btn.disabled = true; btn.textContent = label;
+            Promise.resolve().then(fn).catch(function (e) {
+                alert('Não consegui gerar o arquivo: ' + e.message);
+            }).then(function () { btn.disabled = false; btn.textContent = orig; });
+        }
+
+        dlZip.addEventListener('click', function () {
+            comBotao(dlZip, 'Zipando…', function () {
+                var prep = window.JSZip ? Promise.resolve()
+                    : loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+                return prep.then(function () {
+                    var zip = new JSZip();
+                    return Promise.all(cenas.map(function (src, i) {
+                        return fetch(src).then(function (r) {
+                            if (!r.ok) throw new Error(src);
+                            return r.blob();
+                        }).then(function (b) { zip.file((i + 1) + '.jpeg', b); });
+                    })).then(function () { return zip.generateAsync({ type: 'blob' }); });
+                }).then(function (blob) { baixarBlob(blob, id + '.zip'); });
+            });
+        });
+
+        dlPdf.addEventListener('click', function () {
+            comBotao(dlPdf, 'Gerando…', function () {
+                var prep = (window.jspdf && window.jspdf.jsPDF) ? Promise.resolve()
+                    : loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+                return prep.then(function () {
+                    return Promise.all(cenas.map(carregaImg));   // 1 <img> por cena (pra ter w/h)
+                }).then(function (imgs) {
+                    var jsPDF = window.jspdf.jsPDF;
+                    var doc;
+                    imgs.forEach(function (im, i) {
+                        var w = im.naturalWidth, h = im.naturalHeight;
+                        var orient = w >= h ? 'l' : 'p';
+                        // cada página = tamanho exato da imagem → 1 cena por página, sem margem
+                        if (i === 0) doc = new jsPDF({ orientation: orient, unit: 'px', format: [w, h] });
+                        else doc.addPage([w, h], orient);
+                        doc.addImage(im, 'JPEG', 0, 0, w, h);
+                    });
+                    doc.save(id + '.pdf');
+                });
+            });
         });
 
         mount.replaceWith(main);

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>A Tristeza — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Hero (componente kids-hero) renderiza aqui -->
+<div id="kidsHero"></div>
+
+<main class="content">
+    <section class="section section-light">
+        <div class="emodet" style="--emo: var(--c-blue)">
+
+            <!-- O que é -->
+            <div class="emodet-lead">
+                <div class="emodet-face">😢</div>
+                <div>
+                    <h2 class="emodet-h2">O que é a tristeza?</h2>
+                    <p>A tristeza vem quando a gente perde algo importante, sente falta de alguém, ou quando
+                    o dia não foi como a gente queria. Ela é pesadinha, mas faz parte de ser gente. Não tem
+                    problema nenhum em ficar triste.</p>
+                </div>
+            </div>
+
+            <!-- Sinais no corpo -->
+            <h2 class="emodet-h2">Como o meu corpo fica</h2>
+            <div class="emodet-signs">
+                <span class="sign-chip">😢 Vontade de chorar</span>
+                <span class="sign-chip">🫧 Pesinho no peito</span>
+                <span class="sign-chip">🔇 Vontade de ficar quietinho</span>
+                <span class="sign-chip">🐢 Corpo mais devagar</span>
+                <span class="sign-chip">🤗 Vontade de colo</span>
+            </div>
+            <p class="emodet-note">Quando eu percebo esses sinais, já sei: a tristeza chegou. E tudo bem.</p>
+
+            <!-- O Kaco também sente -->
+            <h2 class="emodet-h2">O Kaco também sente</h2>
+            <figure class="emodet-scene">
+                <img src="historias/passeio-feliz/5.jpeg" alt="O Kaco está triste e chorando">
+                <figcaption>O Kaco ficou triste e as lágrimas vieram. Chorar ajuda a colocar a tristeza pra fora.</figcaption>
+            </figure>
+
+            <!-- O que fazer -->
+            <h2 class="emodet-h2">O que eu posso fazer</h2>
+            <ol class="emodet-steps">
+                <li><span class="step-emoji">🤗</span><div><strong>Peço um abraço</strong> de quem eu amo.</div></li>
+                <li><span class="step-emoji">💬</span><div><strong>Falo o que estou sentindo</strong> pra alguém de confiança.</div></li>
+                <li><span class="step-emoji">🎨</span><div><strong>Desenho ou ouço</strong> uma música que eu gosto.</div></li>
+                <li><span class="step-emoji">😭</span><div><strong>Deixo a lágrima cair,</strong> sem vergonha. Chorar alivia.</div></li>
+                <li><span class="step-emoji">⏳</span><div><strong>Lembro que vai passar.</strong> A tristeza sempre passa.</div></li>
+            </ol>
+
+            <!-- Atividade: respirar -->
+            <div class="emo-respira">
+                <h2 class="emo-respira-titulo">Vamos respirar com o Kaco 🐒</h2>
+                <p class="emo-respira-sub">Siga a bolinha: enche o ar devagar e solta devagar.</p>
+                <div class="breath-circle"><span>respira…</span></div>
+            </div>
+
+            <!-- Fecho acolhedor -->
+            <p class="emodet-fecho">Ficar triste não é ser fraco. É o coração pedindo um cuidadinho. E você merece esse cuidado. 💙</p>
+
+            <a class="emodet-back" href="emocoes.html">← Voltar pras Emoções</a>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script>
+    window.kidsHeroConfig = {
+        kicker: 'EMOÇÕES · COMO LIDAR',
+        titulo: 'A Tristeza',
+        sub: 'A tristeza faz parte. Ela vem, fica um tempinho, e vai embora.',
+        emojis: ['😢', '💙'],
+    };
+</script>
+<script src="components/kids-hero.js"></script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>

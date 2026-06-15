@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>A Surpresa — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="kidsHero"></div>
+
+<main class="content">
+    <section class="section section-light">
+        <div class="emodet" style="--emo: var(--c-pink)">
+
+            <div class="emodet-lead">
+                <div class="emodet-face">😲</div>
+                <div>
+                    <h2 class="emodet-h2">O que é a surpresa?</h2>
+                    <p>A surpresa é aquele susto de algo inesperado. Ela pode ser boa (um presente, uma
+                    visita) ou difícil (um plano que mudou de repente). E passa rapidinho.</p>
+                </div>
+            </div>
+
+            <h2 class="emodet-h2">Como o meu corpo fica</h2>
+            <div class="emodet-signs">
+                <span class="sign-chip">😲 Olhos arregalados</span>
+                <span class="sign-chip">😮 Boca aberta</span>
+                <span class="sign-chip">🫢 Um pulinho de susto</span>
+                <span class="sign-chip">💓 Coração que dispara num instante</span>
+                <span class="sign-chip">🧠 Cabeça tentando entender</span>
+            </div>
+            <p class="emodet-note">Quando eu sinto isso, já sei: veio uma surpresa. E tudo bem.</p>
+
+            <!-- imagem genérica (placeholder) — trocar pela cena de surpresa depois -->
+            <h2 class="emodet-h2">O Kaco também sente</h2>
+            <figure class="emodet-scene">
+                <img src="img/personagens/KACO.jpeg" alt="O Kaco">
+                <figcaption>O Kaco também se surpreende. Ele para, respira e entende com calma.</figcaption>
+            </figure>
+
+            <h2 class="emodet-h2">O que eu posso fazer</h2>
+            <ol class="emodet-steps">
+                <li><span class="step-emoji">⏸️</span><div><strong>Paro um instante</strong> antes de reagir.</div></li>
+                <li><span class="step-emoji">🫁</span><div><strong>Respiro fundo</strong> uma vez.</div></li>
+                <li><span class="step-emoji">❓</span><div><strong>Pergunto</strong> o que está acontecendo.</div></li>
+                <li><span class="step-emoji">⏳</span><div><strong>Peço um tempinho</strong> se eu precisar entender melhor.</div></li>
+                <li><span class="step-emoji">🙂</span><div><strong>Lembro</strong> que toda surpresa passa rápido.</div></li>
+            </ol>
+
+            <div class="emo-respira">
+                <h2 class="emo-respira-titulo">Vamos respirar com o Kaco 🐒</h2>
+                <p class="emo-respira-sub">Siga a bolinha: enche o ar devagar e solta devagar.</p>
+                <div class="breath-circle"><span>respira…</span></div>
+            </div>
+
+            <p class="emodet-fecho">Surpresa boa a gente comemora. Surpresa difícil a gente respira e entende com calma. As duas passam. 💗</p>
+
+            <a class="emodet-back" href="emocoes.html">← Voltar pras Emoções</a>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script>
+    window.kidsHeroConfig = {
+        kicker: 'EMOÇÕES · COMO LIDAR',
+        titulo: 'A Surpresa',
+        sub: 'A surpresa é um susto rápido. Pode ser boa ou difícil.',
+        emojis: ['😲', '🎁'],
+    };
+</script>
+<script src="components/kids-hero.js"></script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>
