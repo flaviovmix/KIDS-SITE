@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Acordar — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Hero (componente kids-hero) renderiza aqui -->
+<div id="kidsHero"></div>
+
+<main class="content">
+    <section class="section section-light">
+        <div class="emodet" style="--emo: var(--c-amber)">
+
+            <!-- O que acontece -->
+            <div class="emodet-lead">
+                <div class="emodet-face">🌅</div>
+                <div>
+                    <h2 class="emodet-h2">Hora de acordar!</h2>
+                    <p>O dia está começando. Acordar com calma deixa tudo mais leve. Eu já sei o que
+                    vem agora, e saber o que vem deixa o meu corpo tranquilo.</p>
+                </div>
+            </div>
+
+            <!-- Sinais no corpo -->
+            <h2 class="emodet-h2">Como o meu corpo acorda</h2>
+            <div class="emodet-signs">
+                <span class="sign-chip">😴 Ainda com sono</span>
+                <span class="sign-chip">🥱 Um bocejo grande</span>
+                <span class="sign-chip">🙆 Vontade de espreguiçar</span>
+                <span class="sign-chip">👀 Olhos pesados</span>
+                <span class="sign-chip">☀️ Aos poucos, mais desperto</span>
+            </div>
+            <p class="emodet-note">Tudo bem acordar devagar. Cada um tem o seu ritmo.</p>
+
+            <!-- O Kaco também acorda -->
+            <!-- imagem genérica (placeholder) — trocar pela cena do Kaco acordando depois -->
+            <h2 class="emodet-h2">O Kaco também acorda assim</h2>
+            <figure class="emodet-scene">
+                <img src="img/personagens/KACO.jpeg" alt="O Kaco acordando">
+                <figcaption>O Kaco acorda devagar, espreguiça e dá um bom dia. Aí o dia dele começa!</figcaption>
+            </figure>
+
+            <!-- A sequência -->
+            <h2 class="emodet-h2">A minha sequência do acordar</h2>
+            <ol class="emodet-steps">
+                <li><span class="step-emoji">👀</span><div><strong>Abro os olhos</strong> devagar, deixando a luz chegar.</div></li>
+                <li><span class="step-emoji">🙆</span><div><strong>Espreguiço o corpo todo,</strong> braços pro alto!</div></li>
+                <li><span class="step-emoji">🛏️</span><div><strong>Sento na cama</strong> e sinto os pés tocarem o chão.</div></li>
+                <li><span class="step-emoji">☀️</span><div><strong>Falo "bom dia"</strong> pra quem está em casa.</div></li>
+                <li><span class="step-emoji">🚶</span><div><strong>Levanto e começo o meu dia,</strong> com calma.</div></li>
+            </ol>
+
+            <!-- Atividade: espreguiçar -->
+            <div class="emo-respira">
+                <h2 class="emo-respira-titulo">Vamos espreguiçar com o Kaco 🐒</h2>
+                <p class="emo-respira-sub">Estica os braços pro alto, conta até três e solta. Bom dia, corpo!</p>
+                <div class="breath-circle"><span>estica…</span></div>
+            </div>
+
+            <!-- Próximo passo da rotina -->
+            <a class="rotina-next" href="index.html#rotina" style="--emo: var(--c-blue)">
+                <span class="rotina-next-emoji">🪥</span>
+                <span class="rotina-next-txt">
+                    <span class="rotina-next-lab">Próximo passo</span>
+                    <span class="rotina-next-nome">Escovar os dentes</span>
+                </span>
+                <span class="rotina-next-arrow">→</span>
+            </a>
+
+            <!-- Fecho acolhedor -->
+            <p class="emodet-fecho">Cada dia começa com um novo bom dia. Acordar no meu ritmo deixa tudo mais gostoso. ☀️</p>
+
+            <a class="emodet-back" href="index.html#rotina">← Voltar pra rotina</a>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script>
+    window.kidsHeroConfig = {
+        kicker: 'ROTINA · PASSO A PASSO',
+        titulo: 'Acordar',
+        sub: 'O dia começa devagar. Saber o que vem agora deixa tudo mais tranquilo.',
+        emojis: ['🌅', '☀️'],
+    };
+</script>
+<script src="components/kids-hero.js"></script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>

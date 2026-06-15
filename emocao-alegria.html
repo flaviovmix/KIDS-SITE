@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>A Alegria — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Hero (componente kids-hero) renderiza aqui -->
+<div id="kidsHero"></div>
+
+<main class="content">
+    <section class="section section-light">
+        <div class="emodet" style="--emo: var(--c-amber)">
+
+            <!-- O que é -->
+            <div class="emodet-lead">
+                <div class="emodet-face">😄</div>
+                <div>
+                    <h2 class="emodet-h2">O que é a alegria?</h2>
+                    <p>A alegria aparece quando uma coisa boa acontece. O corpo fica leve, dá vontade de
+                    pular, sorrir e contar pra todo mundo! É uma das melhores sensações que existem.</p>
+                </div>
+            </div>
+
+            <!-- Sinais no corpo -->
+            <h2 class="emodet-h2">Como o meu corpo fica</h2>
+            <div class="emodet-signs">
+                <span class="sign-chip">😁 Sorriso grande</span>
+                <span class="sign-chip">🦋 Borboletas boas na barriga</span>
+                <span class="sign-chip">🤸 Vontade de pular</span>
+                <span class="sign-chip">🗣️ Vontade de contar pra todo mundo</span>
+                <span class="sign-chip">☀️ Corpo quentinho e leve</span>
+            </div>
+            <p class="emodet-note">Quando eu sinto isso, eu sei: a alegria chegou. Que bom!</p>
+
+            <!-- O Kaco também sente -->
+            <h2 class="emodet-h2">O Kaco também sente</h2>
+            <figure class="emodet-scene">
+                <img src="historias/passeio-feliz/7.jpeg" alt="O Kaco está feliz">
+                <figcaption>O Kaco ficou feliz de novo, do jeitinho dele. Olha esse sorriso!</figcaption>
+            </figure>
+
+            <!-- Como aproveitar -->
+            <h2 class="emodet-h2">Como eu aproveito</h2>
+            <ol class="emodet-steps">
+                <li><span class="step-emoji">😄</span><div><strong>Aproveito o momento</strong> sem pressa.</div></li>
+                <li><span class="step-emoji">🤝</span><div><strong>Divido a alegria</strong> com quem eu amo.</div></li>
+                <li><span class="step-emoji">📸</span><div><strong>Guardo essa sensação</strong> na memória.</div></li>
+                <li><span class="step-emoji">💛</span><div><strong>Lembro dela</strong> nos dias difíceis, pra me dar força.</div></li>
+                <li><span class="step-emoji">🙏</span><div><strong>Agradeço</strong> pela coisa boa que aconteceu.</div></li>
+            </ol>
+
+            <!-- Atividade: comemorar -->
+            <div class="emo-respira">
+                <h2 class="emo-respira-titulo">Comemora com o Kaco 🎉</h2>
+                <p class="emo-respira-sub">Dá um pulo, abre um sorriso bem grande e conta pra alguém o que te deixou feliz!</p>
+                <div class="breath-circle"><span>yay!</span></div>
+            </div>
+
+            <!-- Fecho -->
+            <p class="emodet-fecho">A alegria é pra ser vivida e dividida. Quanto mais a gente compartilha, maior ela fica! ☀️</p>
+
+            <a class="emodet-back" href="emocoes.html">← Voltar pras Emoções</a>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script>
+    window.kidsHeroConfig = {
+        kicker: 'EMOÇÕES · COMO APROVEITAR',
+        titulo: 'A Alegria',
+        sub: 'A alegria deixa o corpo leve. Vamos aproveitar e guardar essa sensação!',
+        emojis: ['😄', '☀️'],
+    };
+</script>
+<script src="components/kids-hero.js"></script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>

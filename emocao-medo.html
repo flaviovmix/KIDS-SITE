@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>O Medo — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="kidsHero"></div>
+
+<main class="content">
+    <section class="section section-light">
+        <div class="emodet" style="--emo: var(--c-purple)">
+
+            <div class="emodet-lead">
+                <div class="emodet-face">😨</div>
+                <div>
+                    <h2 class="emodet-h2">O que é o medo?</h2>
+                    <p>O medo aparece diante do que é novo, do escuro, de um barulho alto, ou de uma
+                    situação que parece grande demais. Ele não é covardia: é o meu corpo tentando me
+                    proteger.</p>
+                </div>
+            </div>
+
+            <h2 class="emodet-h2">Como o meu corpo fica</h2>
+            <div class="emodet-signs">
+                <span class="sign-chip">😨 Coração disparado</span>
+                <span class="sign-chip">🥶 Mãos geladas ou tremendo</span>
+                <span class="sign-chip">🫨 Vontade de fugir ou congelar</span>
+                <span class="sign-chip">😶 Voz que some</span>
+                <span class="sign-chip">😣 Barriga embrulhada</span>
+            </div>
+            <p class="emodet-note">Quando eu percebo esses sinais, já sei: o medo chegou. E tudo bem.</p>
+
+            <!-- imagem genérica (placeholder) — trocar pela cena de medo depois -->
+            <h2 class="emodet-h2">O Kaco também sente</h2>
+            <figure class="emodet-scene">
+                <img src="img/personagens/KACO.jpeg" alt="O Kaco">
+                <figcaption>O Kaco também sente medo às vezes. E aprende a atravessar com ajuda.</figcaption>
+            </figure>
+
+            <h2 class="emodet-h2">O que eu posso fazer</h2>
+            <ol class="emodet-steps">
+                <li><span class="step-emoji">✋</span><div><strong>Seguro a mão</strong> de quem cuida de mim.</div></li>
+                <li><span class="step-emoji">🗣️</span><div><strong>Falo o que sinto</strong> em voz alta, pra alguém.</div></li>
+                <li><span class="step-emoji">🐢</span><div><strong>Vou bem devagar,</strong> no meu ritmo.</div></li>
+                <li><span class="step-emoji">🤝</span><div><strong>Lembro</strong> que eu não estou sozinho.</div></li>
+                <li><span class="step-emoji">🧠</span><div><strong>Penso:</strong> "será que é tão grande quanto parece?"</div></li>
+            </ol>
+
+            <div class="emo-respira">
+                <h2 class="emo-respira-titulo">Vamos respirar com o Kaco 🐒</h2>
+                <p class="emo-respira-sub">Siga a bolinha: enche o ar devagar e solta devagar.</p>
+                <div class="breath-circle"><span>respira…</span></div>
+            </div>
+
+            <p class="emodet-fecho">Ter medo é normal, todo mundo tem. Coragem não é não sentir medo: é dar um passinho mesmo sentindo. 💜</p>
+
+            <a class="emodet-back" href="emocoes.html">← Voltar pras Emoções</a>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script>
+    window.kidsHeroConfig = {
+        kicker: 'EMOÇÕES · COMO LIDAR',
+        titulo: 'O Medo',
+        sub: 'O medo aparece pra nos proteger. Dá pra atravessar ele com ajuda.',
+        emojis: ['😨', '🛡️'],
+    };
+</script>
+<script src="components/kids-hero.js"></script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>

@@ -9,6 +9,7 @@
     var LINKS = [
         { href: 'index.html',           label: 'Início' },
         { href: 'historias.html',       label: 'Histórias' },
+        { href: 'emocoes.html',         label: 'Emoções' },
         { href: 'colorir.html',         label: 'Colorir' },
         { href: 'audio-historias.html', label: 'Áudio-histórias' },
         { href: 'familia.html',         label: 'Pra Família' }
