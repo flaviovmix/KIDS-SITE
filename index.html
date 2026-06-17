@@ -164,6 +164,12 @@
             </p>
         </div>
         <div class="char-showcase" data-char-showcase>
+            <!-- filtros por condição (reusa .chip da página de histórias) -->
+            <div class="char-filtros" data-char-filtros role="group" aria-label="Filtrar personagens">
+                <button class="chip active" type="button" data-cond="all">Todos</button>
+                <button class="chip" type="button" data-cond="autismo">Autismo</button>
+                <button class="chip" type="button" data-cond="paralisia">Paralisia</button>
+            </div>
             <!-- fileira de miniaturas (passe o mouse / toque) -->
             <div class="char-thumbs" role="tablist" aria-label="Escolha um personagem">
                 <button class="char-thumb is-active" type="button" data-index="0" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/mae.png" style="--accent:#e0729e;--accent2:#f7d9e8;">
@@ -251,6 +257,197 @@
                 ele tem dias leves e dias difíceis. E é nas pequenas aventuras do dia a dia
                 que ele aprende, no seu ritmo, a entender o mundo e a si mesmo.
             </p>
+        </div>
+    </section>
+
+    <section id="rotina" class="section section-light">
+        <div class="section-inner">
+            <h2 class="section-title">Criança tem que ser Criança</h2>
+            <p class="section-text section-intro">
+                A rotina do dia, passo a passo, do jeitinho do Kaco. Saber o que vem agora deixa
+                tudo mais tranquilo. Pais e terapeutas podem adaptar a sequência pra cada criança.
+            </p>
+        </div>
+        <div class="rotina-layout">
+            <div class="rotina-destaques">
+                <div class="destaque-card destaque-card-img" style="--rc:var(--c-amber)">
+                    <img class="destaque-img" src="modelo/image-1.png" alt="">
+                    <span class="destaque-text">
+                        <b class="destaque-label">Brincar</b>
+                        <small class="destaque-desc">Tempo livre pra brincar e ser criança, no ritmo dele. É assim que o Kaco aprende e fica feliz.</small>
+                        <span class="destaque-mais">Saiba mais →</span>
+                    </span>
+                </div>
+                <div class="destaque-card destaque-card-img" style="--rc:var(--c-green)">
+                    <img class="destaque-img" src="modelo/image-3.png" alt="">
+                    <span class="destaque-text">
+                        <b class="destaque-label">Terapia</b>
+                        <small class="destaque-desc">Apoio que acolhe e ajuda o Kaco a crescer com confiança. Cada conquista é celebrada.</small>
+                        <span class="destaque-mais">Saiba mais →</span>
+                    </span>
+                </div>
+            </div>
+            <div class="rotina-steps">
+                <a class="rotina-card rotina-card-img" href="rotina-acordar.html" style="--rc:var(--c-amber)">
+                    <span class="rotina-emoji has-img"><img src="modelo/image-2.png" alt="Acordar"></span>
+                    <span class="rotina-step">1</span>
+                    <span class="rotina-text">
+                        <b class="rotina-label">Acordar</b>
+                        <small class="rotina-desc">Começar o dia com calma.</small>
+                        <span class="rotina-mais">Saiba mais →</span>
+                    </span>
+                </a>
+                <div class="rotina-card rotina-card-img" style="--rc:var(--c-blue)">
+                    <span class="rotina-emoji has-img"><img src="modelo/image-3.png" alt="Escovar os dentes"></span>
+                    <span class="rotina-step">2</span>
+                    <span class="rotina-text">
+                        <b class="rotina-label">Escovar os dentes</b>
+                        <small class="rotina-desc">Sorriso limpinho.</small>
+                        <span class="rotina-mais">Saiba mais →</span>
+                    </span>
+                </div>
+                <div class="rotina-card rotina-card-img" style="--rc:var(--c-green)">
+                    <span class="rotina-emoji has-img"><img src="modelo/image-4.png" alt="Tomar café"></span>
+                    <span class="rotina-step">3</span>
+                    <span class="rotina-text">
+                        <b class="rotina-label">Tomar café</b>
+                        <small class="rotina-desc">Pra começar com energia.</small>
+                        <span class="rotina-mais">Saiba mais →</span>
+                    </span>
+                </div>
+                <div class="rotina-card rotina-card-img" style="--rc:var(--c-purple)">
+                    <span class="rotina-emoji has-img"><img src="modelo/image-2.png" alt="Se arrumar"></span>
+                    <span class="rotina-step">4</span>
+                    <span class="rotina-text">
+                        <b class="rotina-label">Se arrumar</b>
+                        <small class="rotina-desc">Pronto pra sair.</small>
+                        <span class="rotina-mais">Saiba mais →</span>
+                    </span>
+                </div>
+                <div class="rotina-card rotina-card-img" style="--rc:var(--c-pink)">
+                    <span class="rotina-emoji has-img"><img src="modelo/image-3.png" alt="Ir pra escola"></span>
+                    <span class="rotina-step">5</span>
+                    <span class="rotina-text">
+                        <b class="rotina-label">Ir pra escola</b>
+                        <small class="rotina-desc">Bora aprender!</small>
+                        <span class="rotina-mais">Saiba mais →</span>
+                    </span>
+                </div>
+                <div class="rotina-card rotina-card-img" style="--rc:var(--c-blue)">
+                    <span class="rotina-emoji has-img"><img src="modelo/image-4.png" alt="Tomar banho"></span>
+                    <span class="rotina-step">6</span>
+                    <span class="rotina-text">
+                        <b class="rotina-label">Tomar banho</b>
+                        <small class="rotina-desc">Hora da água.</small>
+                        <span class="rotina-mais">Saiba mais →</span>
+                    </span>
+                </div>
+                <div class="rotina-card rotina-card-img" style="--rc:#14b8a6">
+                    <span class="rotina-emoji has-img"><img src="modelo/image-2.png" alt="Arrumar os brinquedos"></span>
+                    <span class="rotina-step">7</span>
+                    <span class="rotina-text">
+                        <b class="rotina-label">Arrumar os brinquedos</b>
+                        <small class="rotina-desc">Cada um no lugar.</small>
+                        <span class="rotina-mais">Saiba mais →</span>
+                    </span>
+                </div>
+                <div class="rotina-card rotina-card-img" style="--rc:var(--c-red)">
+                    <span class="rotina-emoji has-img"><img src="modelo/image-3.png" alt="Ajudar a mamãe e o papai"></span>
+                    <span class="rotina-step">8</span>
+                    <span class="rotina-text">
+                        <b class="rotina-label">Ajudar a mamãe e o papai</b>
+                        <small class="rotina-desc">Em família é melhor.</small>
+                        <span class="rotina-mais">Saiba mais →</span>
+                    </span>
+                </div>
+                <div class="rotina-card rotina-card-img" style="--rc:var(--c-indigo)">
+                    <span class="rotina-emoji has-img"><img src="modelo/image-4.png" alt="Dormir"></span>
+                    <span class="rotina-step">9</span>
+                    <span class="rotina-text">
+                        <b class="rotina-label">Dormir</b>
+                        <small class="rotina-desc">Boa noite, Kaco.</small>
+                        <span class="rotina-mais">Saiba mais →</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="audios" class="section section-tint">
+        <div class="section-inner">
+            <h2 class="section-title">Áudio-histórias</h2>
+            <p class="section-text section-intro">
+                Modo de escutar pra quem cansa visualmente, está aprendendo a ler, ou prefere ouvir.
+                Transcrição sempre visível pra acompanhar.
+            </p>
+        </div>
+        <div class="home-audio-list">
+            <div class="home-audio-item" style="--c:var(--c-blue)">
+                <img class="home-audio-thumb" src="img-slide/0 (1).png" alt="O Passeio Feliz">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">O Passeio Feliz</a>
+                    <span class="home-audio-desc">Um passeio com a mamãe que vira brincadeira no caminho.</span>
+                    <span class="home-audio-row">
+                        <small>Rotina · 3:12</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/o-passeio-feliz.m4a"></audio>
+            </div>
+            <div class="home-audio-item" style="--c:var(--c-blue)">
+                <img class="home-audio-thumb" src="img-slide/0 (2).png" alt="A Mochila Esquecida">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">A Mochila Esquecida</a>
+                    <span class="home-audio-desc">Esquecer faz parte, e quase tudo tem solução com calma.</span>
+                    <span class="home-audio-row">
+                        <small>Rotina · 2:48</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/a-mochila-esquecida.m4a"></audio>
+            </div>
+            <div class="home-audio-item" style="--c:var(--c-green)">
+                <img class="home-audio-thumb" src="img-slide/0 (3).png" alt="Brincando no Parque">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">Brincando no Parque</a>
+                    <span class="home-audio-desc">Esperar a vez e dividir o balanço com a turma toda.</span>
+                    <span class="home-audio-row">
+                        <small>Aventura · 4:05</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/brincando-no-parque.m4a"></audio>
+            </div>
+            <div class="home-audio-item" style="--c:var(--c-amber)">
+                <img class="home-audio-thumb" src="img-slide/0 (4).png" alt="Aniversário Surpresa">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">Aniversário Surpresa</a>
+                    <span class="home-audio-desc">Uma festa inesperada e o coração batendo forte de surpresa.</span>
+                    <span class="home-audio-row">
+                        <small>Emoções · 3:30</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/aniversario-surpresa.m4a"></audio>
+            </div>
+            <div class="home-audio-item" style="--c:var(--c-amber)">
+                <img class="home-audio-thumb" src="img-slide/0 (5).png" alt="Dia de Chuva">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">Dia de Chuva</a>
+                    <span class="home-audio-desc">O passeio foi cancelado, mas dá pra achar diversão dentro de casa.</span>
+                    <span class="home-audio-row">
+                        <small>Emoções · 2:55</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/dia-de-chuva.m4a"></audio>
+            </div>
+            <a class="home-audio-more" href="audio-historias.html">Ouvir todas →</a>
         </div>
     </section>
 
@@ -348,153 +545,6 @@
         </div>
     </section>
 
-    <section id="rotina" class="section section-tint">
-        <div class="section-inner">
-            <h2 class="section-title">Criança tem que ser Criança</h2>
-            <p class="section-text section-intro">
-                A rotina do dia, passo a passo, do jeitinho do Kaco. Saber o que vem agora deixa
-                tudo mais tranquilo. Pais e terapeutas podem adaptar a sequência pra cada criança.
-            </p>
-        </div>
-        <div class="rotina-layout">
-            <div class="rotina-destaques">
-                <div class="destaque-card" style="--rc:var(--c-amber)">
-                    <span class="destaque-emoji">🧸</span>
-                    <span class="destaque-label">Brincar</span>
-                </div>
-                <div class="destaque-card" style="--rc:var(--c-green)">
-                    <span class="destaque-emoji">🧩</span>
-                    <span class="destaque-label">Terapia</span>
-                </div>
-            </div>
-            <div class="rotina-steps">
-                <a class="rotina-card" href="rotina-acordar.html" style="--rc:var(--c-amber)">
-                    <span class="rotina-emoji">🌅</span>
-                    <span class="rotina-step">1</span>
-                    <span class="rotina-label">Acordar</span>
-                </a>
-                <div class="rotina-card" style="--rc:var(--c-blue)">
-                    <span class="rotina-emoji">🪥</span>
-                    <span class="rotina-step">2</span>
-                    <span class="rotina-label">Escovar os dentes</span>
-                </div>
-                <div class="rotina-card" style="--rc:var(--c-green)">
-                    <span class="rotina-emoji">🥣</span>
-                    <span class="rotina-step">3</span>
-                    <span class="rotina-label">Tomar café</span>
-                </div>
-                <div class="rotina-card" style="--rc:var(--c-purple)">
-                    <span class="rotina-emoji">👕</span>
-                    <span class="rotina-step">4</span>
-                    <span class="rotina-label">Se arrumar</span>
-                </div>
-                <div class="rotina-card" style="--rc:var(--c-pink)">
-                    <span class="rotina-emoji">🎒</span>
-                    <span class="rotina-step">5</span>
-                    <span class="rotina-label">Ir pra escola</span>
-                </div>
-                <div class="rotina-card" style="--rc:var(--c-blue)">
-                    <span class="rotina-emoji">🛁</span>
-                    <span class="rotina-step">6</span>
-                    <span class="rotina-label">Tomar banho</span>
-                </div>
-                <div class="rotina-card" style="--rc:#14b8a6">
-                    <span class="rotina-emoji">🧺</span>
-                    <span class="rotina-step">7</span>
-                    <span class="rotina-label">Arrumar os brinquedos</span>
-                </div>
-                <div class="rotina-card" style="--rc:var(--c-red)">
-                    <span class="rotina-emoji">🤝</span>
-                    <span class="rotina-step">8</span>
-                    <span class="rotina-label">Ajudar a mamãe e o papai</span>
-                </div>
-                <div class="rotina-card" style="--rc:var(--c-indigo)">
-                    <span class="rotina-emoji">🌙</span>
-                    <span class="rotina-step">9</span>
-                    <span class="rotina-label">Dormir</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="audios" class="section section-light">
-        <div class="section-inner">
-            <h2 class="section-title">Áudio-histórias</h2>
-            <p class="section-text section-intro">
-                Modo de escutar pra quem cansa visualmente, está aprendendo a ler, ou prefere ouvir.
-                Transcrição sempre visível pra acompanhar.
-            </p>
-        </div>
-        <div class="home-audio-list">
-            <div class="home-audio-item" style="--c:var(--c-blue)">
-                <img class="home-audio-thumb" src="img-slide/0 (1).png" alt="O Passeio Feliz">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">O Passeio Feliz</a>
-                    <span class="home-audio-desc">Um passeio com a mamãe que vira brincadeira no caminho.</span>
-                    <span class="home-audio-row">
-                        <small>Rotina · 3:12</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/o-passeio-feliz.m4a"></audio>
-            </div>
-            <div class="home-audio-item" style="--c:var(--c-blue)">
-                <img class="home-audio-thumb" src="img-slide/0 (2).png" alt="A Mochila Esquecida">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">A Mochila Esquecida</a>
-                    <span class="home-audio-desc">Esquecer faz parte, e quase tudo tem solução com calma.</span>
-                    <span class="home-audio-row">
-                        <small>Rotina · 2:48</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/a-mochila-esquecida.m4a"></audio>
-            </div>
-            <div class="home-audio-item" style="--c:var(--c-green)">
-                <img class="home-audio-thumb" src="img-slide/0 (3).png" alt="Brincando no Parque">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">Brincando no Parque</a>
-                    <span class="home-audio-desc">Esperar a vez e dividir o balanço com a turma toda.</span>
-                    <span class="home-audio-row">
-                        <small>Aventura · 4:05</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/brincando-no-parque.m4a"></audio>
-            </div>
-            <div class="home-audio-item" style="--c:var(--c-amber)">
-                <img class="home-audio-thumb" src="img-slide/0 (4).png" alt="Aniversário Surpresa">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">Aniversário Surpresa</a>
-                    <span class="home-audio-desc">Uma festa inesperada e o coração batendo forte de surpresa.</span>
-                    <span class="home-audio-row">
-                        <small>Emoções · 3:30</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/aniversario-surpresa.m4a"></audio>
-            </div>
-            <div class="home-audio-item" style="--c:var(--c-amber)">
-                <img class="home-audio-thumb" src="img-slide/0 (5).png" alt="Dia de Chuva">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">Dia de Chuva</a>
-                    <span class="home-audio-desc">O passeio foi cancelado, mas dá pra achar diversão dentro de casa.</span>
-                    <span class="home-audio-row">
-                        <small>Emoções · 2:55</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/dia-de-chuva.m4a"></audio>
-            </div>
-            <a class="home-audio-more" href="audio-historias.html">Ouvir todas →</a>
-        </div>
-    </section>
-
     <section id="familia" class="section section-tint">
         <div class="section-inner">
             <h2 class="section-title">Pra Família</h2>
@@ -553,6 +603,17 @@
             const r = bar.getBoundingClientRect();
             if (audio.duration) audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
         });
+    });
+</script>
+<script>
+    /* Filtro por condição na seção Personagens (só alterna o chip ativo por enquanto;
+       a filtragem real depende de marcar cada personagem com data-cond). */
+    const charFiltros = document.querySelector('[data-char-filtros]');
+    if (charFiltros) charFiltros.addEventListener('click', (e) => {
+        const b = e.target.closest('.chip');
+        if (!b) return;
+        charFiltros.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        b.classList.add('active');
     });
 </script>
 <script src="components/kids-footer.js"></script>

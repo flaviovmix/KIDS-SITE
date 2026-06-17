@@ -11,8 +11,8 @@
     var ITEMS = [
         { id: 'sobre',       label: 'Sobre' },
         { id: 'personagens', label: 'Personagens' },
-        { id: 'emocoes',     label: 'Lidando com Emoções' },
         { id: 'rotina',      label: 'Ser Criança' },
+        { id: 'emocoes',     label: 'Lidando com Emoções' },
         { id: 'familia',     label: 'Família' }
     ];
 

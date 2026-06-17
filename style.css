@@ -76,6 +76,7 @@ body {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    width: max-content;   /* mede pelo conteúdo; senão fica presa à metade direita e quebra o texto */
 }
 
 .menu-link {
@@ -297,6 +298,7 @@ body {
         left: 0;
         right: 0;
         transform: none;
+        width: auto;   /* dropdown mobile volta a ser full-width (sobrescreve o max-content do desktop) */
         flex-direction: column;
         align-items: stretch;
         gap: 0;
@@ -342,64 +344,20 @@ body {
 }
 
 /* ===== Conteúdo central ===== */
-.hero-content {
-    position: relative;
-    z-index: 3;
-    text-align: center;
-    color: #fff;
-    padding: 0 24px;
-}
 
-.hero-title {
-    font-size: clamp(80px, 14vw, 200px);
-    font-weight: 900;
-    letter-spacing: 4px;
-    line-height: 1;
-    color: #ffd84d;
-    -webkit-text-stroke: 6px #6b3a0e;
-    text-shadow:
-        0 6px 0 #6b3a0e,
-        0 12px 24px rgba(0,0,0,0.25);
-    animation: title-bounce 3s ease-in-out infinite;
-}
 
-.hero-sub {
-    margin-top: 12px;
-    font-size: clamp(18px, 2.4vw, 28px);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    opacity: 0.92;
-    animation: sub-fade 4s ease-in-out infinite;
-}
+
+
+
 
 /* ===== Personagem placeholder ===== */
-.character {
-    margin: 32px auto 0;
-    width: 140px;
-    height: 140px;
-    position: relative;
-    animation: character-float 4s ease-in-out infinite;
-}
 
-.character-body {
-    width: 100%; height: 100%;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #b87333 0%, #6b3a0e 80%);
-    box-shadow: inset -10px -14px 24px rgba(0,0,0,0.3), 0 16px 32px rgba(0,0,0,0.25);
-    position: relative;
-}
 
-.character-body::before,
-.character-body::after {
-    content: '';
-    position: absolute;
-    top: 38%; width: 18px; height: 18px;
-    background: #fff;
-    border-radius: 50%;
-    box-shadow: inset -4px -4px 0 #1a1a1a;
-}
-.character-body::before { left: 28%; }
-.character-body::after  { right: 28%; }
+
+
+
+
+
 
 /* ===== Personagem do cabeçalho ===== */
 .hero-character {
@@ -664,16 +622,7 @@ body {
     margin: 0 auto;
     text-align: center;
 }
-.section-kicker {
-    display: inline-block;
-    font-family: 'Baloo 2', system-ui, sans-serif;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--c-blue);
-    margin-bottom: 12px;
-}
+
 .section-title {
     font-family: 'Baloo 2', system-ui, sans-serif;
     font-size: clamp(28px, 4vw, 44px);
@@ -699,36 +648,10 @@ body {
 }
 
 /* ===== Grid de personagens ===== */
-.char-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    margin-top: 32px;
-    /* break out pra tela toda, ignorando padding/max-width da seção */
-    width: 100vw;
-    margin-left: calc(50% - 50vw);
-    border-top: 1px solid rgba(var(--shadow-rgb),0.10);
-    border-left: 1px solid rgba(var(--shadow-rgb),0.10);
-    background: #ffffff;
-}
-.char-card {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-    text-align: left;
-    padding: 28px 24px;
-    text-decoration: none;
-    color: inherit;
-    border-right: 1px solid rgba(var(--shadow-rgb),0.10);
-    border-bottom: 1px solid rgba(var(--shadow-rgb),0.10);
-    transition: background 0.2s ease;
-}
-.char-card:hover {
-    background: var(--c-surface-2);
-}
-.char-card:active {
-    background: #eaf3fa;
-}
+
+
+
+
 .char-avatar {
     flex-shrink: 0;
     align-self: center;
@@ -751,41 +674,23 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 12px 24px rgba(0,30,60,0.22);
 }
-.char-info {
-    flex: 1;
-    min-width: 0;
-}
-.char-name {
-    font-family: 'Baloo 2', system-ui, sans-serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--c-ink);
-    margin-bottom: 4px;
-    text-align: left;
-}
-.char-desc {
-    font-family: 'Baloo 2', system-ui, sans-serif;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    color: var(--c-text-2);
-    text-align: left;
-    margin: 0;
-}
+
+
+
 
 /* Desktop: grid contido e centralizado em vez de full-bleed */
-@media (min-width: 900px) {
-    .char-grid {
-        width: 100%;
-        max-width: 1100px;
-        margin-left: auto;
-        margin-right: auto;
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
+
 
 /* ===== Showcase de personagens (miniatura no hover -> detalhe desliza embaixo) ===== */
 .char-showcase {
     margin-top: 36px;
+}
+/* filtros por condição (chips) acima das miniaturas */
+.char-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
 }
 /* fileira de miniaturas */
 .char-thumbs {
@@ -984,6 +889,14 @@ body {
 }
 
 @media (min-width: 900px) {
+    .char-filtros {
+        justify-content: flex-end;       /* alinha os chips com as miniaturas */
+        max-width: 1100px;
+        margin-left: auto;
+        margin-right: auto;
+        position: relative;
+        left: 64px;                      /* casa a borda direita com as miniaturas */
+    }
     .char-thumbs {
         justify-content: flex-end;       /* fileira alinhada à direita */
         flex-wrap: wrap;
@@ -1229,10 +1142,10 @@ body {
 @media (max-width: 600px) {
     .section { padding: 56px 20px; }
     .section-title { margin-bottom: 18px; }
-    .char-card { padding: 20px 16px; gap: 12px; }
+    
     .char-avatar { width: 130px; height: 130px; border-width: 3px; }
-    .char-name { font-size: 0.98rem; }
-    .char-desc { font-size: 0.82rem; line-height: 1.4; }
+    
+    
 
     .emocao-grid { grid-template-columns: 1fr; }
     .emocao-card { padding: 24px 18px; gap: 12px; }
@@ -1656,25 +1569,8 @@ body {
 }
 .story-dl-btn:hover { transform: translateY(-2px); border-color: var(--accent); color: var(--accent); }
 .story-dl-btn:disabled { opacity: 0.6; cursor: default; transform: none; }
-.story-badge {
-    display: block;
-    width: fit-content;
-    margin: 0 auto 8px;
-    font-size: 0.66rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #fff;
-    background: var(--accent);
-    padding: 5px 12px;
-    border-radius: 8px;
-}
-.story-title {
-    font-family: 'Baloo 2', system-ui, sans-serif;
-    font-size: clamp(26px, 4vw, 40px);
-    font-weight: 700;
-    color: var(--c-ink);
-}
+
+
 
 /* Palco: setas laterais + moldura da cena */
 .story-stage { position: relative; display: flex; align-items: center; gap: 12px; }
@@ -1704,15 +1600,8 @@ body {
     border-radius: 18px;
 }
 
-.story-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;   /* texto embutido não pode cortar */
-    display: block;
-    opacity: 0;
-    transition: opacity .6s ease;
-}
-.story-img.is-in { opacity: 1; }
+
+
 
 .story-nav {
     flex: none;
@@ -1792,9 +1681,9 @@ body {
 
 /* Variante livro (StPageFlip) — a lib monta .stf__parent dentro do .flip-wrap.
    Largura travada < 2 páginas pra lib cair em modo página-única. */
-.flip-wrap { flex: 1; min-width: 0; max-width: 1200px; margin: 0 auto; }
-.flip-wrap .stf__parent { margin: 0 auto; }
-.flip-wrap .stf__block { border-radius: 14px; overflow: hidden; }
+
+
+
 
 /* Flip 3D próprio (kids-story-flip3d) — base estática + clone que gira */
 .book3d {
@@ -2134,43 +2023,13 @@ body {
 .emodet-back:hover { text-decoration: underline; }
 
 /* Próximo passo da rotina (cor herda de --emo via inline style) */
-.rotina-next {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-top: 40px;
-    padding: 18px 22px;
-    border-radius: 20px;
-    background: color-mix(in srgb, var(--emo) 12%, #fff);
-    border: 2px solid color-mix(in srgb, var(--emo) 40%, #fff);
-    text-decoration: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.rotina-next:hover {
-    transform: translateX(4px);
-    box-shadow: 0 12px 26px rgba(var(--shadow-rgb),0.12);
-}
-.rotina-next-emoji { font-size: 46px; line-height: 1; }
-.rotina-next-txt { display: flex; flex-direction: column; }
-.rotina-next-lab {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--c-text-2);
-}
-.rotina-next-nome {
-    font-family: 'Baloo 2', system-ui, sans-serif;
-    font-weight: 700;
-    font-size: 22px;
-    color: var(--c-ink);
-}
-.rotina-next-arrow {
-    margin-left: auto;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--emo);
-}
+
+
+
+
+
+
+
 
 @media (max-width: 600px) {
     .emodet-lead { flex-direction: column; text-align: center; }
@@ -2409,11 +2268,12 @@ a.home-audio-title:hover { text-decoration: underline; text-decoration-color: va
 
 /* Layout: cards grandes (Brincar/Terapia) à esquerda + passos do dia à direita */
 .rotina-layout {
-    max-width: 1100px;
-    margin: 36px auto 0;
+    max-width: 1320px;
+    margin: 80px auto 0;       /* desce o bloco pras personagens não subirem no texto */
+    transform: translateX(50px); /* afasta da esquerda, compensa as personagens que vazam pra fora */
     display: grid;
     grid-template-columns: 300px 1fr;
-    gap: 18px;
+    gap: 18px 48px;            /* column-gap maior: só o vão entre os cards grandes e a grade de passos */
     align-items: stretch;
 }
 .rotina-destaques {
@@ -2424,10 +2284,11 @@ a.home-audio-title:hover { text-decoration: underline; text-decoration-color: va
 .rotina-steps {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
+    grid-auto-rows: 1fr;   /* todos os cards na mesma altura */
+    gap: 56px 64px;        /* respiro vertical e horizontal pras personagens não invadirem os vizinhos */
 }
 @media (max-width: 900px) {
-    .rotina-layout { grid-template-columns: 1fr; }
+    .rotina-layout { grid-template-columns: 1fr; transform: none; }
     .rotina-destaques { grid-template-rows: none; grid-template-columns: repeat(2, 1fr); }
     .rotina-steps { grid-template-columns: repeat(2, 1fr); }
 }
@@ -2471,6 +2332,49 @@ a.home-audio-title:hover { text-decoration: underline; text-decoration-color: va
     background: color-mix(in srgb, var(--rc) 18%, #fff);
     border: 3px solid var(--rc, var(--c-blue));
 }
+/* personagem (recorte transparente) vazando pra cima do card, sem o círculo */
+.rotina-emoji.has-img {
+    overflow: visible; position: relative;
+    background: transparent; border: none;   /* tira a bolha */
+    width: 80px;                              /* slot reservado no flex */
+}
+.rotina-emoji.has-img img {
+    position: absolute;
+    left: 50%; bottom: -40px;                 /* desce um pouco */
+    transform: translateX(calc(-50% - 18px)); /* personagem um pouco pra esquerda */
+    width: auto; height: 200px;               /* altura fixa */
+    filter: drop-shadow(0 8px 10px rgba(var(--shadow-rgb),0.28));
+}
+/* nesse card o número vai pro canto direito (a personagem ocupa a esquerda) */
+.rotina-card-img { padding-bottom: 40px; }   /* reserva o espaço do "Saiba mais" absoluto */
+.rotina-card-img .rotina-step { left: auto; right: -14px; }
+/* texto empurrado pra direita + descriçãozinha */
+.rotina-card-img .rotina-text {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: right;
+    max-width: 68%;
+}
+.rotina-card-img .rotina-label { font-size: 21px; transform: translateX(-10px); }
+.rotina-mais {
+    position: absolute;
+    right: 18px;
+    bottom: 12px;                 /* preso na base do card, fora do fluxo */
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--rc, var(--c-blue));
+}
+.rotina-card:hover .rotina-mais { text-decoration: underline; }
+.rotina-card-img .rotina-desc {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.35;
+    color: var(--c-text-2);
+}
 .rotina-step {
     position: absolute;
     top: -14px;
@@ -2501,6 +2405,8 @@ a.home-audio-title:hover { text-decoration: underline; text-decoration-color: va
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-decoration: none;
+    color: inherit;
     background: #fff;
     border: 3px solid var(--rc, var(--c-blue));
     border-radius: 28px;
@@ -2516,24 +2422,65 @@ a.home-audio-title:hover { text-decoration: underline; text-decoration-color: va
 }
 .destaque-card:nth-child(odd):hover  { transform: rotate(1.2deg) translateY(-5px) scale(1.05); }
 .destaque-card:nth-child(even):hover { transform: rotate(-1.2deg) translateY(-5px) scale(1.05); }
-.destaque-emoji {
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    font-size: 74px;
-    line-height: 1;
-    margin-bottom: 16px;
-    background: color-mix(in srgb, var(--rc) 18%, #fff);
-    border: 4px solid var(--rc, var(--c-blue));
-}
+
 .destaque-label {
     display: block;
     font-family: 'Baloo 2', system-ui, sans-serif;
     font-weight: 800;
     font-size: clamp(32px, 4.4vw, 48px);
     color: var(--rc, var(--c-blue));
+}
+/* card de destaque no mesmo formato dos cards de passo: imagem à esquerda,
+   texto (título + descrição) à direita; tamanho grande do destaque */
+.destaque-card-img {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    overflow: visible;
+    position: relative;
+}
+.destaque-img {
+    position: absolute;
+    left: -130px;              /* puxada bem pra esquerda, vaza bastante pra fora */
+    top: 50%;
+    transform: translateY(-50%);
+    height: 280px;             /* fixa, grande */
+    width: auto;
+    z-index: 1;                /* atrás do texto */
+    filter: drop-shadow(0 12px 16px rgba(var(--shadow-rgb),0.28));
+}
+.destaque-text {
+    margin-left: auto;         /* empurra o texto pra direita */
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    z-index: 2;                /* texto na frente da imagem (flex item, dispensa position) */
+}
+.destaque-card-img { padding-bottom: 56px; }   /* reserva a faixa do "Saiba mais" */
+.destaque-card-img .destaque-text { max-width: 80%; }
+.destaque-card-img .destaque-label { font-size: clamp(22px, 3vw, 28px); }
+.destaque-mais {
+    position: absolute;
+    right: 24px;
+    bottom: 18px;                 /* preso na base do card */
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--rc, var(--c-blue));
+}
+.destaque-card:hover .destaque-mais { text-decoration: underline; }
+.destaque-desc {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.35;
+    color: var(--c-text-2);
+}
+@media (max-width: 900px) {
+    .destaque-img { height: 120px; }
 }
 
 /* ===== Rodapé único (injetado por components/kids-footer.js) ===== */
@@ -2651,3 +2598,87 @@ a.home-audio-title:hover { text-decoration: underline; text-decoration-color: va
 .fam-card p { font-size: 15px; line-height: 1.6; color: var(--c-text-soft); font-weight: 500; }
 @media (max-width: 860px) { .fam-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 540px) { .fam-grid { grid-template-columns: 1fr; } }
+
+/* ===== Página de Tema (Pra Família) — MOLDE reutilizável =====
+   Guia pra pais/terapeutas sobre um tema (alimentação, fala, agressividade…).
+   A cor de acento chega via --tema (setado inline no HTML, apontando pros
+   tokens de acento). Clonar esta estrutura pra cada novo tema. */
+.tema { max-width: 760px; margin: 0 auto; --tema: var(--c-green); }
+.tema p { font-size: 17px; line-height: 1.8; color: var(--c-text); margin-bottom: 16px; }
+.tema strong { color: var(--c-ink); }
+
+/* Abertura: emoji grande + parágrafo acolhedor */
+.tema-lead { display: flex; align-items: center; gap: 24px; margin-bottom: 12px; }
+.tema-face {
+    flex: none; width: 96px; height: 96px; border-radius: 28px;
+    display: grid; place-items: center; font-size: 52px; line-height: 1;
+    background: color-mix(in srgb, var(--tema) 14%, #fff);
+    border: 2px solid color-mix(in srgb, var(--tema) 34%, #fff);
+}
+.tema-lead p { margin-bottom: 0; }
+
+/* Títulos de seção, com um filete na cor do tema */
+.tema-h2 {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 1.5rem; font-weight: 700; color: var(--c-ink);
+    margin: 40px 0 14px; padding-left: 14px;
+    border-left: 6px solid var(--tema);
+}
+
+/* Chips de sinais (mesma pegada do .sign-chip das emoções) */
+.tema-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.tema-chip {
+    padding: 9px 15px; border-radius: 999px; font-weight: 600; font-size: 0.96rem;
+    color: var(--c-ink); background: var(--c-surface-2); border: 1px solid var(--c-line);
+}
+
+/* Lista de dicas numeradas com emoji */
+.tema-tips { list-style: none; display: flex; flex-direction: column; gap: 14px; margin: 0; }
+.tema-tips li { display: flex; align-items: flex-start; gap: 14px; }
+.tema-tip-emoji { flex: none; font-size: 28px; line-height: 1.2; }
+.tema-tips div {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 1.02rem; line-height: 1.55; color: var(--c-text);
+}
+
+/* Faz / Evita — duas colunas */
+.tema-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.tema-col { padding: 20px 22px; border-radius: 20px; background: #fff; border: 2px solid var(--c-line); }
+.tema-col h3 { font-size: 1.1rem; font-weight: 700; color: var(--c-ink); margin-bottom: 12px; }
+.tema-col ul { list-style: none; margin: 0; display: flex; flex-direction: column; gap: 9px; }
+.tema-col li { font-size: 0.98rem; line-height: 1.5; color: var(--c-text); padding-left: 26px; position: relative; }
+.tema-col.is-do { border-color: color-mix(in srgb, var(--c-green) 40%, #fff); }
+.tema-col.is-dont { border-color: color-mix(in srgb, var(--c-red) 40%, #fff); }
+.tema-col.is-do li::before { content: "✓"; position: absolute; left: 0; color: var(--c-green); font-weight: 800; }
+.tema-col.is-dont li::before { content: "✕"; position: absolute; left: 0; color: var(--c-red); font-weight: 800; }
+
+/* Caixa de alerta: quando procurar ajuda */
+.tema-alerta {
+    margin-top: 18px; padding: 24px 26px; border-radius: 20px;
+    background: color-mix(in srgb, var(--tema) 12%, #fff);
+    border: 2px solid color-mix(in srgb, var(--tema) 30%, #fff);
+}
+.tema-alerta h3 {
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 1.2rem; font-weight: 700; color: var(--c-ink); margin-bottom: 8px;
+}
+.tema-alerta ul { margin: 12px 0 0; padding-left: 20px; }
+.tema-alerta li { font-size: 1rem; line-height: 1.7; color: var(--c-text); }
+
+/* Fecho + voltar */
+.tema-fecho {
+    margin-top: 40px; text-align: center;
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 1.1rem; font-weight: 600; color: var(--c-ink);
+}
+.tema-back {
+    display: inline-block; margin-top: 24px;
+    font-family: 'Baloo 2', system-ui, sans-serif; font-weight: 700;
+    color: var(--tema); text-decoration: none;
+}
+.tema-back:hover { text-decoration: underline; }
+
+@media (max-width: 600px) {
+    .tema-lead { flex-direction: column; text-align: center; }
+    .tema-cols { grid-template-columns: 1fr; }
+}
