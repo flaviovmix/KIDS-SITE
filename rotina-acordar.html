@@ -149,7 +149,7 @@
                 <span class="cloud c1">☁️</span><span class="cloud c2">☁️</span>
 
                 <figure class="tr-scene">
-                    <img src="modelo/image-1.png" alt="O Kaco">
+                    <img src="ser-crianca/image-1.png" alt="O Kaco">
                     <figcaption>Dormindo… 😴</figcaption>
                 </figure>
 
@@ -193,7 +193,7 @@
                 <span class="flag">🏁</span>
                 Trilha completa! O dia do Kaco começou.
                 <br>
-                <a class="tr-next" href="index.html#rotina">🪥 Próxima trilha: escovar os dentes →</a>
+                <a class="tr-next" href="rotina-escovar-dentes.html">🪥 Próxima trilha: escovar os dentes →</a>
             </div>
 
             <button class="tr-reset" type="button">↺ Começar de novo</button>
@@ -225,7 +225,7 @@
 
         // 1 imagem por estado (0 = dormindo). Faltam image-5 e image-6 pros 2 últimos passos;
         // por ora a última imagem se repete. Só adicionar no array quando tiver as artes.
-        var frames = ['modelo/image-1.png', 'modelo/image-2.png', 'modelo/image-3.png', 'modelo/image-4.png'];
+        var frames = ['ser-crianca/image-1.png', 'ser-crianca/image-2.png', 'ser-crianca/image-3.png', 'ser-crianca/image-4.png'];
         var caps = ['Dormindo… 😴', 'Abri os olhos! 👀', 'Espreguicei! 🙆',
                     'Sentei na cama 🛏️', 'Bom dia! ☀️', 'De pé pro dia! 🚶'];
         var current = 0; // passos feitos = próximo passo liberado
@@ -250,6 +250,12 @@
                 if (i !== current) return; // só o passo da vez avança
                 current++;
                 render();
+                if (current === total) {           // trilha completa → vai pro próximo sozinho
+                    var next = finish.querySelector('.tr-next');
+                    if (next && next.href) {
+                        setTimeout(function () { window.location.href = next.href; }, 2200);
+                    }
+                }
             });
         });
         if (reset) reset.addEventListener('click', function () { current = 0; render(); });
@@ -276,6 +282,7 @@
     })();
 </script>
 <script src="components/kids-toc.js"></script>
+<script src="components/kids-nav.js"></script>
 <script src="components/kids-footer.js"></script>
 </body>
 </html>

@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Arrumar os brinquedos — Trilha do quarto</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ===== Trilha (tabuleiro) — cena em PNG (1 arte por passo) ===== */
+        .section { padding-top: 16px; }
+        .tr-page { max-width: 1200px; margin: 0 auto; padding: 6px 18px 48px; }
+        .tr-mission {
+            display: flex; align-items: center; gap: 16px; justify-content: center;
+            background: #fff; border: 2px dashed var(--c-amber); border-radius: 20px;
+            padding: 14px 22px; margin: 0 auto 30px; max-width: 520px;
+        }
+        .tr-mission .av { width: 56px; height: 56px; border-radius: 50%; object-fit: cover;
+            border: 3px solid var(--c-amber); }
+        .tr-mission b { display: block; font-family: 'Baloo 2', system-ui, sans-serif;
+            color: var(--c-ink); font-size: 1.1rem; }
+        .tr-mission small { color: var(--c-text-2); }
+        .tr-stars { margin-left: auto; font-size: 18px; letter-spacing: 2px; }
+
+        /* barra de progresso */
+        .tr-prog { max-width: 520px; margin: 0 auto 26px; }
+        .tr-prog-top { display: flex; justify-content: space-between; align-items: center;
+            font-family: 'Baloo 2', system-ui, sans-serif; font-weight: 800;
+            color: var(--c-ink); margin-bottom: 8px; }
+        .tr-prog-top .cnt { color: var(--c-green); }
+        .tr-bar { height: 16px; border-radius: 12px; background: #e6eef5; overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(var(--shadow-rgb),0.12); }
+        .tr-fill { height: 100%; width: 0; border-radius: 12px;
+            background: linear-gradient(90deg, var(--c-green), var(--c-amber));
+            transition: width 0.45s cubic-bezier(.4,1.4,.5,1); }
+        /* variante quando a barra é movida pra dentro do hero (entre título e descrição) */
+        .tr-prog.in-hero { max-width: 360px; margin: 18px auto 4px; }
+        .tr-prog.in-hero .tr-prog-top, .tr-prog.in-hero .cnt { color: #fff; }
+        .tr-prog.in-hero .tr-bar { background: rgba(255,255,255,0.28);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.18); }
+
+        .tr-board {
+            position: relative; border-radius: 28px; padding: 40px 20px 48px;
+            background: linear-gradient(180deg, #ffe9a8 0%, #ffd6e6 45%, #e9e0ff 100%);
+            box-shadow: inset 0 0 0 3px rgba(255,255,255,.5), 0 18px 40px rgba(var(--shadow-rgb),0.12);
+            overflow: visible;
+            margin-left: 230px;
+        }
+        .tr-board .bigsun { position: absolute; top: 18px; right: 24px; font-size: 64px;
+            filter: drop-shadow(0 6px 10px rgba(42,169,224,.4)); }
+        .tr-board .cloud { position: absolute; font-size: 40px; opacity: .8; }
+        .tr-board .c1 { top: 30px; left: 24px; } .tr-board .c2 { bottom: 40px; right: 30px; }
+
+        .tr-path { position: relative; list-style: none; display: flex; flex-direction: column;
+            gap: 18px; flex: 1 1 50%; min-width: 0; margin: 0; }
+        .tr-path::before { content: ""; position: absolute; left: 50%; top: 30px; bottom: 30px;
+            width: 0; border-left: 4px dashed rgba(255,255,255,.85); transform: translateX(-50%); }
+
+        .tr-stone { position: relative; display: flex; align-items: center; gap: 16px;
+            background: #fff; border-radius: 20px; padding: 14px 52px 14px 20px;
+            box-shadow: 0 10px 22px rgba(var(--shadow-rgb),0.14);
+            border: 3px solid var(--sc); width: 78%; cursor: pointer; user-select: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.25s ease; }
+        .tr-check { position: absolute; top: 50%; right: 14px; transform: translateY(-50%);
+            width: 30px; height: 30px; border-radius: 50%; border: 3px solid var(--sc);
+            background: #fff; display: grid; place-items: center; color: transparent;
+            font-weight: 900; font-size: 16px; transition: all 0.2s ease; }
+        .tr-stone.done .tr-check { background: var(--sc); color: #fff; transform: translateY(-50%) scale(1.12); }
+        .tr-stone.done .tr-bubble { background: color-mix(in srgb, var(--sc) 40%, #fff); }
+        .tr-stone:nth-child(odd)  { align-self: flex-start; transform: rotate(-1.4deg); }
+        .tr-stone:nth-child(even) { align-self: flex-end;   transform: rotate(1.4deg); }
+        .tr-stone:not(.locked):hover { box-shadow: 0 18px 34px rgba(var(--shadow-rgb),0.2); z-index: 2; }
+        .tr-stone:nth-child(odd):not(.locked):hover  { transform: rotate(1.4deg) translateY(-4px) scale(1.06); }
+        .tr-stone:nth-child(even):not(.locked):hover { transform: rotate(-1.4deg) translateY(-4px) scale(1.06); }
+        .tr-bubble { flex-shrink: 0; width: 64px; height: 64px; border-radius: 50%;
+            display: grid; place-items: center; font-size: 34px;
+            background: color-mix(in srgb, var(--sc) 18%, #fff); border: 3px solid var(--sc); }
+        .tr-num { position: absolute; top: -10px; left: -10px; width: 28px; height: 28px;
+            border-radius: 50%; background: var(--sc); color: #fff; display: grid;
+            place-items: center; font-family: 'Baloo 2', system-ui, sans-serif;
+            font-weight: 800; font-size: 14px; border: 2px solid #fff; }
+        .tr-stone b { font-family: 'Baloo 2', system-ui, sans-serif; font-size: 1.12rem;
+            color: var(--c-ink); display: block; }
+        .tr-stone span { color: var(--c-text); font-size: 0.94rem; }
+
+        /* estados sequenciais: travado / ativo (pulsa pra chamar o toque) */
+        .tr-stone.locked { opacity: 0.5; filter: grayscale(0.6); cursor: not-allowed; }
+        .tr-stone.active .tr-check { animation: tr-pulse 1.3s ease-in-out infinite; }
+        @keyframes tr-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--sc) 50%, transparent); }
+            70%      { box-shadow: 0 0 0 10px color-mix(in srgb, var(--sc) 0%, transparent); }
+        }
+
+        /* trilha à direita; deixa espaço à esquerda pra figura transbordar */
+        .tr-board-inner { position: relative; z-index: 1; display: flex;
+            align-items: center; gap: 18px; padding-left: 250px; }
+        /* cena: PNG (alpha) cravado na borda esquerda do board — metade dentro, metade fora */
+        .tr-scene { position: absolute; left: 0; top: 50%;
+            transform: translate(-50%, -50%); width: 460px; z-index: 3;
+            text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .tr-scene img { width: 100%; max-height: 720px; object-fit: contain;
+            filter: drop-shadow(0 16px 18px rgba(15,39,64,0.30)); }
+        .tr-scene figcaption { margin-top: 8px; font-family: 'Baloo 2', system-ui, sans-serif;
+            font-weight: 800; color: var(--c-ink); font-size: 1.1rem;
+            background: rgba(255,255,255,0.72); border-radius: 999px; padding: 5px 16px; }
+        @media (max-width: 900px) {
+            .tr-board { margin-left: 0; }
+            .tr-board-inner { flex-direction: column; padding-left: 0; padding-top: 280px; }
+            .tr-scene { position: absolute; left: 50%; top: 14px; transform: translateX(-50%);
+                width: 60%; max-width: 300px; }
+            .tr-scene img { max-height: 280px; }
+        }
+
+        .tr-reset { margin-top: 18px; font-family: 'Baloo 2', system-ui, sans-serif;
+            font-weight: 700; font-size: 0.98rem; color: var(--c-text-2); background: #fff;
+            border: 2px solid var(--c-line); border-radius: 999px; padding: 10px 22px;
+            cursor: pointer; transition: all 0.2s ease; }
+        .tr-reset:hover { border-color: var(--c-amber); color: var(--c-amber); }
+
+        .tr-finish { text-align: center; margin-top: 28px; font-family: 'Baloo 2', system-ui, sans-serif;
+            font-weight: 800; color: var(--c-ink); font-size: 1.15rem; }
+        .tr-finish .flag { font-size: 40px; display: block; }
+        .tr-next { display: inline-flex; align-items: center; gap: 10px; margin-top: 14px;
+            padding: 12px 22px; border-radius: 999px; text-decoration: none; font-weight: 700;
+            background: var(--c-blue); color: #fff; box-shadow: 0 10px 22px rgba(42,169,224,.4); }
+
+        .tr-back { display: inline-block; margin-top: 28px; font-family: 'Baloo 2', system-ui, sans-serif;
+            font-weight: 700; color: var(--c-amber); text-decoration: none; }
+        .tr-back:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div id="kidsHero"></div>
+
+<main class="content">
+    <section class="section section-light">
+        <div class="tr-page">
+
+            <div class="tr-prog">
+                <div class="tr-prog-top"><span class="cnt">0 de 5 prontos</span><span>🌟</span></div>
+                <div class="tr-bar"><div class="tr-fill"></div></div>
+            </div>
+
+            <div class="tr-board">
+                <span class="bigsun">🧸</span>
+                <span class="cloud c1">☁️</span><span class="cloud c2">⭐</span>
+
+                <figure class="tr-scene">
+                    <img src="ser-crianca/image-2.png" alt="O Kaco: Arrumar os brinquedos">
+                    <figcaption>Bora arrumar! 🧸</figcaption>
+                </figure>
+
+                <div class="tr-board-inner">
+                <ul class="tr-path">
+                    <li class="tr-stone" style="--sc: var(--c-amber)">
+                        <span class="tr-num">1</span>
+                        <span class="tr-bubble">👀</span>
+                        <div><b>Olhar a bagunça</b><span>Ver o que está fora do lugar.</span></div>
+                        <span class="tr-check">✓</span>
+                    </li>
+                    <li class="tr-stone" style="--sc: var(--c-green)">
+                        <span class="tr-num">2</span>
+                        <span class="tr-bubble">🧺</span>
+                        <div><b>Pegar a caixa</b><span>Onde os brinquedos moram.</span></div>
+                        <span class="tr-check">✓</span>
+                    </li>
+                    <li class="tr-stone" style="--sc: var(--c-blue)">
+                        <span class="tr-num">3</span>
+                        <span class="tr-bubble">🧸</span>
+                        <div><b>Guardar um por um</b><span>Cada brinquedo no seu lugar.</span></div>
+                        <span class="tr-check">✓</span>
+                    </li>
+                    <li class="tr-stone" style="--sc: var(--c-purple)">
+                        <span class="tr-num">4</span>
+                        <span class="tr-bubble">📚</span>
+                        <div><b>Organizar os livros</b><span>Em pé, na estante.</span></div>
+                        <span class="tr-check">✓</span>
+                    </li>
+                    <li class="tr-stone" style="--sc: var(--c-pink)">
+                        <span class="tr-num">5</span>
+                        <span class="tr-bubble">✨</span>
+                        <div><b>Olhar o quarto limpo</b><span>Que delícia de arrumado!</span></div>
+                        <span class="tr-check">✓</span>
+                    </li>
+                </ul>
+                </div>
+            </div>
+
+            <div class="tr-finish">
+                <span class="flag">🏁</span>
+                Trilha completa! O quarto do Kaco está arrumado.
+                <br>
+                <a class="tr-next" href="rotina-ajudar.html">🤝 Próxima trilha: ajudar a mamãe e o papai →</a>
+            </div>
+
+            <button class="tr-reset" type="button">↺ Começar de novo</button>
+
+            <a class="tr-back" href="index.html#rotina">← Voltar pra rotina</a>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script>
+    window.kidsHeroConfig = {
+        kicker: 'ROTINA · AVENTURA',
+        titulo: 'Arrumar os brinquedos',
+        sub: 'Uma trilha pra deixar o quarto arrumado, com o Kaco.',
+        emojis: ['🧸', '✨'],
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var stones = Array.prototype.slice.call(document.querySelectorAll('.tr-stone'));
+        var fill = document.querySelector('.tr-fill');
+        var cnt = document.querySelector('.tr-prog .cnt');
+        var finish = document.querySelector('.tr-finish');
+        var sceneImg = document.querySelector('.tr-scene img');
+        var sceneCap = document.querySelector('.tr-scene figcaption');
+        var reset = document.querySelector('.tr-reset');
+        var total = stones.length;
+
+        // 1 PNG por estado (0 = antes de começar, 1..5 = depois de cada passo).
+        // CRIE a arte do Kaco fazendo cada passo em: ser-crianca/arrumar-brinquedos/image-1..6.png
+        // Enquanto não existir, cai no placeholder (PLACEHOLDER) e nada quebra.
+        var frames = ['ser-crianca/arrumar-brinquedos/image-1.png', 'ser-crianca/arrumar-brinquedos/image-2.png', 'ser-crianca/arrumar-brinquedos/image-3.png', 'ser-crianca/arrumar-brinquedos/image-4.png', 'ser-crianca/arrumar-brinquedos/image-5.png', 'ser-crianca/arrumar-brinquedos/image-6.png'];
+        var caps = ['Bora arrumar! 🧸', 'Vi a bagunça!', 'Peguei a caixa!', 'Guardando os brinquedos…', 'Livros na estante!', 'Quarto limpo! ✨'];
+        var PLACEHOLDER = 'ser-crianca/image-2.png';
+        var current = 0; // passos feitos = próximo passo liberado
+
+        function at(arr, i) { return arr[Math.min(i, arr.length - 1)]; }
+        function setScene(src) {
+            sceneImg.onerror = function () { sceneImg.onerror = null; sceneImg.src = PLACEHOLDER; };
+            sceneImg.src = src;
+        }
+        function render() {
+            stones.forEach(function (s, i) {
+                s.classList.toggle('done', i < current);
+                s.classList.toggle('active', i === current);
+                s.classList.toggle('locked', i > current);
+            });
+            setScene(at(frames, current));
+            sceneCap.textContent = at(caps, current);
+            fill.style.width = (current / total * 100) + '%';
+            cnt.textContent = current + ' de ' + total + ' prontos';
+            finish.style.opacity = (current === total) ? '1' : '0.45';
+        }
+        stones.forEach(function (s, i) {
+            s.addEventListener('click', function () {
+                if (i !== current) return; // só o passo da vez avança
+                current++;
+                render();
+                if (current === total) {           // trilha completa → vai pro próximo sozinho
+                    var next = finish.querySelector('.tr-next');
+                    if (next && next.href) {
+                        setTimeout(function () { window.location.href = next.href; }, 2200);
+                    }
+                }
+            });
+        });
+        if (reset) reset.addEventListener('click', function () { current = 0; render(); });
+        render();
+    });
+</script>
+<script src="components/kids-hero.js"></script>
+<script>
+    // Move a barra de progresso pra dentro do hero, entre o título e a descrição.
+    (function () {
+        function moveProg() {
+            var prog = document.querySelector('.tr-prog');
+            var hero = document.querySelector('.page-hero-content');
+            var sub = hero && hero.querySelector('.page-hero-sub');
+            if (!prog || !hero || !sub) return;
+            prog.classList.add('in-hero');
+            hero.insertBefore(prog, sub);
+        }
+        if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', moveProg);
+        else moveProg();
+    })();
+</script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-nav.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>

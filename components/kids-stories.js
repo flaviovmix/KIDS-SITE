@@ -26,37 +26,60 @@
         aventura: { nome: 'Aventura', cor: 'var(--c-aventura)' },
     };
 
+    // Personagens (slug → nome de exibição). Alimenta os chips da página
+    // personagens.html. O `personagens` de cada história abaixo aponta pra estes
+    // slugs. (Os mesmos slugs/nomes estão na seção Personagens do index.html.)
+    window.KIDS_PERSONAGENS = {
+        kaco: { nome: 'Kaco', icone: 'img/icone-kaco.png', cor: '#a9744f' },
+        mae:  { nome: 'Mãe',  icone: 'img/icone-mae.png',  cor: '#e0729e' },
+        gato: { nome: 'Gato', icone: 'img/icone-gato.png', cor: '#f0922b' },
+        rato: { nome: 'Rato', icone: 'img/icone-rato.png', cor: '#6f7bd1' },
+        pato: { nome: 'Pato', icone: 'img/icone-pato.png', cor: '#2aa9e0' },
+        pai:  { nome: 'Pai',  icone: 'img/icone-pai.png',  cor: '#ec5a5a' },
+        motorista: { nome: 'Motorista', icone: 'img/icone-motorista.png', cor: '#9b6fd1' },
+        terapeuta: { nome: 'Tio Thiago', icone: 'img/icone-terapeuta.png', cor: '#5bbf6a' },
+    };
+
     window.KIDS_STORIES = [
         {
-            id: 'passeio-feliz', t: 'O Passeio Feliz', cat: 'rotina',
-            img: 'img-slide/0 (1).png', dur: '3:12', src: 'audio/o-passeio-feliz.m4a',
+            id: 'o-passeio-feliz', t: 'O Passeio Feliz', cat: 'emocoes',
+            img: 'historias/o-passeio-feliz/1.jpeg', dur: '', src: '',
             cenas: 9,
-            tx: 'Kaco sai pra passear com a mamãe e descobre que o caminho também é brincadeira. Cada esquina vira uma pequena aventura, e voltar pra casa fica tão gostoso quanto sair.',
+            personagens: ['kaco', 'mae'],
+            desc: 'Num passeio no parque, o Kaco se frustra e chora. Com o colo da Mãe ele aprende a se acalmar, e o dia volta a ficar feliz.',
+            tx: 'Num passeio no parque, o Kaco se frustra e chora. Com o colo da Mãe ele aprende a se acalmar, e o dia volta a ficar feliz.',
         },
         {
-            id: 'mochila-esquecida', t: 'A Mochila Esquecida', cat: 'rotina',
-            img: 'img-slide/0 (2).png', dur: '2:48', src: 'audio/a-mochila-esquecida.m4a',
-            tx: 'A mochila ficou em casa! Kaco aprende que esquecer faz parte e que quase tudo tem solução quando a gente respira e pensa com calma.',
+            id: 'o-gato-o-rato-e-o-pato', t: 'O Gato, o Rato e o Pato', cat: 'aventura',
+            img: 'historias/o-gato-o-rato-e-o-pato/1.jpeg', dur: '', src: '',
+            cenas: 7,
+            personagens: ['gato', 'rato', 'pato'],
+            desc: 'Uma brincadeira animada no jardim, cheia de rimas e correria. O gato, o rato e o pato aprontam e se divertem juntos.',
+            tx: 'Uma brincadeira animada no jardim, cheia de rimas e correria. O gato, o rato e o pato aprontam e se divertem juntos.',
         },
         {
-            id: 'brincando-no-parque', t: 'Brincando no Parque', cat: 'aventura',
-            img: 'img-slide/0 (3).png', dur: '4:05', src: 'audio/brincando-no-parque.m4a',
-            tx: 'Um dia de parque com a turma: esperar a vez, dividir o balanço e brincar junto. Pequenas combinações que deixam todo mundo feliz.',
+            id: 'kaco-anda-de-bicicleta', t: 'Kaco Anda de Bicicleta', cat: 'aventura',
+            img: 'historias/kaco-anda-de-bicicleta/1.jpeg', dur: '', src: '',
+            cenas: 8,
+            personagens: ['kaco', 'pai'],
+            desc: 'O Kaco ganha uma bicicleta e pede ajuda ao Pai pra aprender. De capacete, ele cai, levanta e no fim pedala sozinho, feliz da vida.',
+            tx: 'O Kaco ganha uma bicicleta e pede ajuda ao Pai pra aprender. De capacete, ele cai, levanta e no fim pedala sozinho, feliz da vida.',
         },
         {
-            id: 'aniversario-surpresa', t: 'Aniversário Surpresa', cat: 'emocoes',
-            img: 'img-slide/0 (4).png', dur: '3:30', src: 'audio/aniversario-surpresa.m4a',
-            tx: 'Uma festa inesperada! Kaco sente a surpresa batendo forte no peito e aprende a respirar fundo pra aproveitar o momento.',
+            id: 'kaco-vai-a-praia', t: 'Kaco Vai à Praia', cat: 'aventura',
+            img: 'historias/kaco-vai-a-praia/1.jpeg', dur: '', src: '',
+            cenas: 10,
+            personagens: ['kaco', 'mae', 'motorista'],
+            desc: 'O Kaco vai à praia com a Mãe, anda de ônibus, faz uma piscininha na areia e vê o pôr do sol. Um passeio gostoso que termina em sono bom.',
+            tx: 'O Kaco vai à praia com a Mãe, anda de ônibus, faz uma piscininha na areia e vê o pôr do sol. Um passeio gostoso que termina em sono bom.',
         },
         {
-            id: 'dia-de-chuva', t: 'Dia de Chuva', cat: 'emocoes',
-            img: 'img-slide/0 (5).png', dur: '2:55', src: 'audio/dia-de-chuva.m4a',
-            tx: 'O passeio foi cancelado pela chuva. E agora? Kaco lida com a mudança de plano e descobre que dentro de casa também cabe diversão.',
-        },
-        {
-            id: 'a-lua-cheia', t: 'A Lua Cheia', cat: 'aventura',
-            img: 'img-slide/0 (6).png', dur: '3:40', src: 'audio/a-lua-cheia.m4a',
-            tx: 'Uma noite tranquila olhando a lua, do jeitinho calmo que o Kaco gosta. Um respiro de paz pra fechar o dia.',
+            id: 'kaco-com-tio-thiago', t: 'Kaco com Tio Thiago', cat: 'emocoes',
+            img: 'historias/kaco-com-tio-thiago/1.jpeg', dur: '', src: '',
+            cenas: 9,
+            personagens: ['kaco', 'mae', 'terapeuta'],
+            desc: 'Na terapia, o Kaco chega tímido e se irrita na hora de guardar os brinquedos. Com o Tio Thiago ele respira, coopera e termina o dia orgulhoso.',
+            tx: 'Na terapia, o Kaco chega tímido e se irrita na hora de guardar os brinquedos. Com o Tio Thiago ele respira, coopera e termina o dia orgulhoso.',
         },
     ];
 })();

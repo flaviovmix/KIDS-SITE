@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Aprender — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Cabeçalho do card: título à esquerda, sinal de + à direita */
+        .fam-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+        .fam-head h3 { margin: 0; }
+        .fam-head .fam-emoji { margin: 0; }
+
+        /* Níveis de dificuldade dentro do card (Aprender) */
+        .niveis { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+        .nivel-btn { flex: 1; min-width: 88px; text-align: center; text-decoration: none; font-family: 'Baloo 2', system-ui, sans-serif; font-weight: 700; font-size: 15px; padding: 11px 10px; border-radius: 14px; color: #fff; box-shadow: 0 6px 14px rgba(15, 39, 64, .12); transition: transform .15s ease, box-shadow .15s ease; }
+        .nivel-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 22px rgba(15, 39, 64, .18); }
+        .nivel-facil   { background: var(--c-green); }
+        .nivel-medio   { background: var(--c-amber); }
+        .nivel-dificil { background: var(--c-red); }
+    </style>
+</head>
+<body>
+
+<!-- Hero (componente kids-hero) renderiza aqui -->
+<div id="kidsHero"></div>
+
+<main class="content">
+    <section class="section section-light">
+        <div class="fam-grid">
+            <div class="fam-card" style="--c:var(--c-green)">
+                <div class="fam-head">
+                    <h3>Somar</h3>
+                    <span class="fam-emoji">➕</span>
+                </div>
+                <p>Somar brincando com o Kaco: juntar quantidades, um pouquinho de cada vez.</p>
+                <div class="niveis">
+                    <a class="nivel-btn nivel-facil"   href="MATEMATICA/somar/facil.html" target="_blank" rel="noopener">Fácil</a>
+                    <a class="nivel-btn nivel-medio"   href="MATEMATICA/somar/medio.html">Médio</a>
+                    <a class="nivel-btn nivel-dificil" href="MATEMATICA/somar/dificil.html">Difícil</a>
+                </div>
+            </div>
+            <div class="fam-card" style="--c:var(--c-blue)">
+                <div class="fam-head">
+                    <h3>Subtrair</h3>
+                    <span class="fam-emoji">➖</span>
+                </div>
+                <p>Tirar e descobrir quanto sobra, no ritmo do Kaco, um pouquinho de cada vez.</p>
+                <div class="niveis">
+                    <a class="nivel-btn nivel-facil"   href="MATEMATICA/subtrair/facil.html">Fácil</a>
+                    <a class="nivel-btn nivel-medio"   href="MATEMATICA/subtrair/medio.html">Médio</a>
+                    <a class="nivel-btn nivel-dificil" href="MATEMATICA/subtrair/dificil.html">Difícil</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script>
+    window.kidsHeroConfig = {
+        kicker: 'NO RITMO DA CRIANÇA',
+        titulo: 'Aprender',
+        sub: 'Letras, números, cores e o mundo do Kaco, um pouquinho de cada vez.',
+        emojis: ['🧠', '✏️'],
+    };
+</script>
+<script src="components/kids-hero.js"></script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-nav.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>

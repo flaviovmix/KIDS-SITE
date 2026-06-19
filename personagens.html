@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Histórias por personagem — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Componente kids-historias (hero + filtros + grid) renderiza aqui.
+     Aqui os chips são PERSONAGENS (filtro por inclusão), não categorias. -->
+<div id="kidsHistorias"></div>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script src="components/kids-stories.js"></script>
+<script>
+    // Tudo vem de kids-stories.js (fonte única). Os chips usam KIDS_PERSONAGENS;
+    // cada card guarda os personagens da história (s.personagens) pro filtro.
+    window.kidsHistoriasConfig = {
+        kicker: 'AS AVENTURAS DO KACO',
+        titulo: 'Histórias por personagem',
+        sub: 'Escolha um personagem e veja as histórias em que ele aparece.',
+        hint: 'Clique num personagem pra filtrar ↗',
+        acaoLabel: 'Ler →',
+        categorias: window.KIDS_CATEGORIAS,        // continua dando o selo/cor do card
+        filtros: window.KIDS_PERSONAGENS,          // os chips: filtra por personagem
+        itens: window.KIDS_STORIES.map(function (s) {
+            return {
+                t: s.t, cat: s.cat, img: s.img,
+                link: 'historia.html?id=' + s.id,
+                status: 'no ar', desc: s.desc,
+                filtros: s.personagens || [],      // personagens daquela história
+            };
+        }),
+    };
+</script>
+<script src="components/kids-hero.js"></script>
+<script src="components/kids-historias.js"></script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-nav.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>

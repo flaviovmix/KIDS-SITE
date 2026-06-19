@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Multiplicar — Médio</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+  <script id="dados-jogo">
+    const bancoDeContas = {
+      "jogo": "Multiplicação",
+      "versao": 1,
+      "contas": [
+          { "id": 1,  "nivel": 3, "operacao": "×", "a": 3, "b": 4 },
+          { "id": 2,  "nivel": 3, "operacao": "×", "a": 4, "b": 3 },
+          { "id": 3,  "nivel": 3, "operacao": "×", "a": 2, "b": 6 },
+          { "id": 4,  "nivel": 3, "operacao": "×", "a": 6, "b": 2 },
+          { "id": 5,  "nivel": 3, "operacao": "×", "a": 3, "b": 5 },
+          { "id": 6,  "nivel": 3, "operacao": "×", "a": 5, "b": 3 },
+          { "id": 7,  "nivel": 3, "operacao": "×", "a": 4, "b": 4 },
+          { "id": 8,  "nivel": 3, "operacao": "×", "a": 4, "b": 5 },
+          { "id": 9,  "nivel": 3, "operacao": "×", "a": 5, "b": 4 },
+          { "id": 10, "nivel": 3, "operacao": "×", "a": 5, "b": 5 },
+
+          { "id": 11, "nivel": 3, "operacao": "×", "a": 3, "b": 6 },
+          { "id": 12, "nivel": 3, "operacao": "×", "a": 6, "b": 3 },
+          { "id": 13, "nivel": 3, "operacao": "×", "a": 4, "b": 6 },
+          { "id": 14, "nivel": 3, "operacao": "×", "a": 6, "b": 4 },
+          { "id": 15, "nivel": 3, "operacao": "×", "a": 5, "b": 6 },
+          { "id": 16, "nivel": 3, "operacao": "×", "a": 6, "b": 5 },
+          { "id": 17, "nivel": 3, "operacao": "×", "a": 6, "b": 6 },
+          { "id": 18, "nivel": 3, "operacao": "×", "a": 2, "b": 5 },
+          { "id": 19, "nivel": 3, "operacao": "×", "a": 5, "b": 2 },
+          { "id": 20, "nivel": 3, "operacao": "×", "a": 3, "b": 3 },
+
+          { "id": 21, "nivel": 3, "operacao": "×", "a": 4, "b": 5 },
+          { "id": 22, "nivel": 3, "operacao": "×", "a": 5, "b": 4 },
+          { "id": 23, "nivel": 3, "operacao": "×", "a": 6, "b": 3 },
+          { "id": 24, "nivel": 3, "operacao": "×", "a": 3, "b": 6 },
+          { "id": 25, "nivel": 3, "operacao": "×", "a": 6, "b": 4 },
+
+          { "id": 26, "nivel": 3, "operacao": "×", "a": 4, "b": 6 },
+          { "id": 27, "nivel": 3, "operacao": "×", "a": 5, "b": 5 },
+          { "id": 28, "nivel": 3, "operacao": "×", "a": 6, "b": 6 },
+          { "id": 29, "nivel": 3, "operacao": "×", "a": 5, "b": 6 },
+          { "id": 30, "nivel": 3, "operacao": "×", "a": 6, "b": 5 }
+        ]
+    };
+  </script>
+
+  <script>window.JOGO = { op: "multiplicar", nivel: "medio" };</script>
+  <script src="../jogo-shell.js"></script>
+  <script src="../script.js"></script>
+</body>
+
+</html>

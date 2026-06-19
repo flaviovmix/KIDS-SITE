@@ -2,6 +2,11 @@
    Mude um valor aqui e ele muda no site inteiro. As categorias apontam pros
    acentos de marca; a sombra navy é um trio RGB pra usar com alpha variável:
    box-shadow: 0 10px 26px rgba(var(--shadow-rgb), .07). */
+
+/* Menu/header: fonte única em components/kids-menu.css (reusável; o componente
+   kids-menu.js injeta esse mesmo arquivo nas páginas em subpasta). */
+@import url("components/kids-menu.css");
+
 :root {
     /* Acentos de marca */
     --c-blue:   #2aa9e0;
@@ -42,86 +47,14 @@ body {
     background: #fff;
 }
 
-/* ===== Menu ===== */
-.menu {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 48px;
-    font-family: 'Baloo 2', system-ui, sans-serif;
-    background: rgba(255,255,255,0.72);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 1px solid rgba(255,255,255,0.4);
-}
-
-.menu-logo {
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    color: var(--c-ink);
-    text-decoration: none;
-    transition: opacity 0.25s ease;
-}
-.menu-logo:hover { opacity: 0.6; }
-
-.menu-list {
-    display: flex;
-    gap: 4px;
-    list-style: none;
-    /* Centraliza os links na barra independente da largura do logo. */
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    width: max-content;   /* mede pelo conteúdo; senão fica presa à metade direita e quebra o texto */
-}
-
-.menu-link {
-    position: relative;
-    display: inline-block;
-    padding: 6px 16px;
-    font-size: 17px;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    color: rgba(var(--shadow-rgb),0.65);
-    text-decoration: none;
-    transition: color 0.25s ease;
-}
-
-.menu-link::after {
-    content: '';
-    position: absolute;
-    left: 14px; right: 14px; bottom: 2px;
-    height: 1px;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: center;
-    transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-}
-
-.menu-link:hover {
-    color: var(--c-ink);
-}
-.menu-link:hover::after {
-    transform: scaleX(1);
-}
-
-.menu-link.active {
-    color: var(--c-ink);
-    font-weight: 700;
-}
-.menu-link.active::after {
-    transform: scaleX(1);
-}
+/* ===== Menu/header ===== estilo movido pra components/kids-menu.css (fonte única,
+   importado no topo deste arquivo). Mexer no menu = mexer só lá. */
 
 /* ===== PAGE TOC — Table of Contents lateral ===== */
 .page-toc-toggle {
     position: fixed;
     top: 76px;
-    left: 24px;
+    right: 24px;
     z-index: 61;
     width: 44px;
     height: 44px;
@@ -179,7 +112,7 @@ body {
 .page-toc {
     position: fixed;
     top: 128px;
-    left: 24px;
+    right: 24px;
     z-index: 60;
     width: 220px;
     padding: 16px;
@@ -195,7 +128,7 @@ body {
 .page-toc.collapsed {
     opacity: 0;
     pointer-events: none;
-    transform: translateX(calc(-100% - 40px));
+    transform: translateX(calc(100% + 40px));
 }
 .page-toc-title {
     margin-bottom: 10px;
@@ -232,6 +165,74 @@ body {
     transform: translateX(-2px);
 }
 
+/* ===== Navegação VOLTAR / AVANÇAR — flutuante à esquerda, grande pra criança =====
+   Par do components/kids-nav.js (drop-in: o componente se injeta sozinho no body).
+   Fica no canto onde antes morava o toggle do TOC (que foi pra direita). Os botões
+   só espelham o histórico do navegador (history.back / history.forward). */
+.kids-nav {
+    position: fixed;
+    top: 72px;
+    left: 24px;
+    z-index: 61;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: kidsBackIn 0.4s cubic-bezier(.34,1.56,.64,1) both;
+}
+.kids-back, .kids-fwd {
+    display: inline-flex;
+    align-items: center;
+    height: 52px;
+    border: 0;
+    border-radius: 999px;
+    color: #fff;
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.kids-back {
+    gap: 10px;
+    padding: 0 22px 0 8px;
+    background: linear-gradient(135deg, var(--c-amber), var(--c-pink));
+    box-shadow: 0 12px 28px rgba(236,72,153,0.38);
+}
+.kids-fwd {
+    justify-content: center;
+    width: 52px;
+    padding: 0;
+    background: linear-gradient(135deg, var(--c-blue), var(--c-indigo));
+    box-shadow: 0 12px 28px rgba(42,169,224,0.38);
+}
+.kids-back:hover, .kids-fwd:hover { transform: translateY(-2px) scale(1.05); }
+.kids-back:active, .kids-fwd:active { transform: translateY(0) scale(0.96); }
+.kids-back-arrow {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.28);
+}
+.kids-back-arrow svg, .kids-fwd svg { width: 22px; height: 22px; display: block; }
+
+@keyframes kidsBackIn {
+    from { opacity: 0; transform: translateX(-20px) scale(0.9); }
+    to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@media (max-width: 640px) {
+    .kids-nav { gap: 8px; }
+    .kids-back, .kids-fwd { height: 46px; font-size: 1.02rem; }
+    .kids-back { padding-right: 18px; }
+    .kids-fwd { width: 46px; }
+    .kids-back-arrow { width: 34px; height: 34px; }
+}
+
 @keyframes tocLineIn {
     from { transform: translateY(var(--y, 0)) scaleX(0); opacity: 0; }
     to { transform: translateY(var(--y, 0)) scaleX(1); opacity: 1; }
@@ -243,7 +244,7 @@ body {
 
 @media (max-width: 1440px) {
     .page-toc {
-        transform: translateX(calc(-100% - 40px));
+        transform: translateX(calc(100% + 40px));
         opacity: 0;
         pointer-events: none;
     }
@@ -260,76 +261,7 @@ body {
     .page-toc { width: min(220px, calc(100vw - 48px)); }
 }
 
-/* ===== Hamburger (escondido por padrão) ===== */
-.menu-burger {
-    display: none;
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-    position: relative;
-}
-.menu-burger span {
-    position: absolute;
-    left: 7px;
-    right: 7px;
-    height: 2px;
-    background: var(--c-ink);
-    border-radius: 2px;
-    transition: transform 0.3s ease, opacity 0.2s ease, top 0.3s ease;
-}
-.menu-burger span:nth-child(1) { top: 11px; }
-.menu-burger span:nth-child(2) { top: 17px; }
-.menu-burger span:nth-child(3) { top: 23px; }
-
-.menu-burger[aria-expanded="true"] span:nth-child(1) { top: 17px; transform: rotate(45deg); }
-.menu-burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
-.menu-burger[aria-expanded="true"] span:nth-child(3) { top: 17px; transform: rotate(-45deg); }
-
-@media (max-width: 700px) {
-    .menu { padding: 10px 20px; }
-    .menu-burger { display: block; }
-
-    .menu-list {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        transform: none;
-        width: auto;   /* dropdown mobile volta a ser full-width (sobrescreve o max-content do desktop) */
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0;
-        padding: 8px 0;
-        background: rgba(255,255,255,0.92);
-        backdrop-filter: saturate(180%) blur(20px);
-        -webkit-backdrop-filter: saturate(180%) blur(20px);
-        border-bottom: 1px solid rgba(var(--shadow-rgb),0.08);
-        box-shadow: 0 12px 24px rgba(0,0,0,0.08);
-
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        pointer-events: none;
-        transition: max-height 0.32s ease, opacity 0.22s ease;
-    }
-    .menu.open .menu-list {
-        max-height: 400px;
-        opacity: 1;
-        pointer-events: auto;
-    }
-
-    .menu-link {
-        display: block;
-        padding: 14px 24px;
-        font-size: 18px;
-    }
-    .menu-link::after { display: none; }
-    .menu-link:hover { background: rgba(var(--shadow-rgb),0.05); }
-    .menu-link.active { background: rgba(var(--shadow-rgb),0.06); }
-}
+/* Hamburger + dropdown mobile do menu: em components/kids-menu.css */
 
 /* ===== HERO (cabeçalho ocupando 80% da tela) ===== */
 .hero {
@@ -693,13 +625,36 @@ body {
     margin-bottom: 16px;
 }
 /* fileira de miniaturas */
+/* fileira de personagens = carrossel infinito (mecânica do hero em script.js) */
+.char-thumbs-carousel { position: relative; margin-top: 4px; }
+.char-thumbs-stage { display: flex; align-items: center; gap: 8px; }
+.char-thumbs-viewport {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    cursor: grab;
+    -webkit-user-select: none;
+    user-select: none;
+    padding: 10px 0 8px;     /* respiro pro lift/scale/sombra da miniatura ativa não cortar */
+    /* fade nas pontas (sinaliza que rola) */
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+}
+.char-thumbs-carousel.dragging,
+.char-thumbs-carousel.dragging .char-thumbs-viewport { cursor: grabbing; }
+/* setas inline (não sobrepõem as miniaturas): anula o position:absolute do .carousel-arrow */
+.char-thumbs-stage .carousel-arrow { position: static; transform: none; flex: 0 0 auto; }
+.char-thumbs-stage .carousel-arrow:hover  { transform: scale(1.08); }
+.char-thumbs-stage .carousel-arrow:active { transform: scale(0.95); }
 .char-thumbs {
     display: flex;
-    justify-content: flex-start;
     gap: 14px;
-    padding: 4px 16px 8px;
-    overflow-x: auto;
-    scrollbar-width: none;
+    width: max-content;
+    align-items: flex-start;
+    padding: 0 8px;
+    will-change: transform;
+    user-select: none;
+    touch-action: pan-y;
 }
 .char-thumbs::-webkit-scrollbar { display: none; }
 .char-thumb {
@@ -740,6 +695,16 @@ body {
     box-shadow: 0 10px 22px rgba(0,30,60,0.22);
 }
 .char-thumb.is-active .char-thumb-name { color: var(--c-ink); }
+
+/* mensagem quando o filtro de condição não tem personagem */
+.char-vazio {
+    text-align: center;
+    color: var(--c-text-2);
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-size: 1.05rem;
+    padding: 48px 20px;
+    margin: 40px auto 0;
+}
 
 /* palco deslizante */
 .char-stage {
@@ -897,16 +862,19 @@ body {
         position: relative;
         left: 64px;                      /* casa a borda direita com as miniaturas */
     }
-    .char-thumbs {
-        justify-content: flex-end;       /* fileira alinhada à direita */
-        flex-wrap: wrap;
-        overflow: visible;
+    .char-showcase .char-thumbs-carousel {
         max-width: 1100px;               /* mesma largura do palco */
         margin-left: auto;
         margin-right: auto;
         position: relative;
         left: 64px;                      /* casa a borda direita com a do vídeo (right:-64px) */
-        padding-right: 0;
+        display: flex;
+        justify-content: flex-end;       /* janela (~6) alinhada à direita */
+    }
+    .char-showcase .char-thumbs-viewport {
+        flex: 0 0 auto;
+        width: 670px;                    /* mostra ~6 personagens */
+        max-width: 100%;
     }
     .char-panel {
         grid-template-columns: 0.9fr 1.5fr;   /* duas áreas: texto (livre do gato) | vídeo maior */
@@ -1408,6 +1376,13 @@ body {
     font-size: 0.82rem;
     color: var(--c-text-2);
 }
+/* filtros como miniaturas (página personagens.html) — reusa .char-thumb do index */
+.hist-chips-thumbs { gap: 16px; align-items: center; flex-wrap: nowrap; width: 100%; }
+/* "Todos" fica fixo à esquerda; o carrossel preenche o resto da fileira (mostra ~8) */
+.hist-chips-thumbs .char-thumbs-carousel { flex: 1 1 auto; min-width: 0; margin-top: 0; }
+.char-thumb-all { --accent: var(--c-ink); flex: 0 0 auto; }
+.char-thumb-all .char-thumb-pic { display: flex; align-items: center; justify-content: center; }
+.char-thumb-allmark { font-size: 30px; line-height: 1; color: var(--c-blue, #2aa9e0); }
 
 /* Grid de cards das histórias */
 .hist-grid {
@@ -1573,10 +1548,14 @@ body {
 
 
 /* Palco: setas laterais + moldura da cena */
-.story-stage { position: relative; display: flex; align-items: center; gap: 12px; }
+.story-stage { position: relative; display: flex; align-items: center; justify-content: center; gap: 12px; }
 .story-frame {
     flex: 1;
     aspect-ratio: 43 / 24;   /* = 2752x1536, proporção exata das cenas (sem barras) */
+    /* trava a altura na viewport: a cena cabe inteira sem cortar pra baixo. A
+       largura segue da proporção (não esticamos a altura), então a moldura não
+       distorce; em telas estreitas o flex:1 manda e a altura fica menor. */
+    max-width: calc(min(80vh, 100vh - 220px) * 43 / 24);
     display: flex;
     border-radius: 18px;
     overflow: hidden;
@@ -1596,7 +1575,7 @@ body {
     inset: 0;
     z-index: 1;             /* sobre a imagem da página; a folha de cima (z2) cobre */
     pointer-events: none;
-    background: url('modelo/folha-livro.png') center / 100% 100% no-repeat;
+    background: url('ser-crianca/folha-livro.png') center / 100% 100% no-repeat;
     border-radius: 18px;
 }
 
@@ -2013,14 +1992,21 @@ body {
     color: var(--c-ink);
 }
 .emodet-back {
-    display: inline-block;
-    margin-top: 24px;
+    display: block;
+    width: fit-content;
+    margin: 28px auto 0;
     font-family: 'Baloo 2', system-ui, sans-serif;
-    font-weight: 700;
-    color: var(--emo);
+    font-weight: 800;
+    color: #fff;
+    background: var(--emo);
     text-decoration: none;
+    padding: 16px 56px;
+    border-radius: 999px;
+    box-shadow: 0 10px 22px color-mix(in srgb, var(--emo) 42%, transparent);
+    transition: transform .2s, box-shadow .2s;
 }
-.emodet-back:hover { text-decoration: underline; }
+.emodet-back:hover { transform: translateY(-2px); box-shadow: 0 14px 28px color-mix(in srgb, var(--emo) 52%, transparent); }
+.emodet-back-top { margin-top: 0; margin-bottom: 22px; }
 
 /* Próximo passo da rotina (cor herda de --emo via inline style) */
 
@@ -2040,7 +2026,6 @@ body {
 /* Site todo em Baloo 2 (arredondada e divertida). Títulos com peso 700 pra
    chamar mais atenção; corpo herda Baloo 2 do body. Bloco no fim do arquivo
    pra sobrescrever os font-family por seletor. */
-.menu-logo,
 .page-toc-title,
 .hero-title,
 .section-kicker,
@@ -2591,8 +2576,12 @@ a.home-audio-title:hover { text-decoration: underline; text-decoration-color: va
 .carta p { font-size: 18px; line-height: 1.8; color: var(--c-text); margin-bottom: 16px; }
 .carta .assinatura { font-weight: 700; color: var(--c-ink); }
 .fam-grid { max-width: 1040px; margin: 40px auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.fam-card { background: #fff; border: 2px solid var(--c); border-radius: 20px; padding: 26px 22px; text-align: left; text-decoration: none; box-shadow: 0 10px 26px rgba(var(--shadow-rgb), .07); transition: transform .2s ease, box-shadow .2s ease; }
+.fam-card { position: relative; background: #fff; border: 2px solid var(--c); border-radius: 20px; padding: 26px 22px; text-align: left; text-decoration: none; box-shadow: 0 10px 26px rgba(var(--shadow-rgb), .07); transition: transform .2s ease, box-shadow .2s ease; }
 .fam-card:hover { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(var(--shadow-rgb), .14); }
+.fam-card.is-soon { border-color: var(--c-border, #e5e7eb); box-shadow: none; pointer-events: none; cursor: default; }
+.fam-card.is-soon .fam-emoji { filter: grayscale(1); opacity: .7; }
+.fam-card.is-soon h3, .fam-card.is-soon p { color: var(--c-text-soft); }
+.fam-card.is-soon::after { content: "Em breve"; position: absolute; top: 14px; right: 14px; font-size: 12px; font-weight: 700; color: var(--c-text-soft); background: rgba(var(--shadow-rgb), .06); padding: 3px 10px; border-radius: 999px; }
 .fam-emoji { font-size: 42px; line-height: 1; display: block; margin-bottom: 12px; }
 .fam-card h3 { font-size: 20px; font-weight: 700; color: var(--c-ink); margin-bottom: 6px; }
 .fam-card p { font-size: 15px; line-height: 1.6; color: var(--c-text-soft); font-weight: 500; }

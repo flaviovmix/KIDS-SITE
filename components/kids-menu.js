@@ -9,26 +9,45 @@
     var LINKS = [
         { href: 'index.html',           label: 'Início' },
         { href: 'historias.html',       label: 'Histórias' },
+        { href: 'personagens.html',     label: 'Personagens' },
         { href: 'emocoes.html',         label: 'Emoções' },
         { href: 'colorir.html',         label: 'Colorir' },
-        { href: 'audio-historias.html', label: 'Áudio-histórias' },
+        { href: 'quebra-cabeca.html',   label: 'Quebra-cabeça' },
+        { href: 'aprender.html',        label: 'Aprender' },
+        // { href: 'audio-historias.html', label: 'Áudio-histórias' }, // oculto até ter áudios
         { href: 'familia.html',         label: 'Pra Família' }
     ];
+
+    // Prefixo até a raiz do site. Páginas em subpasta (ex: MATEMATICA/somar/)
+    // definem window.kidsMenuBase = '../../' pros links/logo apontarem certo.
+    var BASE = window.kidsMenuBase || '';
 
     function currentPage() {
         var p = location.pathname.split('/').pop();
         return p === '' ? 'index.html' : p;
     }
 
+    // Em subpasta o CSS do menu (style.css da raiz) não está carregado: injeta a
+    // versão portátil (components/kids-menu.css). Páginas da raiz já têm no style.css.
+    function ensureCss() {
+        if (!BASE) return;
+        if (document.querySelector('link[data-kids-menu-css]')) return;
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = BASE + 'components/kids-menu.css';
+        link.setAttribute('data-kids-menu-css', '');
+        document.head.appendChild(link);
+    }
+
     function build() {
         if (document.querySelector('.menu')) return null; // não duplica
 
         var page = currentPage();
-        var logoHref = page === 'index.html' ? '#' : 'index.html';
+        var logoHref = page === 'index.html' ? '#' : BASE + 'index.html';
 
         var items = LINKS.map(function (l) {
             var active = l.href === page ? ' active' : '';
-            return '<li><a href="' + l.href + '" class="menu-link' + active + '">' + l.label + '</a></li>';
+            return '<li><a href="' + BASE + l.href + '" class="menu-link' + active + '">' + l.label + '</a></li>';
         }).join('');
 
         var nav = document.createElement('nav');
@@ -71,6 +90,7 @@
     }
 
     function init() {
+        ensureCss();
         var menu = build();
         if (menu) wire(menu);
     }

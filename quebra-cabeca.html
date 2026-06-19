@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Quebra-cabeça — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Componente kids-historias (hero + filtros + grid) renderiza aqui -->
+<div id="kidsHistorias"></div>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script src="components/kids-stories.js"></script>
+<script>
+    // Mesma fonte das histórias (kids-stories.js). Cada card monta um quebra-cabeça
+    // com a capa daquela história; o card leva pra tela do jogo.
+    window.kidsHistoriasConfig = {
+        kicker: 'MONTE E DIVIRTA-SE',
+        titulo: 'Quebra-cabeça',
+        sub: 'Arraste as peças e monte as figuras do mundo do Kaco, um pouquinho de cada vez.',
+        hint: 'Clique pra montar ↗',
+        acaoLabel: 'Montar →',
+        emojis: ['🧩', '🐵'],
+        categorias: window.KIDS_CATEGORIAS,
+        itens: window.KIDS_STORIES.map(function (s) {
+            return {
+                t: s.t, cat: s.cat, img: s.img, desc: s.desc,
+                link: 'quebra-cabeca-jogo.html?img=' + encodeURIComponent(s.img) + '&titulo=' + encodeURIComponent(s.t),
+            };
+        }),
+    };
+</script>
+<script src="components/kids-hero.js"></script>
+<script src="components/kids-historias.js"></script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-nav.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>

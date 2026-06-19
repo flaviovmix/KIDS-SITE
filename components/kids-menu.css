@@ -1,0 +1,123 @@
+/* kids-menu — estilo do header reutilizável (par do components/kids-menu.js).
+   Cópia PORTÁTIL das regras .menu do style.css, com fallback de cor e reset local
+   (margin/padding) pra funcionar em páginas que NÃO carregam os design tokens nem o
+   reset global do site — ex: o sub-app MATEMATICA, que tem style.css próprio.
+   O componente injeta este arquivo só quando a página define window.kidsMenuBase. */
+.menu {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 48px;
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.4);
+}
+.menu-logo {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: var(--c-ink, #0f2740);
+    text-decoration: none;
+    transition: opacity 0.25s ease;
+}
+.menu-logo:hover { opacity: 0.6; }
+.menu-list {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+}
+.menu-link {
+    position: relative;
+    display: inline-block;
+    padding: 6px 16px;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: rgba(var(--shadow-rgb, 15, 39, 64), 0.65);
+    text-decoration: none;
+    transition: color 0.25s ease;
+}
+.menu-link::after {
+    content: '';
+    position: absolute;
+    left: 14px; right: 14px; bottom: 2px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+}
+.menu-link:hover { color: var(--c-ink, #0f2740); }
+.menu-link:hover::after { transform: scaleX(1); }
+.menu-link.active { color: var(--c-ink, #0f2740); font-weight: 700; }
+.menu-link.active::after { transform: scaleX(1); }
+
+/* Hamburger (escondido por padrão) */
+.menu-burger {
+    display: none;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+}
+.menu-burger span {
+    position: absolute;
+    left: 7px;
+    right: 7px;
+    height: 2px;
+    background: var(--c-ink, #0f2740);
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.2s ease, top 0.3s ease;
+}
+.menu-burger span:nth-child(1) { top: 11px; }
+.menu-burger span:nth-child(2) { top: 17px; }
+.menu-burger span:nth-child(3) { top: 23px; }
+.menu-burger[aria-expanded="true"] span:nth-child(1) { top: 17px; transform: rotate(45deg); }
+.menu-burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.menu-burger[aria-expanded="true"] span:nth-child(3) { top: 17px; transform: rotate(-45deg); }
+
+@media (max-width: 700px) {
+    .menu { padding: 10px 20px; }
+    .menu-burger { display: block; }
+    .menu-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        transform: none;
+        width: auto;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 8px 0;
+        background: rgba(255,255,255,0.92);
+        backdrop-filter: saturate(180%) blur(20px);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        border-bottom: 1px solid rgba(var(--shadow-rgb, 15, 39, 64),0.08);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transition: max-height 0.32s ease, opacity 0.22s ease;
+    }
+    .menu.open .menu-list { max-height: 400px; opacity: 1; pointer-events: auto; }
+    .menu-link { display: block; padding: 14px 24px; font-size: 18px; }
+    .menu-link::after { display: none; }
+    .menu-link:hover { background: rgba(var(--shadow-rgb, 15, 39, 64),0.05); }
+    .menu-link.active { background: rgba(var(--shadow-rgb, 15, 39, 64),0.06); }
+}

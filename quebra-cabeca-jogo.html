@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>Quebra-cabeça — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        html, body { margin: 0; height: 100%; overflow: hidden; }
+        body { background: #eaf4fb; font-family: 'Baloo 2', system-ui, sans-serif; }
+
+        #puzzleCanvas { display: block; touch-action: none; }
+
+        /* Barra de controles (topo) */
+        .pz-bar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, .82); backdrop-filter: blur(6px);
+            box-shadow: 0 4px 14px rgba(15, 39, 64, .10);
+        }
+        .pz-back {
+            text-decoration: none; font-weight: 800; font-size: 15px;
+            color: #0f2740; background: #fff; border: 0; border-radius: 12px;
+            padding: 9px 14px; box-shadow: 0 4px 10px rgba(15, 39, 64, .12); cursor: pointer;
+        }
+        .pz-title { font-weight: 800; font-size: 17px; color: #0f2740; margin-right: auto; }
+        .pz-niveis { display: flex; gap: 8px; }
+        .pz-nivel {
+            text-decoration: none; font-weight: 700; font-size: 14px; color: #fff;
+            border-radius: 12px; padding: 9px 13px; box-shadow: 0 4px 10px rgba(15, 39, 64, .12);
+            transition: transform .12s ease, filter .12s ease; opacity: .55;
+        }
+        .pz-nivel:hover { transform: translateY(-2px); }
+        .pz-nivel.is-active { opacity: 1; transform: translateY(-1px); }
+        .pz-facil   { background: var(--c-green, #22b07d); }
+        .pz-medio   { background: var(--c-amber, #f59e0b); }
+        .pz-dificil { background: var(--c-red, #ec5a5a); }
+
+        .pz-hint {
+            position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%);
+            z-index: 15; font-weight: 600; font-size: 13px; color: #355;
+            background: rgba(255, 255, 255, .8); border-radius: 999px; padding: 6px 14px;
+        }
+
+        /* Tela de "Parabéns" */
+        .pz-win {
+            position: fixed; inset: 0; z-index: 50; display: none;
+            align-items: center; justify-content: center;
+            background: rgba(15, 39, 64, .55); backdrop-filter: blur(4px);
+        }
+        .pz-win.show { display: flex; }
+        .pz-win-box {
+            background: #fff; border-radius: 26px; padding: 34px 30px; text-align: center;
+            max-width: 360px; width: calc(100% - 48px); box-shadow: 0 24px 60px rgba(15, 39, 64, .35);
+            animation: pzpop .35s cubic-bezier(.2, 1.2, .4, 1);
+        }
+        @keyframes pzpop { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .pz-win-box .emoji { font-size: 54px; }
+        .pz-win-box h2 { margin: 8px 0 4px; color: #0f2740; font-size: 26px; }
+        .pz-win-box p { margin: 0 0 20px; color: #4a5b6b; }
+        .pz-win-acoes { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .pz-win-acoes a {
+            text-decoration: none; font-weight: 800; font-size: 15px; color: #fff;
+            border-radius: 14px; padding: 12px 18px; cursor: pointer;
+        }
+        .pz-de-novo { background: var(--c-green, #22b07d); }
+        .pz-voltar  { background: #2aa9e0; }
+    </style>
+</head>
+<body>
+
+<div class="pz-bar">
+    <a class="pz-back" href="quebra-cabeca.html">← Voltar</a>
+    <span class="pz-title" id="pzTitle">Quebra-cabeça</span>
+    <div class="pz-niveis" id="pzNiveis"></div>
+</div>
+
+<div id="game-container" data-img="img/kaco.png">
+    <canvas id="puzzleCanvas"></canvas>
+</div>
+
+<div class="pz-hint">Arraste as peças pra montar a figura 🧩</div>
+
+<div class="pz-win" id="puzzle-win">
+    <div class="pz-win-box">
+        <div class="emoji">🎉</div>
+        <h2>Parabéns!</h2>
+        <p>Você montou o quebra-cabeça!</p>
+        <div class="pz-win-acoes">
+            <a class="pz-de-novo" id="pzDeNovo" href="#">Jogar de novo</a>
+            <a class="pz-voltar" href="quebra-cabeca.html">Outros</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Lê img/título da URL e monta os botões de nível preservando a imagem.
+    (function () {
+        var params = new URLSearchParams(location.search);
+        var img = params.get('img');
+        var titulo = params.get('titulo');
+        var linha = parseInt(params.get('linha'), 10) || 3;
+
+        if (img) document.getElementById('game-container').setAttribute('data-img', img);
+        if (titulo) {
+            document.getElementById('pzTitle').textContent = titulo;
+            document.title = titulo + ' — Quebra-cabeça';
+        }
+
+        // Níveis: nº de linhas/colunas crescente. Grade quadrada (linha = coluna).
+        var niveis = [
+            { n: 2, label: 'Fácil',   cls: 'pz-facil' },
+            { n: 3, label: 'Médio',   cls: 'pz-medio' },
+            { n: 4, label: 'Difícil', cls: 'pz-dificil' }
+        ];
+        function urlNivel(n) {
+            var u = new URLSearchParams();
+            if (img) u.set('img', img);
+            if (titulo) u.set('titulo', titulo);
+            u.set('linha', n); u.set('coluna', n);
+            return 'quebra-cabeca-jogo.html?' + u.toString();
+        }
+        document.getElementById('pzNiveis').innerHTML = niveis.map(function (nv) {
+            var active = nv.n === linha ? ' is-active' : '';
+            return '<a class="pz-nivel ' + nv.cls + active + '" href="' + urlNivel(nv.n) + '">' + nv.label + '</a>';
+        }).join('');
+
+        // "Jogar de novo" recarrega o mesmo nível.
+        document.getElementById('pzDeNovo').addEventListener('click', function (e) {
+            e.preventDefault(); location.reload();
+        });
+    })();
+</script>
+<script src="components/kids-puzzle.js"></script>
+</body>
+</html>
