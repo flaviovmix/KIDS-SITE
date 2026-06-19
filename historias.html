@@ -18,16 +18,7 @@
 <script src="components/kids-menu.js"></script>
 <script src="components/kids-stories.js"></script>
 <script>
-    // Só os textos dos cards desta página; título/categoria/capa vêm de
-    // kids-stories.js (fonte única).
-    const DESCS = {
-        'passeio-feliz':        'Kaco sai pra passear com a mamãe e descobre que o caminho também é brincadeira.',
-        'mochila-esquecida':    'A mochila ficou em casa! Kaco aprende que esquecer faz parte e tem solução.',
-        'brincando-no-parque':  'Um dia de parque com a turma: esperar a vez, dividir o balanço, brincar junto.',
-        'aniversario-surpresa': 'Uma festa inesperada! Kaco sente a surpresa e aprende a respirar e aproveitar.',
-        'dia-de-chuva':         'O passeio foi cancelado pela chuva. E agora? Kaco lida com a mudança de plano.',
-        'a-lua-cheia':          'Uma noite tranquila olhando a lua, do jeitinho calmo que o Kaco gosta.',
-    };
+    // Tudo (título, categoria, capa, descrição) vem de kids-stories.js (fonte única).
     window.kidsHistoriasConfig = {
         kicker: 'AS AVENTURAS DO KACO',
         titulo: 'Histórias',
@@ -36,13 +27,14 @@
         acaoLabel: 'Ler →',
         categorias: window.KIDS_CATEGORIAS,
         itens: window.KIDS_STORIES.map(function (s) {
-            return { t: s.t, cat: s.cat, img: s.img, link: 'historia.html?id=' + s.id, status: 'no ar', desc: DESCS[s.id] };
+            return { t: s.t, cat: s.cat, img: s.img, link: 'historia.html?id=' + s.id, status: 'no ar', desc: s.desc };
         }),
     };
 </script>
 <script src="components/kids-hero.js"></script>
 <script src="components/kids-historias.js"></script>
 <script src="components/kids-toc.js"></script>
+<script src="components/kids-nav.js"></script>
 <script src="components/kids-footer.js"></script>
 </body>
 </html>

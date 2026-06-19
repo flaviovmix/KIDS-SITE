@@ -8,140 +8,98 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .m1 { max-width: 1000px; margin: 0 auto; padding: 96px 20px 60px; font-family: 'Baloo 2', system-ui, sans-serif; }
+        .m1-head { text-align: center; margin-bottom: 36px; }
+        .m1-kicker { font-size: .8rem; font-weight: 700; letter-spacing: .14em; color: #8aa0b3; text-transform: uppercase; }
+        .m1-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; color: #1f3a4d; margin: 4px 0 8px; }
+        .m1-sub { color: #5b7384; font-size: 1.05rem; max-width: 560px; margin: 0 auto; }
+        .m1-picker { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-bottom: 36px; }
+        .m1-chip { --c:#2aa9e0; border:none; cursor:pointer; background:#fff; width:92px; height:104px; border-radius:24px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; box-shadow:0 8px 20px rgba(15,39,64,.08); transition:transform .25s, box-shadow .25s, background .25s; }
+        .m1-chip .e { font-size:38px; line-height:1; transition:transform .25s; }
+        .m1-chip .n { font-size:.82rem; font-weight:700; color:#6b8294; }
+        .m1-chip:hover { transform:translateY(-4px); } .m1-chip:hover .e { transform:scale(1.12); }
+        .m1-chip.on { background:var(--c); transform:translateY(-6px) scale(1.04); box-shadow:0 16px 30px color-mix(in srgb,var(--c) 45%,transparent); }
+        .m1-chip.on .n { color:#fff; }
+
+        /* ===== Balão de fala do Kaco ===== */
+        .v2 { --c:#2aa9e0; display:flex; align-items:center; gap:24px; animation:v2in .4s ease; }
+        @keyframes v2in { from{opacity:0; transform:translateX(-12px);} to{opacity:1; transform:none;} }
+        .v2-kaco { flex:none; text-align:center; }
+        .v2-kaco .face {
+            width:150px; height:150px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:90px;
+            background:radial-gradient(circle at 50% 38%, color-mix(in srgb,var(--c) 26%,#fff), color-mix(in srgb,var(--c) 12%,#fff));
+            box-shadow:0 14px 30px color-mix(in srgb,var(--c) 36%,transparent); animation:v2bob 3.5s ease-in-out infinite;
+        }
+        @keyframes v2bob { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+        .v2-kaco .tag { margin-top:10px; font-weight:800; color:var(--c); font-size:1.2rem; }
+        .v2-bubble {
+            position:relative; flex:1; background:#fff; border:3px solid var(--c); border-radius:28px; padding:44px 30px;
+            box-shadow:0 16px 36px rgba(15,39,64,.10);
+        }
+        .v2-bubble::before { content:''; position:absolute; left:-18px; top:54px; width:0; height:0; border:11px solid transparent; border-right-color:var(--c); }
+        .v2-bubble::after  { content:''; position:absolute; left:-13px; top:56px; width:0; height:0; border:9px solid transparent; border-right-color:#fff; }
+        .v2-bloco { margin-bottom:40px; }
+        .v2-bloco:last-of-type { margin-bottom:40px; }
+        .v2-bloco .lab { display:inline-block; font-size:.85rem; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:#fff; background:var(--c); padding:4px 14px; border-radius:999px; margin-bottom:8px; }
+        .v2-bloco p { margin:0; color:#45616f; line-height:1.55; font-size:1.3rem; }
+        .v2-more { display:block; width:fit-content; margin:16px auto 0; font-weight:800; text-decoration:none; color:#fff; background:var(--c); font-size:1.15rem; padding:14px 72px; border-radius:999px; box-shadow:0 10px 22px color-mix(in srgb,var(--c) 42%,transparent); transition:transform .2s, box-shadow .2s; }
+        .v2-more:hover { transform:translateY(-2px); box-shadow:0 14px 28px color-mix(in srgb,var(--c) 52%,transparent); }
+        @media (max-width:680px){ .v2{ flex-direction:column; } .v2-bubble::before,.v2-bubble::after{ display:none; } }
+
+        .m1-respira { text-align:center; margin-top:56px; }
+        .m1-respira h2 { font-size:1.6rem; font-weight:800; color:#1f3a4d; margin-bottom:4px; }
+        .m1-respira p { color:#5b7384; margin-bottom:22px; }
+        .m1-breath { width:120px; height:120px; border-radius:50%; margin:0 auto; background:radial-gradient(circle at 50% 40%,#bfe6f7,#5cb8e6); display:flex; align-items:center; justify-content:center; color:#14506e; font-weight:700; box-shadow:0 12px 30px rgba(44,169,224,.4); animation:m1breath 8s ease-in-out infinite; }
+        @keyframes m1breath { 0%,100%{transform:scale(.8);} 50%{transform:scale(1.15);} }
+    </style>
 </head>
 <body>
 
-<!-- Hero (componente kids-hero) renderiza aqui -->
-<div id="kidsHero"></div>
+<main class="m1">
+    <div class="m1-head">
+        <p class="m1-sub">Toque numa carinha e ouça o que o Kaco tem pra contar. 💛</p>
+    </div>
 
-<main class="content">
-    <section class="section section-light">
-        <div class="emo-page">
-            <p class="section-text emo-intro">
-                Toda emoção é importante, até as difíceis. Aqui o Kaco mostra o que ele
-                sente e o que ele faz pra ficar bem. Vamos junto? 💛
-            </p>
+    <div class="m1-picker" id="m1picker"></div>
+    <div id="m1panel"></div>
 
-            <div class="emo-list">
-                <article class="emo-card" id="alegria" style="--emo: var(--c-amber)">
-                    <div class="emo-face">😄</div>
-                    <div class="emo-body">
-                        <h2 class="emo-nome">Alegria</h2>
-                        <div class="emo-bloco">
-                            <span class="lab">O que eu sinto</span>
-                            <p>Meu corpo fica leve e dá vontade de pular! É quando uma coisa boa acontece.</p>
-                        </div>
-                        <div class="emo-bloco">
-                            <span class="lab">O que eu faço</span>
-                            <p>Aproveito e divido com quem eu amo. E guardo essa alegria pra lembrar nos dias difíceis.</p>
-                        </div>
-                        <a class="emo-saibamais" href="emocao-alegria.html">Saiba mais →</a>
-                    </div>
-                </article>
-
-                <article class="emo-card" id="tristeza" style="--emo: var(--c-blue)">
-                    <div class="emo-face">😢</div>
-                    <div class="emo-body">
-                        <h2 class="emo-nome">Tristeza</h2>
-                        <div class="emo-bloco">
-                            <span class="lab">O que eu sinto</span>
-                            <p>Fico com um pesinho no peito e às vezes a lágrima cai. Acontece com todo mundo.</p>
-                        </div>
-                        <div class="emo-bloco">
-                            <span class="lab">O que eu faço</span>
-                            <p>Peço um abraço, falo com quem eu confio ou desenho. A tristeza vai passar, sempre passa.</p>
-                        </div>
-                        <a class="emo-saibamais" href="emocao-tristeza.html">Saiba mais →</a>
-                    </div>
-                </article>
-
-                <article class="emo-card" id="raiva" style="--emo: var(--c-red)">
-                    <div class="emo-face">😠</div>
-                    <div class="emo-body">
-                        <h2 class="emo-nome">Raiva</h2>
-                        <div class="emo-bloco">
-                            <span class="lab">O que eu sinto</span>
-                            <p>Uma energia quente sobe no meu peito quando alguma coisa parece injusta.</p>
-                        </div>
-                        <div class="emo-bloco">
-                            <span class="lab">O que eu faço</span>
-                            <p>Respiro fundo, conto até dez e saio um pouquinho. Depois eu converso, com calma.</p>
-                        </div>
-                        <a class="emo-saibamais" href="emocao-raiva.html">Saiba mais →</a>
-                    </div>
-                </article>
-
-                <article class="emo-card" id="medo" style="--emo: var(--c-purple)">
-                    <div class="emo-face">😨</div>
-                    <div class="emo-body">
-                        <h2 class="emo-nome">Medo</h2>
-                        <div class="emo-bloco">
-                            <span class="lab">O que eu sinto</span>
-                            <p>Meu coração bate forte diante do novo, do escuro ou de um barulho alto.</p>
-                        </div>
-                        <div class="emo-bloco">
-                            <span class="lab">O que eu faço</span>
-                            <p>Seguro a mão de quem cuida de mim e vou devagar, no meu ritmo. Não estou sozinho.</p>
-                        </div>
-                        <a class="emo-saibamais" href="emocao-medo.html">Saiba mais →</a>
-                    </div>
-                </article>
-
-                <article class="emo-card" id="surpresa" style="--emo: var(--c-pink)">
-                    <div class="emo-face">😲</div>
-                    <div class="emo-body">
-                        <h2 class="emo-nome">Surpresa</h2>
-                        <div class="emo-bloco">
-                            <span class="lab">O que eu sinto</span>
-                            <p>É o susto de algo inesperado. Pode ser bom (uma visita) ou difícil (mudou o plano).</p>
-                        </div>
-                        <div class="emo-bloco">
-                            <span class="lab">O que eu faço</span>
-                            <p>Paro um instante, respiro e pergunto o que está acontecendo. Peço um tempinho se precisar.</p>
-                        </div>
-                        <a class="emo-saibamais" href="emocao-surpresa.html">Saiba mais →</a>
-                    </div>
-                </article>
-
-                <article class="emo-card" id="calma" style="--emo: var(--c-green)">
-                    <div class="emo-face">😌</div>
-                    <div class="emo-body">
-                        <h2 class="emo-nome">Calma</h2>
-                        <div class="emo-bloco">
-                            <span class="lab">O que eu sinto</span>
-                            <p>Meu corpo fica solto e a respiração tranquila. Consigo escutar tudo com mais clareza.</p>
-                        </div>
-                        <div class="emo-bloco">
-                            <span class="lab">O que eu faço</span>
-                            <p>Aproveito esse momento e lembro como cheguei aqui, pra voltar quando precisar.</p>
-                        </div>
-                        <a class="emo-saibamais" href="emocao-calma.html">Saiba mais →</a>
-                    </div>
-                </article>
-            </div>
-
-            <!-- Atividade lúdica: respirar junto com o Kaco -->
-            <div class="emo-respira">
-                <h2 class="emo-respira-titulo">Vamos respirar com o Kaco 🐒</h2>
-                <p class="emo-respira-sub">Siga a bolinha: enche o ar devagar e solta devagar.</p>
-                <div class="breath-circle"><span>respira…</span></div>
-            </div>
-        </div>
-    </section>
+    <div class="m1-respira">
+        <h2>Vamos respirar com o Kaco 🐒</h2>
+        <p>Siga a bolinha: enche o ar devagar e solta devagar.</p>
+        <div class="m1-breath">respira…</div>
+    </div>
 </main>
 
-<script src="script.js"></script>
 <script src="components/kids-menu.js"></script>
-<script>
-    window.kidsHeroConfig = {
-        kicker: 'ENTENDENDO O QUE EU SINTO',
-        titulo: 'Emoções',
-        sub: 'Toda emoção é importante. O Kaco ajuda a dar nome e a saber o que fazer.',
-        emojis: ['💛', '🌈'],
-    };
-</script>
-<script src="components/kids-hero.js"></script>
-<script src="components/kids-toc.js"></script>
+<script src="components/kids-nav.js"></script>
 <script src="components/kids-footer.js"></script>
+<script>
+    var EMO = [
+        { id:'alegria',  nome:'Alegria',  e:'😄', cor:'#f59e0b', sinto:'Meu corpo fica leve e dá vontade de pular! É quando uma coisa boa acontece.', faco:'Aproveito e divido com quem eu amo. E guardo essa alegria pra lembrar nos dias difíceis.' },
+        { id:'tristeza', nome:'Tristeza', e:'😢', cor:'#2aa9e0', sinto:'Fico com um pesinho no peito e às vezes a lágrima cai. Acontece com todo mundo.', faco:'Peço um abraço, falo com quem eu confio ou desenho. A tristeza vai passar, sempre passa.' },
+        { id:'raiva',    nome:'Raiva',    e:'😠', cor:'#ec5a5a', sinto:'Uma energia quente sobe no meu peito quando alguma coisa parece injusta.', faco:'Respiro fundo, conto até dez e saio um pouquinho. Depois eu converso, com calma.' },
+        { id:'medo',     nome:'Medo',     e:'😨', cor:'#9b6fd1', sinto:'Meu coração bate forte diante do novo, do escuro ou de um barulho alto.', faco:'Seguro a mão de quem cuida de mim e vou devagar, no meu ritmo. Não estou sozinho.' },
+        { id:'surpresa', nome:'Surpresa', e:'😲', cor:'#e0729e', sinto:'É o susto de algo inesperado. Pode ser bom (uma visita) ou difícil (mudou o plano).', faco:'Paro um instante, respiro e pergunto o que está acontecendo. Peço um tempinho se precisar.' },
+        { id:'calma',    nome:'Calma',    e:'😌', cor:'#5bbf6a', sinto:'Meu corpo fica solto e a respiração tranquila. Consigo escutar tudo com mais clareza.', faco:'Aproveito esse momento e lembro como cheguei aqui, pra voltar quando precisar.' },
+    ];
+    var picker = document.getElementById('m1picker'), panel = document.getElementById('m1panel');
+    picker.innerHTML = EMO.map(function (m,i){ return '<button class="m1-chip" data-i="'+i+'" style="--c:'+m.cor+'"><span class="e">'+m.e+'</span><span class="n">'+m.nome+'</span></button>'; }).join('');
+    function show(i){
+        var m = EMO[i];
+        panel.innerHTML =
+            '<div class="v2" style="--c:'+m.cor+'">' +
+                '<div class="v2-kaco"><div class="face">'+m.e+'</div><div class="tag">'+m.nome+'</div></div>' +
+                '<div class="v2-bubble">' +
+                    '<div class="v2-bloco"><span class="lab">O que eu sinto</span><p>'+m.sinto+'</p></div>' +
+                    '<div class="v2-bloco"><span class="lab">O que eu faço</span><p>'+m.faco+'</p></div>' +
+                    '<a class="v2-more" href="emocao-'+m.id+'.html">Saiba mais →</a>' +
+                '</div>' +
+            '</div>';
+        picker.querySelectorAll('.m1-chip').forEach(function(c,k){ c.classList.toggle('on',k===i); });
+    }
+    picker.addEventListener('click', function(ev){ var b=ev.target.closest('.m1-chip'); if(b) show(Number(b.dataset.i)); });
+    show(0);
+</script>
 </body>
 </html>

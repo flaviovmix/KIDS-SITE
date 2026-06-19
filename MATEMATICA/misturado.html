@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Misturado</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  
+</head>
+
+<body>
+
+  <div>
+    <script id="dados-jogo">
+    const bancoDeContas = {
+      "jogo": "Adição e Subtração",
+      "versao": 1,
+      "contas": [
+        { "id": 1,  "nivel": 1, "operacao": "+", "a": 1, "b": 1 },
+        { "id": 2,  "nivel": 1, "operacao": "-", "a": 3, "b": 1 },
+        { "id": 3,  "nivel": 1, "operacao": "+", "a": 2, "b": 2 },
+        { "id": 4,  "nivel": 1, "operacao": "-", "a": 4, "b": 2 },
+        { "id": 5,  "nivel": 1, "operacao": "+", "a": 3, "b": 1 },
+
+        { "id": 6,  "nivel": 2, "operacao": "-", "a": 5, "b": 2 },
+        { "id": 7,  "nivel": 2, "operacao": "+", "a": 4, "b": 3 },
+        { "id": 8,  "nivel": 2, "operacao": "-", "a": 6, "b": 3 },
+        { "id": 9,  "nivel": 2, "operacao": "+", "a": 5, "b": 2 },
+        { "id": 10, "nivel": 2, "operacao": "-", "a": 7, "b": 4 },
+
+        { "id": 11, "nivel": 3, "operacao": "+", "a": 6, "b": 3 },
+        { "id": 12, "nivel": 3, "operacao": "-", "a": 8, "b": 5 },
+        { "id": 13, "nivel": 3, "operacao": "+", "a": 7, "b": 2 },
+        { "id": 14, "nivel": 3, "operacao": "-", "a": 9, "b": 3 },
+        { "id": 15, "nivel": 3, "operacao": "+", "a": 8, "b": 1 },
+
+        { "id": 16, "nivel": 4, "operacao": "-", "a": 10, "b": 4 },
+        { "id": 17, "nivel": 4, "operacao": "+", "a": 9, "b": 1 },
+        { "id": 18, "nivel": 4, "operacao": "-", "a": 8, "b": 2 },
+        { "id": 19, "nivel": 4, "operacao": "+", "a": 6, "b": 4 },
+        { "id": 20, "nivel": 4, "operacao": "-", "a": 9, "b": 5 },
+
+        { "id": 21, "nivel": 5, "operacao": "+", "a": 8, "b": 2 },
+        { "id": 22, "nivel": 5, "operacao": "-", "a": 10, "b": 6 },
+        { "id": 23, "nivel": 5, "operacao": "+", "a": 7, "b": 3 },
+        { "id": 24, "nivel": 5, "operacao": "-", "a": 9, "b": 4 },
+        { "id": 25, "nivel": 5, "operacao": "+", "a": 6, "b": 4 },
+
+        { "id": 26, "nivel": 6, "operacao": "-", "a": 10, "b": 5 },
+        { "id": 27, "nivel": 6, "operacao": "+", "a": 9, "b": 1 },
+        { "id": 28, "nivel": 6, "operacao": "-", "a": 8, "b": 3 },
+        { "id": 29, "nivel": 6, "operacao": "+", "a": 7, "b": 2 },
+        { "id": 30, "nivel": 6, "operacao": "-", "a": 10, "b": 4 }
+        ]
+    };
+  </script>
+  </div>
+  <div class="app">
+    <header>
+      <div class="config-jogo">
+        <div class="btn-niveis">
+
+          <button class="nivel muito-facil"
+              onclick="window.location.href='misturado/muitoFacil.html'">
+              <i class="fa-solid fa-circle-check"></i>
+            Muito Fácil
+          </button>
+          <button class="nivel facil"
+              onclick="window.location.href='misturado/facil.html'">     
+            Fácil
+          </button>
+          
+          <button class="nivel medio"
+              onclick="window.location.href='misturado/medio.html'">
+            Médio
+          </button>
+          
+          <button class="nivel dificil"
+              onclick="window.location.href='misturado/dificil.html'">
+            Difícil
+          </button>
+
+          <button class="nivel muito-dificil"
+              onclick="window.location.href='misturado/muitoDificil.html'">
+            Muito Difícil
+          </button>
+
+          <div class="operacoes">
+            <select id="operacao">
+              <option value="soma.html">➕ Somar</option>
+              <option value="subtracao.html">➖ Subtrair</option>
+              <option value="misturado.html" selected>🔢 Misturado</option>
+                          <option value="multiplicacao.html">✖️ Multiplicar</option>
+            </select>
+          </div>
+        <div class="stats">
+          <div class="pill">Acertos: <strong id="hits">0</strong></div>
+          <div class="pill">Erros: <strong id="miss">0</strong></div>
+          <div class="pill">Total de: <strong id="total">0</strong><strong> de 30</strong></div>
+        </div>
+      </div>
+      </div>
+      <button class="btn btn-reset" id="btnReset" type="button">
+        <i class="fa-solid fa-rotate-left"></i> 
+      </button>
+    </header>
+
+    <div class="content">
+      <div class="card">
+        <div class="zones">
+          <div class="zone" id="zoneA">
+            <div class="zoneTitle">1º número</div>
+            <div class="dots" id="dotsA"></div>
+          </div>
+          <div class="opBadge" id="opBadge">+</div>
+          <div class="zone" id="zoneB">
+            <div class="zoneTitle">2º número</div>
+            <div class="dots" id="dotsB"></div>
+          </div>
+        </div>
+
+        <div class="stage" id="stage">
+          <div class="stageTitle">(dica)</div>
+          <div class="stageInner" id="stageInner"></div>
+          <div id="stageCounter" class="stageCounter">?</div>
+        </div>
+
+        <div class="question">
+          <div class="big">
+            <span id="n1">?</span>
+            <span id="op">+</span>
+            <span id="n2">?</span>
+            =
+            <span id="finalQuestionText">?</span>
+          </div>
+        </div>
+
+        <div class="buttons" id="buttons"></div>
+        <div id="message" class="msg"></div>
+
+        <div class="controls">
+          <button class="btn btn-hint" id="btnHint" type="button">
+            <i class="fa-solid fa-graduation-cap"></i> Dica / Explicar
+          </button>
+
+          <button class="btn btn-next" id="btnNext" type="button">
+            Próxima <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <div id="hintText" class="hintText"></div>
+
+      </div>
+
+      <div class="card buddy">
+        <div class="avatar-container">
+          <img src="espera.png" id="buddyImg" alt="Personagem" class="buddy-img">
+        </div>
+        <h2 id="buddyTitle">Vamos começar!</h2>
+        <p id="buddyText">Escolha um número.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="animLayer"></div>
+  <script src="./script.js"></script>
+
+  <script>
+    document.getElementById("operacao")
+      .addEventListener("change", function () {
+        window.location.href = this.value;
+      });
+  </script>
+</body>
+
+</html>

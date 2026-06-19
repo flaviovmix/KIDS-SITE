@@ -170,79 +170,134 @@
                 <button class="chip" type="button" data-cond="autismo">Autismo</button>
                 <button class="chip" type="button" data-cond="paralisia">Paralisia</button>
             </div>
-            <!-- fileira de miniaturas (passe o mouse / toque) -->
-            <div class="char-thumbs" role="tablist" aria-label="Escolha um personagem">
-                <button class="char-thumb is-active" type="button" data-index="0" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/mae.png" style="--accent:#e0729e;--accent2:#f7d9e8;">
+            <!-- fileira de miniaturas (carrossel infinito; passe o mouse / arraste) -->
+            <div class="char-thumbs-carousel" data-char-thumbs-carousel>
+              <div class="char-thumbs-stage">
+                <button class="carousel-arrow left" id="charThumbsLeft" type="button" aria-label="Mover para a esquerda">‹</button>
+                <div class="char-thumbs-viewport">
+                <div class="char-thumbs" role="tablist" aria-label="Escolha um personagem">
+                <!-- personagens entram aqui (skill /kaco:postar-historias, Parte 2) -->
+                <button class="char-thumb is-active" type="button" data-index="0" data-cond="autismo" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/kaco.png" style="--accent:#a9744f;--accent2:#ead7c4;">
+                    <span class="char-thumb-pic"><img src="img/icone-kaco.png" alt="Kaco"></span>
+                    <span class="char-thumb-name">Kaco</span>
+                </button>
+                <button class="char-thumb" type="button" data-index="1" data-cond="autismo" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/mae.png" style="--accent:#e0729e;--accent2:#f7d9e8;">
                     <span class="char-thumb-pic"><img src="img/icone-mae.png" alt="Mãe"></span>
                     <span class="char-thumb-name">Mãe</span>
                 </button>
-                <button class="char-thumb" type="button" data-index="1" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/gato.png" style="--accent:#2aa9e0;--accent2:#c7e9f7;">
+                <button class="char-thumb" type="button" data-index="2" data-cond="autismo" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/gato.png" style="--accent:#f0922b;--accent2:#fbe3c4;">
                     <span class="char-thumb-pic"><img src="img/icone-gato.png" alt="Gato"></span>
                     <span class="char-thumb-name">Gato</span>
                 </button>
-                <button class="char-thumb" type="button" data-index="2" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/cao.png" style="--accent:#f0922b;--accent2:#fbe3c4;">
-                    <span class="char-thumb-pic"><img src="img/icone-cao.png" alt="Cão"></span>
-                    <span class="char-thumb-name">Cão</span>
+                <button class="char-thumb" type="button" data-index="3" data-cond="autismo" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/rato.png" style="--accent:#6f7bd1;--accent2:#d3d8f5;">
+                    <span class="char-thumb-pic"><img src="img/icone-rato.png" alt="Rato"></span>
+                    <span class="char-thumb-name">Rato</span>
                 </button>
-                <button class="char-thumb" type="button" data-index="3" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/sapo.png" style="--accent:#ec5a5a;--accent2:#fad1d1;">
-                    <span class="char-thumb-pic"><img src="img/icone-sapo.png" alt="Sapo"></span>
-                    <span class="char-thumb-name">Sapo</span>
+                <button class="char-thumb" type="button" data-index="4" data-cond="autismo" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/pato.png" style="--accent:#2aa9e0;--accent2:#c7e9f7;">
+                    <span class="char-thumb-pic"><img src="img/icone-pato.png" alt="Pato"></span>
+                    <span class="char-thumb-name">Pato</span>
                 </button>
-                <button class="char-thumb" type="button" data-index="4" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/dino.png" style="--accent:#6f7bd1;--accent2:#d3d8f5;">
-                    <span class="char-thumb-pic"><img src="img/icone-dino.png" alt="Dino"></span>
-                    <span class="char-thumb-name">Dino</span>
+                <button class="char-thumb" type="button" data-index="5" data-cond="autismo" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/pai.png" style="--accent:#ec5a5a;--accent2:#fad1d1;">
+                    <span class="char-thumb-pic"><img src="img/icone-pai.png" alt="Pai"></span>
+                    <span class="char-thumb-name">Pai</span>
                 </button>
+                <button class="char-thumb" type="button" data-index="6" data-cond="autismo" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/motorista.png" style="--accent:#9b6fd1;--accent2:#e0cdf5;">
+                    <span class="char-thumb-pic"><img src="img/icone-motorista.png" alt="Motorista"></span>
+                    <span class="char-thumb-name">Motorista</span>
+                </button>
+                <button class="char-thumb" type="button" data-index="7" data-cond="autismo" data-video="zmoG7P3nanM" data-sticker="1" data-full="img/terapeuta.png" style="--accent:#5bbf6a;--accent2:#c4ecca;">
+                    <span class="char-thumb-pic"><img src="img/icone-terapeuta.png" alt="Tio Thiago"></span>
+                    <span class="char-thumb-name">Tio Thiago</span>
+                </button>
+                </div>
+                </div>
+                <button class="carousel-arrow right" id="charThumbsRight" type="button" aria-label="Mover para a direita">›</button>
+              </div>
             </div>
 
             <!-- palco do detalhe (desliza conforme a miniatura ativa) -->
             <div class="char-stage">
                 <!-- imagem solta do carrossel, posicionada fora do card -->
                 <div class="char-float-frame" data-char-float-frame>
-                    <img class="char-float" data-char-float src="img/mae.png" alt="Mãe">
+                    <img class="char-float" data-char-float alt="">
                 </div>
                 <div class="char-viewport">
                     <div class="char-track" data-char-track>
+                        <!-- painéis dos personagens entram aqui -->
+                        <article class="char-panel" style="--accent:#a9744f;--accent2:#ead7c4;">
+                            <div class="char-panel-text">
+                                <h3 class="char-panel-name">Kaco</h3>
+                                <p class="char-panel-desc">Curioso e cheio de energia, o Kaco sente tudo com intensidade. No tempo dele, ele aprende a lidar com cada emoção do dia.</p>
+                                <a class="btn-saiba-mais" href="personagens.html?p=kaco">Ver histórias</a>
+                            </div>
+                        </article>
                         <article class="char-panel" style="--accent:#e0729e;--accent2:#f7d9e8;">
                             <div class="char-panel-text">
                                 <h3 class="char-panel-name">Mãe</h3>
-                                <p class="char-panel-desc">Carinhosa e atenta, a Mãe acolhe, dá colo e ajuda o Kaco a entender o mundo no tempo dele. Um abraço seguro pra qualquer hora.</p>
-                                <a class="btn-saiba-mais" href="historias.html">Ver histórias</a>
-                            </div>                        </article>
-                        <article class="char-panel" style="--accent:#2aa9e0;--accent2:#c7e9f7;">
-                            <div class="char-panel-text">
-                                <h3 class="char-panel-name">Gato</h3>
-                                <p class="char-panel-desc">Tranquilo e observador, o Gato fala pouco mas percebe tudo o que acontece à sua volta. Gosta de um cantinho quentinho pra descansar.</p>
-                                <a class="btn-saiba-mais" href="historias.html">Ver histórias</a>
-                            </div>                        </article>
+                                <p class="char-panel-desc">Carinhosa e paciente, a Mãe acolhe o Kaco e ajuda ele a entender o que sente. Um colo seguro pra qualquer hora.</p>
+                                <a class="btn-saiba-mais" href="personagens.html?p=mae">Ver histórias</a>
+                            </div>
+                        </article>
                         <article class="char-panel" style="--accent:#f0922b;--accent2:#fbe3c4;">
                             <div class="char-panel-text">
-                                <h3 class="char-panel-name">Cão</h3>
-                                <p class="char-panel-desc">Animado e leal, o Cão está sempre pronto pra brincar e fazer companhia. Quando alguém precisa, ele chega abanando o rabo.</p>
-                                <a class="btn-saiba-mais" href="historias.html">Ver histórias</a>
-                            </div>                        </article>
-                        <article class="char-panel" style="--accent:#ec5a5a;--accent2:#fad1d1;">
-                            <div class="char-panel-text">
-                                <h3 class="char-panel-name">Sapo</h3>
-                                <p class="char-panel-desc">Curioso e brincalhão, o Sapo adora dar pulos e descobrir cada cantinho do lago. Topa qualquer aventura perto da água.</p>
-                                <a class="btn-saiba-mais" href="historias.html">Ver histórias</a>
-                            </div>                        </article>
+                                <h3 class="char-panel-name">Gato</h3>
+                                <p class="char-panel-desc">Esperto e brincalhão, o Gato adora uma boa correria pelo jardim. Sempre pronto pra mais uma travessura.</p>
+                                <a class="btn-saiba-mais" href="personagens.html?p=gato">Ver histórias</a>
+                            </div>
+                        </article>
                         <article class="char-panel" style="--accent:#6f7bd1;--accent2:#d3d8f5;">
                             <div class="char-panel-text">
-                                <h3 class="char-panel-name">Dino</h3>
-                                <p class="char-panel-desc">Grandão de coração gigante, o Dino parece bravo mas é o maior amigo da turma. Adora histórias e protege todo mundo.</p>
-                                <a class="btn-saiba-mais" href="historias.html">Ver histórias</a>
-                            </div>                        </article>
+                                <h3 class="char-panel-name">Rato</h3>
+                                <p class="char-panel-desc">Pequeno e ligeiro, o Rato escapa de qualquer enrascada com um sorriso. Vive inventando brincadeira no mato.</p>
+                                <a class="btn-saiba-mais" href="personagens.html?p=rato">Ver histórias</a>
+                            </div>
+                        </article>
+                        <article class="char-panel" style="--accent:#2aa9e0;--accent2:#c7e9f7;">
+                            <div class="char-panel-text">
+                                <h3 class="char-panel-name">Pato</h3>
+                                <p class="char-panel-desc">Animado e tagarela, o Pato faz a maior algazarra por onde passa. Adora rir alto com os amigos.</p>
+                                <a class="btn-saiba-mais" href="personagens.html?p=pato">Ver histórias</a>
+                            </div>
+                        </article>
+                        <article class="char-panel" style="--accent:#ec5a5a;--accent2:#fad1d1;">
+                            <div class="char-panel-text">
+                                <h3 class="char-panel-name">Pai</h3>
+                                <p class="char-panel-desc">Paciente e presente, o Pai ensina sem pressa e segura firme até o Kaco conseguir sozinho. Um colo seguro pra cair e tentar de novo.</p>
+                                <a class="btn-saiba-mais" href="personagens.html?p=pai">Ver histórias</a>
+                            </div>
+                        </article>
+                        <article class="char-panel" style="--accent:#9b6fd1;--accent2:#e0cdf5;">
+                            <div class="char-panel-text">
+                                <h3 class="char-panel-name">Motorista</h3>
+                                <p class="char-panel-desc">Simpático e tranquilo, o Motorista leva todo mundo em segurança e sempre tem um aceno gentil. Uma capivara que conhece cada paradinha do caminho.</p>
+                                <a class="btn-saiba-mais" href="personagens.html?p=motorista">Ver histórias</a>
+                            </div>
+                        </article>
+                        <article class="char-panel" style="--accent:#5bbf6a;--accent2:#c4ecca;">
+                            <div class="char-panel-text">
+                                <h3 class="char-panel-name">Tio Thiago</h3>
+                                <p class="char-panel-desc">Calmo e atencioso, o Tio Thiago transforma a terapia em brincadeira e ajuda o Kaco a lidar com o que sente. Cada conquista vira motivo de festa.</p>
+                                <a class="btn-saiba-mais" href="personagens.html?p=terapeuta">Ver histórias</a>
+                            </div>
+                        </article>
                     </div>
                 </div>
                 <!-- vídeo solto do carrossel: vaza pra cima e pra direita; troca por crossfade -->
                 <div class="char-stage-videos" data-char-videos>
+                    <!-- vídeos dos personagens entram aqui -->
                     <div class="char-stage-video is-active"><iframe src="https://www.youtube.com/embed/zmoG7P3nanM" title="Vídeo do personagem" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+                    <div class="char-stage-video"><iframe src="https://www.youtube.com/embed/zmoG7P3nanM" title="Vídeo do personagem" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+                    <div class="char-stage-video"><iframe src="https://www.youtube.com/embed/zmoG7P3nanM" title="Vídeo do personagem" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+                    <div class="char-stage-video"><iframe src="https://www.youtube.com/embed/zmoG7P3nanM" title="Vídeo do personagem" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
                     <div class="char-stage-video"><iframe src="https://www.youtube.com/embed/zmoG7P3nanM" title="Vídeo do personagem" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
                     <div class="char-stage-video"><iframe src="https://www.youtube.com/embed/zmoG7P3nanM" title="Vídeo do personagem" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
                     <div class="char-stage-video"><iframe src="https://www.youtube.com/embed/zmoG7P3nanM" title="Vídeo do personagem" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
                     <div class="char-stage-video"><iframe src="https://www.youtube.com/embed/zmoG7P3nanM" title="Vídeo do personagem" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
                 </div>
             </div>
+        </div>
+        <div class="familia-cta">
+            <a class="familia-btn" href="personagens.html">Ver todos os personagens →</a>
         </div>
     </section>
 
@@ -271,7 +326,7 @@
         <div class="rotina-layout">
             <div class="rotina-destaques">
                 <div class="destaque-card destaque-card-img" style="--rc:var(--c-amber)">
-                    <img class="destaque-img" src="modelo/image-1.png" alt="">
+                    <img class="destaque-img" src="ser-crianca/image-1.png" alt="">
                     <span class="destaque-text">
                         <b class="destaque-label">Brincar</b>
                         <small class="destaque-desc">Tempo livre pra brincar e ser criança, no ritmo dele. É assim que o Kaco aprende e fica feliz.</small>
@@ -279,7 +334,7 @@
                     </span>
                 </div>
                 <div class="destaque-card destaque-card-img" style="--rc:var(--c-green)">
-                    <img class="destaque-img" src="modelo/image-3.png" alt="">
+                    <img class="destaque-img" src="ser-crianca/image-3.png" alt="">
                     <span class="destaque-text">
                         <b class="destaque-label">Terapia</b>
                         <small class="destaque-desc">Apoio que acolhe e ajuda o Kaco a crescer com confiança. Cada conquista é celebrada.</small>
@@ -289,7 +344,7 @@
             </div>
             <div class="rotina-steps">
                 <a class="rotina-card rotina-card-img" href="rotina-acordar.html" style="--rc:var(--c-amber)">
-                    <span class="rotina-emoji has-img"><img src="modelo/image-2.png" alt="Acordar"></span>
+                    <span class="rotina-emoji has-img"><img src="ser-crianca/image-2.png" alt="Acordar"></span>
                     <span class="rotina-step">1</span>
                     <span class="rotina-text">
                         <b class="rotina-label">Acordar</b>
@@ -297,78 +352,78 @@
                         <span class="rotina-mais">Saiba mais →</span>
                     </span>
                 </a>
-                <div class="rotina-card rotina-card-img" style="--rc:var(--c-blue)">
-                    <span class="rotina-emoji has-img"><img src="modelo/image-3.png" alt="Escovar os dentes"></span>
+                <a class="rotina-card rotina-card-img" href="rotina-escovar-dentes.html" style="--rc:var(--c-blue)">
+                    <span class="rotina-emoji has-img"><img src="ser-crianca/image-3.png" alt="Escovar os dentes"></span>
                     <span class="rotina-step">2</span>
                     <span class="rotina-text">
                         <b class="rotina-label">Escovar os dentes</b>
                         <small class="rotina-desc">Sorriso limpinho.</small>
                         <span class="rotina-mais">Saiba mais →</span>
                     </span>
-                </div>
-                <div class="rotina-card rotina-card-img" style="--rc:var(--c-green)">
-                    <span class="rotina-emoji has-img"><img src="modelo/image-4.png" alt="Tomar café"></span>
+                </a>
+                <a class="rotina-card rotina-card-img" href="rotina-tomar-cafe.html" style="--rc:var(--c-green)">
+                    <span class="rotina-emoji has-img"><img src="ser-crianca/image-4.png" alt="Tomar café"></span>
                     <span class="rotina-step">3</span>
                     <span class="rotina-text">
                         <b class="rotina-label">Tomar café</b>
                         <small class="rotina-desc">Pra começar com energia.</small>
                         <span class="rotina-mais">Saiba mais →</span>
                     </span>
-                </div>
-                <div class="rotina-card rotina-card-img" style="--rc:var(--c-purple)">
-                    <span class="rotina-emoji has-img"><img src="modelo/image-2.png" alt="Se arrumar"></span>
+                </a>
+                <a class="rotina-card rotina-card-img" href="rotina-se-arrumar.html" style="--rc:var(--c-purple)">
+                    <span class="rotina-emoji has-img"><img src="ser-crianca/image-2.png" alt="Se arrumar"></span>
                     <span class="rotina-step">4</span>
                     <span class="rotina-text">
                         <b class="rotina-label">Se arrumar</b>
                         <small class="rotina-desc">Pronto pra sair.</small>
                         <span class="rotina-mais">Saiba mais →</span>
                     </span>
-                </div>
-                <div class="rotina-card rotina-card-img" style="--rc:var(--c-pink)">
-                    <span class="rotina-emoji has-img"><img src="modelo/image-3.png" alt="Ir pra escola"></span>
+                </a>
+                <a class="rotina-card rotina-card-img" href="rotina-ir-pra-escola.html" style="--rc:var(--c-pink)">
+                    <span class="rotina-emoji has-img"><img src="ser-crianca/image-3.png" alt="Ir pra escola"></span>
                     <span class="rotina-step">5</span>
                     <span class="rotina-text">
                         <b class="rotina-label">Ir pra escola</b>
                         <small class="rotina-desc">Bora aprender!</small>
                         <span class="rotina-mais">Saiba mais →</span>
                     </span>
-                </div>
-                <div class="rotina-card rotina-card-img" style="--rc:var(--c-blue)">
-                    <span class="rotina-emoji has-img"><img src="modelo/image-4.png" alt="Tomar banho"></span>
+                </a>
+                <a class="rotina-card rotina-card-img" href="rotina-tomar-banho.html" style="--rc:var(--c-blue)">
+                    <span class="rotina-emoji has-img"><img src="ser-crianca/image-4.png" alt="Tomar banho"></span>
                     <span class="rotina-step">6</span>
                     <span class="rotina-text">
                         <b class="rotina-label">Tomar banho</b>
                         <small class="rotina-desc">Hora da água.</small>
                         <span class="rotina-mais">Saiba mais →</span>
                     </span>
-                </div>
-                <div class="rotina-card rotina-card-img" style="--rc:#14b8a6">
-                    <span class="rotina-emoji has-img"><img src="modelo/image-2.png" alt="Arrumar os brinquedos"></span>
+                </a>
+                <a class="rotina-card rotina-card-img" href="rotina-arrumar-brinquedos.html" style="--rc:#14b8a6">
+                    <span class="rotina-emoji has-img"><img src="ser-crianca/image-2.png" alt="Arrumar os brinquedos"></span>
                     <span class="rotina-step">7</span>
                     <span class="rotina-text">
                         <b class="rotina-label">Arrumar os brinquedos</b>
                         <small class="rotina-desc">Cada um no lugar.</small>
                         <span class="rotina-mais">Saiba mais →</span>
                     </span>
-                </div>
-                <div class="rotina-card rotina-card-img" style="--rc:var(--c-red)">
-                    <span class="rotina-emoji has-img"><img src="modelo/image-3.png" alt="Ajudar a mamãe e o papai"></span>
+                </a>
+                <a class="rotina-card rotina-card-img" href="rotina-ajudar.html" style="--rc:var(--c-red)">
+                    <span class="rotina-emoji has-img"><img src="ser-crianca/image-3.png" alt="Ajudar a mamãe e o papai"></span>
                     <span class="rotina-step">8</span>
                     <span class="rotina-text">
                         <b class="rotina-label">Ajudar a mamãe e o papai</b>
                         <small class="rotina-desc">Em família é melhor.</small>
                         <span class="rotina-mais">Saiba mais →</span>
                     </span>
-                </div>
-                <div class="rotina-card rotina-card-img" style="--rc:var(--c-indigo)">
-                    <span class="rotina-emoji has-img"><img src="modelo/image-4.png" alt="Dormir"></span>
+                </a>
+                <a class="rotina-card rotina-card-img" href="rotina-dormir.html" style="--rc:var(--c-indigo)">
+                    <span class="rotina-emoji has-img"><img src="ser-crianca/image-4.png" alt="Dormir"></span>
                     <span class="rotina-step">9</span>
                     <span class="rotina-text">
                         <b class="rotina-label">Dormir</b>
                         <small class="rotina-desc">Boa noite, Kaco.</small>
                         <span class="rotina-mais">Saiba mais →</span>
                     </span>
-                </div>
+                </a>
             </div>
         </div>
     </section>
@@ -545,6 +600,36 @@
         </div>
     </section>
 
+    <section id="quebra-cabeca" class="section section-light">
+        <div class="section-inner">
+            <h2 class="section-title">Brincar de Montar</h2>
+            <p class="section-text section-intro">
+                Quebra-cabeças com as figuras do mundo do Kaco. Arrastar e encaixar as peças
+                ajuda na atenção e na coordenação, no ritmo da criança.
+            </p>
+        </div>
+        <div class="familia-cards">
+            <a class="familia-card" href="quebra-cabeca-jogo.html?img=historias%2Fo-passeio-feliz%2F1.jpeg&titulo=O%20Passeio%20Feliz" style="--c:var(--c-green)">
+                <span class="familia-emoji">🧩</span>
+                <h3>O Passeio Feliz</h3>
+                <p>Monte a figura da história com peças grandes, bem fácil pra começar.</p>
+            </a>
+            <a class="familia-card" href="quebra-cabeca-jogo.html?img=historias%2Fo-gato-o-rato-e-o-pato%2F1.jpeg&titulo=O%20Gato%2C%20o%20Rato%20e%20o%20Pato" style="--c:var(--c-amber)">
+                <span class="familia-emoji">🐱</span>
+                <h3>O Gato, o Rato e o Pato</h3>
+                <p>Os amigos do jardim viraram quebra-cabeça pra você montar.</p>
+            </a>
+            <a class="familia-card" href="quebra-cabeca-jogo.html?img=historias%2Fkaco-anda-de-bicicleta%2F1.jpeg&titulo=Kaco%20Anda%20de%20Bicicleta" style="--c:var(--c-blue)">
+                <span class="familia-emoji">🚲</span>
+                <h3>Kaco Anda de Bicicleta</h3>
+                <p>Encaixe as peças e veja o Kaco pedalando feliz da vida.</p>
+            </a>
+        </div>
+        <div class="familia-cta">
+            <a class="familia-btn" href="quebra-cabeca.html">Ver todos os quebra-cabeças →</a>
+        </div>
+    </section>
+
     <section id="familia" class="section section-tint">
         <div class="section-inner">
             <h2 class="section-title">Pra Família</h2>
@@ -581,6 +666,7 @@
 <script src="script.js"></script>
 <script src="components/kids-menu.js"></script>
 <script src="components/kids-toc.js"></script>
+<script src="components/kids-nav.js"></script>
 <script>
     /* Player reduzido dos cards de áudio na home (play/pause + barrinha). */
     document.querySelectorAll('.home-audio-item').forEach((item) => {

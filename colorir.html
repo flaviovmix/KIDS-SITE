@@ -8,41 +8,491 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Botão central que abre o ateliê de pintura (placeholder até ter cards). */
+        .colorir-cta { text-align:center; padding:8px 18px 64px; }
+
+        /* Destaca o(s) card(s) de desenho desta página: borda mais grossa e escura. */
+        .hist-card { border:4px solid rgba(var(--shadow-rgb),0.55); }
+        /* Divisória entre a imagem e o texto do card. */
+        .hist-body { border-top:2px solid rgba(var(--shadow-rgb),0.55); }
+
+        /* ===== Modal do ateliê de pintura ===== */
+        .paint-modal { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; padding:18px; }
+        .paint-modal[hidden] { display:none; }
+        .paint-modal-backdrop { position:absolute; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(2px); }
+        .paint-modal-card { position:relative; z-index:1; background:#fff; border-radius:20px; padding:22px;
+            width:80vw; max-width:none; height:80vh; max-height:92vh; overflow:auto; box-shadow:0 24px 60px rgba(0,0,0,.35);
+            display:flex; flex-direction:column; }
+        .paint-modal-close { position:absolute; top:12px; right:14px; z-index:2; width:38px; height:38px; border-radius:50%;
+            border:0; background:#eef2f7; color:#334; font-size:18px; font-weight:700; cursor:pointer; line-height:1; }
+        .paint-modal-close:hover { background:#e0e7f0; }
+
+        /* ===== Ferramenta de pintura (flood-fill), CSS escopado em .paint-app ===== */
+        .paint-app { --panel:#2b2f36; --accent:#a23ca0; font-family:'Baloo 2',system-ui,sans-serif; color:#222;
+            flex:1; min-height:0; display:flex; flex-direction:column; }
+        .paint-app * { box-sizing:border-box; }
+        .paint-app .stage { display:flex; gap:14px; align-items:stretch; justify-content:center; flex-wrap:nowrap;
+            flex:1; min-height:0; }
+        /* área do canvas: encolhe pro tamanho do desenho (não cresce), pra o painel
+           ficar colado ao lado; o conjunto canvas+painel é centralizado pela .stage. */
+        .paint-app .canvas-area { flex:0 1 auto; min-width:0; min-height:0; display:flex; align-items:center; justify-content:center; }
+        /* moldura branca abraça o desenho na proporção 760x560 (sem sobra de branco). */
+        .paint-app .canvas-wrap { background:#fff; border:6px solid #cfd8e3; border-radius:14px; line-height:0;
+            box-shadow:0 8px 24px rgba(0,0,0,.12);
+            height:100%; width:auto; aspect-ratio:760/470; max-width:100%; max-height:100%; }
+        .paint-app canvas { display:block; width:100%; height:100%; object-fit:contain; border-radius:8px; cursor:crosshair; touch-action:none; }
+        .paint-app .panel { width:280px; flex:0 0 280px; align-self:flex-start; background:var(--panel); border-radius:14px; padding:14px;
+            box-shadow:0 8px 24px rgba(0,0,0,.12); }
+        .paint-app .swatches { display:grid; grid-template-columns:repeat(8,1fr); gap:5px; }
+        .paint-app .swatches button { aspect-ratio:1; border:2px solid rgba(255,255,255,.15); border-radius:50%;
+            cursor:pointer; padding:0; }
+        .paint-app .swatches button.sel { outline:3px solid #fff; outline-offset:1px; transform:scale(1.12); }
+        .paint-app .row { display:flex; gap:8px; margin-top:12px; }
+        .paint-app .row.tools button { flex:1; }
+        .paint-app .row.shapes button { flex:1; font-size:18px; line-height:1; padding:10px 4px; }
+        .paint-app .panel label { display:block; color:#cfd2d8; font-size:12px; margin:12px 0 4px; }
+        .paint-app .panel button.tool { background:#3a3f47; color:#fff; border:0; border-radius:9px; padding:10px 8px;
+            font-family:inherit; font-weight:700; font-size:13px; cursor:pointer; }
+        .paint-app .panel button.tool.sel { background:var(--accent); }
+        .paint-app .panel button.act { background:#454b54; color:#fff; border:0; border-radius:9px; padding:9px;
+            font-family:inherit; font-weight:700; font-size:13px; cursor:pointer; flex:1; }
+        .paint-app input[type=range] { width:100%; }
+        .paint-app .val { color:#fff; font-weight:700; font-size:12px; float:right; }
+        .paint-app .file { margin-top:12px; }
+        .paint-app .file input { color:#cfd2d8; font-size:12px; width:100%; }
+        /* Telas estreitas: empilha canvas em cima, painel embaixo. */
+        @media (max-width:820px) {
+            .paint-app .stage { flex-direction:column; }
+            .paint-app .canvas-area { width:100%; flex:0 0 auto; }
+            .paint-app .canvas-wrap { width:100%; height:auto; max-height:52vh; }
+            .paint-app .panel { width:100%; flex:0 0 auto; align-self:stretch; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- Componente kids-historias (hero + filtros + grid) renderiza aqui -->
+<!-- Mesma lógica de personagens.html: hero + chips de personagem + grid.
+     Os cards serão desenhos em preto e branco pra colorir (vazio por enquanto).
+     Clicar num card (ou no botão abaixo) abre o ateliê no modal. -->
 <div id="kidsHistorias"></div>
+
+<div class="colorir-cta">
+    <button class="familia-btn" id="abrirAtelie" type="button">🎨 Pintar agora</button>
+</div>
+
+<!-- Modal do ateliê de pintura -->
+<div class="paint-modal" id="paintModal" hidden>
+    <div class="paint-modal-backdrop" data-close></div>
+    <div class="paint-modal-card">
+        <button class="paint-modal-close" type="button" data-close aria-label="Fechar">✕</button>
+        <div class="paint-app">
+            <div class="stage">
+                <div class="canvas-area">
+                    <div class="canvas-wrap">
+                        <canvas id="cv" width="760" height="470"></canvas>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="swatches" id="swatches"></div>
+
+                    <div class="row tools">
+                        <button class="tool sel" data-tool="bucket">🪣 Balde</button>
+                        <button class="tool" data-tool="brush">🖌️ Pincel</button>
+                        <button class="tool" data-tool="eraser">🧽 Borracha</button>
+                    </div>
+
+                    <label>Formas (arraste; alças giram/redimensionam; clique fora fixa)</label>
+                    <div class="row shapes">
+                        <button class="tool shape" data-tool="line" title="Linha">╱</button>
+                        <button class="tool shape" data-tool="curve" title="Curva">∿</button>
+                        <button class="tool shape" data-tool="triangle" title="Triângulo">△</button>
+                        <button class="tool shape" data-tool="rect" title="Quadrado">▭</button>
+                        <button class="tool shape" data-tool="ellipse" title="Círculo">◯</button>
+                    </div>
+
+                    <label>Tamanho do pincel <span class="val" id="sizeVal">14</span></label>
+                    <input type="range" id="size" min="2" max="60" value="14">
+
+                    <div class="row">
+                        <button class="act" id="undo">↶ Desfazer</button>
+                        <button class="act" id="clear">🗑 Limpar</button>
+                    </div>
+                    <div class="row">
+                        <button class="act" id="save">💾 Salvar PNG</button>
+                        <button class="act" id="print">🖨 Imprimir</button>
+                    </div>
+
+                    <div class="file">
+                        <label>Testar com sua arte (PNG line-art)</label>
+                        <input type="file" id="upload" accept="image/png,image/jpeg">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="script.js"></script>
 <script src="components/kids-menu.js"></script>
 <script src="components/kids-stories.js"></script>
 <script>
-    // Só os textos dos desenhos desta página; título/categoria/capa vêm de
-    // kids-stories.js (fonte única).
-    const DESCS = {
-        'passeio-feliz':        'Kaco e a mamãe no passeio: pinte o caminho com as suas cores favoritas.',
-        'mochila-esquecida':    'A mochila do Kaco esperando por cor: que tal um arco-íris nela?',
-        'brincando-no-parque':  'O parque inteiro pra pintar: balanço, escorregador e a turma toda.',
-        'aniversario-surpresa': 'Bolo, balões e surpresa! Capriche nas cores da festa do Kaco.',
-        'dia-de-chuva':         'Nuvens, gotas e botas de chuva esperando as suas cores.',
-        'a-lua-cheia':          'Uma noite estrelada pra pintar bem calminho, igual ao Kaco.',
-    };
+    // Chips = personagens (KIDS_PERSONAGENS), igual ao personagens.html.
+    // itens VAZIO por enquanto: os desenhos p&b entram depois, cada um marcado
+    // com os personagens que aparecem (filtros). Formato do card:
+    //   { t:'Nome', cat:'rotina', img:'colorir/<id>.png', link:'#',
+    //     status:'no ar', desc:'...', filtros:['kaco','mae'] }
     window.kidsHistoriasConfig = {
-        kicker: 'AS AVENTURAS DO KACO',
+        kicker: 'PINTE DO SEU JEITO',
         titulo: 'Colorir',
-        sub: 'Desenhos do Kaco pra imprimir e pintar do seu jeito.',
-        hint: 'Clique num desenho pra colorir ↗',
+        sub: 'Escolha um personagem e clique num desenho pra pintar.',
+        hint: 'Clique num personagem pra filtrar ↗',
         acaoLabel: 'Colorir →',
         categorias: window.KIDS_CATEGORIAS,
-        itens: window.KIDS_STORIES.map(function (s) {
-            return { t: s.t, cat: s.cat, img: s.img, link: '#', status: 'em breve', desc: DESCS[s.id] };
-        }),
+        filtros: { kaco: window.KIDS_PERSONAGENS.kaco },   // só Kaco por enquanto (add outros quando tiver desenho deles)
+        semCarrossel: true,   // 1 personagem só: ícone do Kaco sozinho, sem slide
+        semTodos: true,       // e sem o botão "Todos"
+        itens: [
+            { t: 'Desenho 1', cat: 'Colorir', img: 'colorir/desenho1.jpeg',
+              link: '#', desc: 'Clique e pinte do seu jeito!', filtros: ['kaco'] },
+        ],
     };
 </script>
 <script src="components/kids-hero.js"></script>
 <script src="components/kids-historias.js"></script>
-<script src="components/kids-toc.js"></script>
+<script src="components/kids-nav.js"></script>
 <script src="components/kids-footer.js"></script>
+
+<script>
+/* ===== Modal: abrir/fechar ===== */
+const paintModal = document.getElementById('paintModal');
+function abrirAtelie(){ paintModal.hidden = false; document.body.style.overflow = 'hidden'; }
+function fecharAtelie(){ paintModal.hidden = true; document.body.style.overflow = ''; }
+document.getElementById('abrirAtelie').addEventListener('click', abrirAtelie);
+paintModal.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', fecharAtelie));
+document.addEventListener('keydown', e => {
+    if(paintModal.hidden) return;
+    if(e.key === 'Enter' && pendingShape){ commitPending(); return; }   // Enter fixa a forma flutuante
+    if(e.key === 'Escape'){ if(pendingShape){ cancelPending(); return; } if(curvePhase!==0){ endCurve(false); return; } fecharAtelie(); }
+});
+// Quando houver cards p&b, clicar num card abre o mesmo ateliê (sem navegar).
+document.addEventListener('click', e => {
+    const card = e.target.closest('.hist-card');
+    if(card){ e.preventDefault(); abrirAtelie(); }
+});
+
+/* ===== Ferramenta de pintura (flood-fill por luminância) ===== */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d', { willReadFrequently:true });
+
+let color = [226,60,160,255];   // rgba atual
+let tool = 'bucket';
+let brushSize = 14;
+
+// ---- paleta ----
+const PALETTE = ['#e63946','#f4791f','#ffb703','#ffd60a','#90be6d','#43aa8b','#4cc9f0','#3a86ff',
+  '#4361ee','#7209b7','#b5179e','#e23ca0','#ff6392','#ff9b85','#7f5539','#000000',
+  '#ffffff','#adb5bd','#6c757d','#212529','#caffbf','#bdb2ff','#a0c4ff','#ffc6ff'];
+const sw = document.getElementById('swatches');
+PALETTE.forEach((hex,i)=>{
+  const b=document.createElement('button');
+  b.style.background=hex; b.title=hex;
+  if(i===11) b.classList.add('sel');
+  b.onclick=()=>{ color=hexToRgba(hex); [...sw.children].forEach(c=>c.classList.remove('sel')); b.classList.add('sel');
+    if(pendingShape) renderPending(); };   // recolore a forma flutuante na hora
+  sw.appendChild(b);
+});
+function hexToRgba(h){ const n=parseInt(h.slice(1),16); return [(n>>16)&255,(n>>8)&255,n&255,255]; }
+
+// ---- desenho de exemplo (line-art simples desenhado no canvas) ----
+function drawSample(){
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.strokeStyle='#000'; ctx.lineWidth=4; ctx.lineJoin='round';
+  // sol
+  ctx.beginPath(); ctx.arc(120,110,55,0,Math.PI*2); ctx.stroke();
+  for(let a=0;a<12;a++){ const ang=a*Math.PI/6; ctx.beginPath();
+    ctx.moveTo(120+Math.cos(ang)*65,110+Math.sin(ang)*65);
+    ctx.lineTo(120+Math.cos(ang)*88,110+Math.sin(ang)*88); ctx.stroke(); }
+  // nuvem
+  ctx.beginPath(); ctx.arc(560,90,34,0,Math.PI*2); ctx.arc(605,80,40,0,Math.PI*2);
+  ctx.arc(650,95,32,0,Math.PI*2); ctx.stroke();
+  // chão
+  ctx.beginPath(); ctx.moveTo(0,440); ctx.lineTo(760,440); ctx.stroke();
+  // casa
+  ctx.strokeRect(280,250,220,190);
+  ctx.beginPath(); ctx.moveTo(270,250); ctx.lineTo(390,160); ctx.lineTo(510,250); ctx.stroke();
+  // porta + janela
+  ctx.strokeRect(360,350,60,90);
+  ctx.strokeRect(300,290,50,50);
+  ctx.strokeRect(430,290,50,50);
+  // árvore
+  ctx.strokeRect(620,360,28,80);
+  ctx.beginPath(); ctx.arc(634,320,55,0,Math.PI*2); ctx.stroke();
+  pushUndo();
+}
+
+// ---- undo ----
+const undoStack=[];
+function pushUndo(){ if(undoStack.length>=25) undoStack.shift();
+  undoStack.push(ctx.getImageData(0,0,cv.width,cv.height)); }
+document.getElementById('undo').onclick=()=>{
+  if(curvePhase!==0){ endCurve(false); return; } // desfaz a curva em andamento
+  if(pendingShape){ cancelPending(); return; }   // desfaz primeiro a forma que está flutuando
+  if(undoStack.length>1){ undoStack.pop();
+  ctx.putImageData(undoStack[undoStack.length-1],0,0); } };
+
+// ---- coords (canvas escalado com object-fit:contain: desconta a margem
+//      letterbox e a escala pra mapear o clique no pixel certo do buffer) ----
+function pos(e){
+  const r=cv.getBoundingClientRect();
+  const scale=Math.min(r.width/cv.width, r.height/cv.height);
+  const offX=(r.width  - cv.width *scale)/2;
+  const offY=(r.height - cv.height*scale)/2;
+  return { x:Math.round((e.clientX-r.left-offX)/scale),
+           y:Math.round((e.clientY-r.top -offY)/scale) }; }
+
+// ---- flood fill por COR de origem (preenche a região clicada até o traço preto;
+//      como compara com a cor de origem, dá pra repintar por cima de qualquer cor) ----
+function floodFill(sx,sy){
+  const W=cv.width,H=cv.height;
+  const img=ctx.getImageData(0,0,W,H); const d=img.data;
+  // traço = pixel escuro E sem cor (preto/cinza). Tinta, mesmo escura, tem
+  // saturação, então NÃO conta como traço — por isso dá pra repintar por cima.
+  const isLine=(p)=>{ const r=d[p],g=d[p+1],b=d[p+2];
+    const mx=Math.max(r,g,b), mn=Math.min(r,g,b);
+    return mx<100 && (mx-mn)<40; };
+  const s=(sy*W+sx)*4;
+  if(isLine(s)) return;                       // clicou no traço, ignora
+  const sr=d[s], sg=d[s+1], sb=d[s+2];        // cor de origem (a região a trocar)
+  if(sr===color[0] && sg===color[1] && sb===color[2]) return;  // já está nessa cor
+  const TOL=70*70;                            // "mesma região" = cor parecida com a de origem
+  const match=(p)=>{ if(isLine(p)) return false;
+    const dr=d[p]-sr, dg=d[p+1]-sg, db=d[p+2]-sb;
+    return dr*dr+dg*dg+db*db <= TOL; };
+  const done=new Uint8Array(W*H);
+  const can=(i)=> !done[i] && match(i*4);
+  const stack=[[sx,sy]];
+  while(stack.length){
+    let [x,y]=stack.pop();
+    while(y>=0 && can(y*W+x)) y--;
+    y++; let left=false,right=false;
+    while(y<H && can(y*W+x)){
+      const i=y*W+x; done[i]=1; const p=i*4;
+      d[p]=color[0]; d[p+1]=color[1]; d[p+2]=color[2]; d[p+3]=255;
+      if(x>0){ if(can(i-1)){ if(!left){ stack.push([x-1,y]); left=true; } } else left=false; }
+      if(x<W-1){ if(can(i+1)){ if(!right){ stack.push([x+1,y]); right=true; } } else right=false; }
+      y++;
+    }
+  }
+  // dilatação: espalha a cor sobre o anti-alias (pixels que não são traço) até o
+  // núcleo da linha — 2 passes pra matar o halo claro junto às bordas.
+  for(let pass=0; pass<2; pass++){
+    const base=new Uint8Array(done);
+    for(let y=0;y<H;y++) for(let x=0;x<W;x++){
+      const i=y*W+x; if(base[i]) continue; const p=i*4;
+      if(isLine(p)) continue;                 // traço fica preto
+      if((x>0&&base[i-1])||(x<W-1&&base[i+1])||(y>0&&base[i-W])||(y<H-1&&base[i+W])){
+        d[p]=color[0]; d[p+1]=color[1]; d[p+2]=color[2]; d[p+3]=255; done[i]=1;
+      }
+    }
+  }
+  ctx.putImageData(img,0,0);
+}
+
+// ---- pincel/borracha ----
+let drawing=false,last=null;
+function paintDot(x,y){ ctx.beginPath();
+  ctx.fillStyle = tool==='eraser' ? '#fff' : `rgb(${color[0]},${color[1]},${color[2]})`;
+  ctx.arc(x,y,brushSize/2,0,Math.PI*2); ctx.fill(); }
+function paintLine(a,b){ ctx.strokeStyle = tool==='eraser' ? '#fff' : `rgb(${color[0]},${color[1]},${color[2]})`;
+  ctx.lineWidth=brushSize; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); }
+
+// ---- formas prontas (linha/triângulo/quadrado/círculo): arrasta do início ao fim ----
+// (a curva tem desenho próprio de 3 arrastos, mas no fim vira a MESMA forma flutuante)
+const SHAPES=['line','triangle','rect','ellipse'];
+let shaping=false, shapeStart=null, snapshot=null;
+// forma = centro (cx,cy) + tamanho (w,h) + rotação (rot); flip = diagonal da linha.
+function shapeFromPoints(a,b,type){ type=type||tool; const dx=b.x-a.x, dy=b.y-a.y;
+  return { type, cx:(a.x+b.x)/2, cy:(a.y+b.y)/2,
+           w:Math.abs(dx), h:Math.abs(dy), rot:0, flip:(dx*dy<0) }; }
+function drawShapeT(s){
+  ctx.save(); ctx.translate(s.cx,s.cy); ctx.rotate(s.rot);   // desenha centrado e girado
+  ctx.strokeStyle=`rgb(${color[0]},${color[1]},${color[2]})`;
+  ctx.lineWidth=brushSize; ctx.lineCap='round'; ctx.lineJoin='round';
+  const hw=s.w/2, hh=s.h/2;
+  ctx.beginPath();
+  if(s.type==='line'){ if(s.flip){ ctx.moveTo(-hw,hh); ctx.lineTo(hw,-hh); } else { ctx.moveTo(-hw,-hh); ctx.lineTo(hw,hh); } }
+  else if(s.type==='triangle'){ ctx.moveTo(0,-hh); ctx.lineTo(-hw,hh); ctx.lineTo(hw,hh); ctx.closePath(); }
+  else if(s.type==='rect'){ ctx.rect(-hw,-hh,s.w,s.h); }
+  else if(s.type==='ellipse'){ ctx.ellipse(0,0,hw,hh,0,0,Math.PI*2); }
+  else if(s.type==='curve'){ const q=s.pts;   // bézier guardada normalizada (-1..1) na caixa
+    ctx.moveTo(q[0].x*hw,q[0].y*hh); ctx.bezierCurveTo(q[1].x*hw,q[1].y*hh,q[2].x*hw,q[2].y*hh,q[3].x*hw,q[3].y*hh); }
+  ctx.stroke(); ctx.restore();
+}
+
+// ---- forma flutuante: depois de desenhar fica "solta" sobre um snapshot pra mover,
+//      redimensionar (cantos) e girar (alça verde); só vira parte do desenho ao fixar
+//      (clique fora / Enter / trocar de ferramenta / salvar). ----
+let pendingShape=null, pendingSnapshot=null, dragMode=null, dragLast=null;
+const HANDLE_R=14, ROT_OFF=36;                              // raio de toque das alças / haste do giro
+// cursor de girar (SVG inline) + vetor de saída de cada alça (pra escolher a seta de redimensionar)
+const ROT_SVG='<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z" fill="#111" stroke="#fff" stroke-width="1"/></svg>';
+const ROTATE_CURSOR='url("data:image/svg+xml,'+encodeURIComponent(ROT_SVG)+'") 12 12, auto';
+const HVEC={ e:[1,0], w:[-1,0], n:[0,-1], s:[0,1], ne:[1,-1], nw:[-1,-1], se:[1,1], sw:[-1,1] };
+function applyCursor(mode){                                 // troca o cursor pra deixar claro a ação
+  if(!mode){ cv.style.cursor='crosshair'; return; }
+  if(mode==='rotate'){ cv.style.cursor=ROTATE_CURSOR; return; }
+  if(mode==='move'){ cv.style.cursor='move'; return; }
+  const [vx,vy]=HVEC[mode], r=pendingShape?pendingShape.rot:0;            // gira o vetor da alça pra tela
+  const wx=vx*Math.cos(r)-vy*Math.sin(r), wy=vx*Math.sin(r)+vy*Math.cos(r);
+  let a=((Math.atan2(wy,wx)*180/Math.PI)%180+180)%180;                    // seta de resize alinhada à rotação
+  cv.style.cursor = a<22.5||a>=157.5 ? 'ew-resize' : a<67.5 ? 'nwse-resize' : a<112.5 ? 'ns-resize' : 'nesw-resize';
+}
+function toLocal(s,p){ const dx=p.x-s.cx, dy=p.y-s.cy;      // ponteiro no espaço local (sem rotação) da forma
+  const c=Math.cos(-s.rot), sn=Math.sin(-s.rot);
+  return { x:dx*c - dy*sn, y:dx*sn + dy*c }; }
+function hitHandle(s,p){ const l=toLocal(s,p), hw=s.w/2, hh=s.h/2;
+  if(Math.hypot(l.x, l.y+hh+ROT_OFF)<=HANDLE_R) return 'rotate';
+  const pts=[['nw',-hw,-hh],['ne',hw,-hh],['se',hw,hh],['sw',-hw,hh],     // cantos (largura+altura)
+             ['n',0,-hh],['s',0,hh],['e',hw,0],['w',-hw,0]];              // lados (só largura OU altura)
+  for(const [name,x,y] of pts) if(Math.hypot(l.x-x,l.y-y)<=HANDLE_R) return name;
+  if(Math.abs(l.x)<=hw+HANDLE_R && Math.abs(l.y)<=hh+HANDLE_R) return 'move';
+  return null; }
+function renderPending(){ ctx.putImageData(pendingSnapshot,0,0);
+  drawShapeT(pendingShape);
+  const s=pendingShape, hw=s.w/2, hh=s.h/2;
+  ctx.save(); ctx.translate(s.cx,s.cy); ctx.rotate(s.rot);
+  ctx.setLineDash([7,5]); ctx.strokeStyle='#7a7f87'; ctx.lineWidth=1;   // moldura tracejada
+  ctx.strokeRect(-hw,-hh,s.w,s.h); ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(0,-hh); ctx.lineTo(0,-hh-ROT_OFF); ctx.stroke();   // haste do giro
+  ctx.beginPath(); ctx.arc(0,-hh-ROT_OFF,8,0,Math.PI*2); ctx.fillStyle='#22c55e'; ctx.fill();
+  ctx.lineWidth=2; ctx.strokeStyle='#fff'; ctx.stroke();                          // alça verde = girar
+  ctx.fillStyle='#fff'; ctx.strokeStyle='#7a7f87'; ctx.lineWidth=1.5;            // alças de canto + lado = tamanho
+  [[-hw,-hh],[hw,-hh],[hw,hh],[-hw,hh],[0,-hh],[0,hh],[hw,0],[-hw,0]].forEach(([x,y])=>{
+    ctx.beginPath(); ctx.rect(x-7,y-7,14,14); ctx.fill(); ctx.stroke(); });
+  ctx.restore(); }
+function commitPending(){ if(!pendingShape) return;        // fixa: redesenha SEM as alças e grava no undo
+  ctx.putImageData(pendingSnapshot,0,0); drawShapeT(pendingShape);
+  pushUndo(); pendingShape=null; pendingSnapshot=null; cv.style.cursor='crosshair'; }
+function cancelPending(){ if(!pendingShape) return;        // descarta: volta ao snapshot anterior
+  ctx.putImageData(pendingSnapshot,0,0); pendingShape=null; pendingSnapshot=null; cv.style.cursor='crosshair'; }
+
+// ---- curva estilo Paint: arrasta a base, depois arrasta 2x pra moldar; ao terminar
+//      vira a MESMA forma flutuante (mover/redimensionar/girar) das demais. ----
+let curvePhase=0, curveDrag=false, cP0,cP3,cC1,cC2, curveSnap=null;
+function drawCurvePreview(){
+  ctx.putImageData(curveSnap,0,0);
+  ctx.strokeStyle=`rgb(${color[0]},${color[1]},${color[2]})`;
+  ctx.lineWidth=brushSize; ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.beginPath(); ctx.moveTo(cP0.x,cP0.y);
+  if(curvePhase===0) ctx.lineTo(cP3.x,cP3.y);                    // ainda é a linha base
+  else ctx.bezierCurveTo(cC1.x,cC1.y,cC2.x,cC2.y,cP3.x,cP3.y);   // cúbica (2 controles)
+  ctx.stroke();
+}
+function endCurve(commit){                        // interrompe curva em andamento (trocar ferramenta/Esc/limpar)
+  if(commit) pushUndo();                          // a curva já está no canvas
+  else if(curveSnap) ctx.putImageData(curveSnap,0,0);
+  curvePhase=0; curveDrag=false; curveSnap=null;
+}
+function curveToShape(){                           // os 4 pontos da bézier viram forma normalizada na caixa
+  const xs=[cP0.x,cC1.x,cC2.x,cP3.x], ys=[cP0.y,cC1.y,cC2.y,cP3.y];
+  const minX=Math.min(...xs), maxX=Math.max(...xs), minY=Math.min(...ys), maxY=Math.max(...ys);
+  const cx=(minX+maxX)/2, cy=(minY+maxY)/2, w=Math.max(1,maxX-minX), h=Math.max(1,maxY-minY);
+  const hw=w/2, hh=h/2, n=P=>({x:(P.x-cx)/hw, y:(P.y-cy)/hh});
+  return { type:'curve', cx, cy, w, h, rot:0, pts:[n(cP0),n(cC1),n(cC2),n(cP3)] };
+}
+
+cv.addEventListener('pointerdown',e=>{ const p=pos(e);
+  if(pendingShape){                          // forma flutuante: alças têm prioridade (qualquer ferramenta)
+    const hit=hitHandle(pendingShape,p);
+    if(hit){ dragMode=hit; dragLast=p; applyCursor(hit); cv.setPointerCapture(e.pointerId); return; }
+    commitPending();                         // clicou fora: fixa a forma e segue pro comportamento da ferramenta
+  }
+  if(tool==='curve'){ cv.setPointerCapture(e.pointerId);   // arrasta a base, depois molda 2x
+    if(curvePhase===0){ cP0={x:p.x,y:p.y}; cP3={x:p.x,y:p.y}; curveSnap=ctx.getImageData(0,0,cv.width,cv.height); }
+    curveDrag=true; return; }
+  if(tool==='bucket'){ floodFill(p.x,p.y); pushUndo(); return; }
+  if(SHAPES.indexOf(tool)!==-1){ shaping=true; shapeStart=p;
+    snapshot=ctx.getImageData(0,0,cv.width,cv.height); cv.setPointerCapture(e.pointerId); return; }
+  drawing=true; last=p; paintDot(p.x,p.y); cv.setPointerCapture(e.pointerId); });
+
+cv.addEventListener('pointermove',e=>{
+  if(pendingShape && !dragMode && !shaping) applyCursor(hitHandle(pendingShape,pos(e)));
+  if(tool==='curve' && curveDrag){ const p=pos(e);
+    if(curvePhase===0) cP3={x:p.x,y:p.y};
+    else if(curvePhase===1) cC1={x:p.x,y:p.y};
+    else if(curvePhase===2) cC2={x:p.x,y:p.y};
+    drawCurvePreview(); return; }
+  if(dragMode){ const p=pos(e);
+    if(dragMode==='move'){ pendingShape.cx+=p.x-dragLast.x; pendingShape.cy+=p.y-dragLast.y; dragLast=p; }
+    else if(dragMode==='rotate'){ pendingShape.rot=Math.atan2(p.y-pendingShape.cy,p.x-pendingShape.cx)+Math.PI/2; }
+    else { const l=toLocal(pendingShape,p), m=dragMode;   // canto/lado: redimensiona ancorado no centro
+      if(m!=='n'&&m!=='s') pendingShape.w=Math.max(8,Math.abs(l.x)*2);   // lados n/s não mexem na largura
+      if(m!=='e'&&m!=='w') pendingShape.h=Math.max(8,Math.abs(l.y)*2); } // lados e/w não mexem na altura
+    renderPending(); return; }
+  if(shaping){ ctx.putImageData(snapshot,0,0); drawShapeT(shapeFromPoints(shapeStart,pos(e),tool)); return; }
+  if(!drawing) return; const p=pos(e); paintLine(last,p); last=p; });
+
+cv.addEventListener('pointerup',e=>{
+  if(tool==='curve' && curveDrag){ const p=pos(e); curveDrag=false;
+    if(curvePhase===0){ cP3={x:p.x,y:p.y};
+      cC1={x:cP0.x+(cP3.x-cP0.x)/3, y:cP0.y+(cP3.y-cP0.y)/3};      // controles na linha base
+      cC2={x:cP0.x+2*(cP3.x-cP0.x)/3, y:cP0.y+2*(cP3.y-cP0.y)/3};
+      curvePhase=1; drawCurvePreview(); }
+    else if(curvePhase===1){ cC1={x:p.x,y:p.y}; curvePhase=2; drawCurvePreview(); }
+    else if(curvePhase===2){ cC2={x:p.x,y:p.y};                    // curva pronta: vira forma flutuante
+      ctx.putImageData(curveSnap,0,0);                             // limpa o preview (as alças entram no renderPending)
+      pendingShape=curveToShape(); pendingSnapshot=curveSnap;
+      curvePhase=0; curveSnap=null; renderPending(); }
+    return; }
+  if(dragMode){ dragMode=null; return; }                   // soltou alça: a forma continua flutuando
+  if(shaping){ shaping=false; const end=pos(e);
+    const tiny=Math.abs(end.x-shapeStart.x)<3 && Math.abs(end.y-shapeStart.y)<3;
+    if(tiny){ ctx.putImageData(snapshot,0,0); snapshot=null; return; }   // clique seco: nada a criar
+    pendingShape=shapeFromPoints(shapeStart,end,tool);
+    pendingSnapshot=snapshot; snapshot=null; renderPending(); return; }  // vira forma flutuante
+  if(drawing){ drawing=false; pushUndo(); } });
+
+// ---- controles ----
+document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>{
+  if(curvePhase!==0) endCurve(false);            // descarta curva incompleta ao trocar de ferramenta
+  if(pendingShape) commitPending();              // fixa a forma flutuante ao trocar de ferramenta
+  tool=b.dataset.tool;
+  document.querySelectorAll('.tool').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); });
+const sizeEl=document.getElementById('size'); sizeEl.oninput=()=>{ brushSize=+sizeEl.value; document.getElementById('sizeVal').textContent=brushSize;
+  if(pendingShape) renderPending(); };   // redimensiona a forma flutuante na hora
+document.getElementById('clear').onclick=()=>{ pendingShape=null; pendingSnapshot=null;
+  curvePhase=0; curveDrag=false; curveSnap=null;
+  if(loadedImg) drawImg(loadedImg); else drawSample(); };
+document.getElementById('save').onclick=()=>{ if(curvePhase!==0) endCurve(true); if(pendingShape) commitPending(); const a=document.createElement('a');
+  a.download='colorir.png'; a.href=cv.toDataURL('image/png'); a.click(); };
+document.getElementById('print').onclick=()=>{ if(curvePhase!==0) endCurve(true); if(pendingShape) commitPending(); const w=window.open('');
+  w.document.write('<img src="'+cv.toDataURL()+'" style="max-width:100%">'); w.document.close(); w.focus(); setTimeout(()=>w.print(),300); };
+
+// ---- upload de arte real ----
+let loadedImg=null;
+function drawImg(img){ // encaixa mantendo proporção, fundo branco
+  pendingShape=null; pendingSnapshot=null;        // troca de imagem cancela forma flutuante
+  cv.width = img.naturalWidth>1200?1200:img.naturalWidth;
+  cv.height = Math.round(cv.width * img.naturalHeight/img.naturalWidth);
+  // moldura acompanha a proporção da imagem (sem letterbox)
+  const wrap = cv.closest('.canvas-wrap');
+  if(wrap) wrap.style.aspectRatio = cv.width + ' / ' + cv.height;
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.drawImage(img,0,0,cv.width,cv.height);
+  undoStack.length=0; pushUndo();
+}
+document.getElementById('upload').onchange=e=>{ const f=e.target.files[0]; if(!f) return;
+  const img=new Image(); img.onload=()=>{ loadedImg=img; drawImg(img); }; img.src=URL.createObjectURL(f); };
+
+// ---- imagem única pra colorir (abre por padrão; cai no exemplo se falhar) ----
+(function(){
+  const img=new Image();
+  img.onload=()=>{ loadedImg=img; drawImg(img); };
+  img.onerror=()=>drawSample();
+  img.src='colorir/desenho1.jpeg';
+})();
+</script>
 </body>
 </html>
