@@ -1,6 +1,8 @@
 /* ===== kids-puzzle — motor do quebra-cabeça (canvas) =====
-   Mecânica só: peças que arrastam, encaixam (snap por vizinho + no tabuleiro),
-   agrupam, com zoom/pan (roda do mouse / pinça). A imagem vem direto por param.
+   Peças que arrastam, encaixam (snap por vizinho + no tabuleiro) e agrupam.
+   Controles: roda = zoom; rodinha pressionada = pan; pinça = zoom; botão direito =
+   dica (mostra a solução montada e volta); arrastar no vazio = laço de seleção, e
+   arrastar uma peça selecionada move o lote inteiro junto. Imagem vem por param.
 
    Uso (ver quebra-cabeca-jogo.html):
      <div id="game-container" data-img="img/kaco.png">
@@ -10,9 +12,12 @@
 
    Params da URL:
      ?n=3      → grade 3×3 (quantidade de peças)
-     ?f=geo    → FORMA dos cortes: 'geo' (polígonos irregulares, grade deslocada)
-                 ou 'reto' (padrão, retângulos). No 2×2 o 'geo' vira o corte
-                 radial (4 polígonos saindo de um ponto central).
+     ?f=...    → FORMA dos cortes:
+                 'reto'    (padrão) retângulos;
+                 'geo'     polígonos irregulares (grade de vértices deslocada);
+                           no 2×2 vira o corte radial (4 polígonos no centro);
+                 'encaixe' jigsaw clássico (grade regular + linguinha/reentrância
+                           bézier nas bordas internas, vizinhos complementares).
      ?img=...  → imagem direta (fallback); senão usa data-img (vindo de ?h=<id>).
    Ao completar, mostra o overlay #puzzle-win se existir (senão, alert).
 
@@ -43,7 +48,7 @@
   const params = new URLSearchParams(window.location.search);
   const n = parseInt(params.get("n"), 10) || 3;
   const rows = n, cols = n;
-  const forma = params.get("f") === "geo" ? "geo" : "reto";
+  const forma = ["geo", "encaixe"].indexOf(params.get("f")) >= 0 ? params.get("f") : "reto";
 
   function buildImageSrc() {
     const fromUrl = params.get("img");
@@ -76,9 +81,17 @@
   // ======= PEÇAS & GRUPOS =======
   let pieces = [];
   let uvVerts = null;            // grade de vértices normalizada (define os cortes)
+  let hCut = null, vCut = null;  // sinais das bordas internas (modo encaixe)
   let draggingGroup = null;
   let grabDX = 0, grabDY = 0;    // pega relativa à posX/posY do grupo
   let groupSeq = 0;
+
+  // Pan (botão do meio), laço de seleção (rubber-band) e dica (botão direito)
+  let panning = false, panStartX = 0, panStartY = 0, panStartVX = 0, panStartVY = 0;
+  let isSelecting = false, selStart = null, selEnd = null;
+  let selectedPieces = new Set();
+  let selDragging = false, selLastX = 0, selLastY = 0;
+  let hintActive = false, hintAnimId = null, hintOriginal = null;
 
   // Gera a grade de vértices (rows+1)×(cols+1) em coords normalizadas [0..1].
   // Cantos fixos; vértices de borda deslizam SÓ ao longo da borda; internos em 2D.
@@ -95,6 +108,28 @@
       }
     }
     return uv;
+  }
+
+  // Sinais aleatórios (±1) das bordas internas — definem onde fica saliência /
+  // reentrância. O vizinho recebe o complemento (-), então sempre encaixa.
+  function buildCuts() {
+    hCut = []; vCut = [];
+    for (let r = 0; r < rows; r++) { hCut[r] = []; for (let c = 0; c < cols - 1; c++) hCut[r][c] = Math.random() < 0.5 ? 1 : -1; }
+    for (let r = 0; r < rows - 1; r++) { vCut[r] = []; for (let c = 0; c < cols; c++) vCut[r][c] = Math.random() < 0.5 ? 1 : -1; }
+  }
+
+  // Desenha uma borda da peça (modo encaixe): reta (s=0) ou com linguinha /
+  // reentrância (s=±1) via bézier. Assume o ponto atual em A; termina em B.
+  // t = fração ao longo da borda; q = saliência perpendicular (s inverte o lado).
+  function knobEdge(A, B, s) {
+    if (!s) { ctx.lineTo(B.x, B.y); return; }
+    const ex = B.x - A.x, ey = B.y - A.y;
+    const P = (t, q) => [A.x + ex * t + ey * q * s, A.y + ey * t - ex * q * s];
+    ctx.lineTo(...P(0.40, 0));
+    ctx.bezierCurveTo(...P(0.33, 0.05), ...P(0.30, 0.20), ...P(0.42, 0.22));
+    ctx.bezierCurveTo(...P(0.48, 0.24), ...P(0.52, 0.24), ...P(0.58, 0.22));
+    ctx.bezierCurveTo(...P(0.70, 0.20), ...P(0.67, 0.05), ...P(0.60, 0.00));
+    ctx.lineTo(B.x, B.y);
   }
 
   function pointInPoly(pts, x, y) {
@@ -116,6 +151,14 @@
         uvVerts[row][col], uvVerts[row][col + 1],
         uvVerts[row + 1][col + 1], uvVerts[row + 1][col]
       ];
+      // sinais das 4 bordas (modo encaixe): 0 = plana (borda externa); ±1 =
+      // saliência/reentrância. O vizinho usa o complemento (-) pra casar.
+      if (forma === "encaixe") {
+        this.eTop    = row === 0        ? 0 : -vCut[row - 1][col];
+        this.eRight  = col === cols - 1 ? 0 :  hCut[row][col];
+        this.eBottom = row === rows - 1 ? 0 :  vCut[row][col];
+        this.eLeft   = col === 0        ? 0 : -hCut[row][col - 1];
+      }
       this.posX = 0; this.posY = 0;   // origem-da-imagem desta peça (no mundo)
       this.locked = false;
       this.groupId = null;
@@ -133,7 +176,16 @@
     bboxH() { return this.maxY - this.minY; }
     pathLocal() {
       ctx.beginPath();
-      this.pts.forEach((pt, i) => i ? ctx.lineTo(pt.x, pt.y) : ctx.moveTo(pt.x, pt.y));
+      if (forma === "encaixe") {
+        const p = this.pts;                 // TL, TR, BR, BL (sentido horário)
+        ctx.moveTo(p[0].x, p[0].y);
+        knobEdge(p[0], p[1], this.eTop);
+        knobEdge(p[1], p[2], this.eRight);
+        knobEdge(p[2], p[3], this.eBottom);
+        knobEdge(p[3], p[0], this.eLeft);
+      } else {
+        this.pts.forEach((pt, i) => i ? ctx.lineTo(pt.x, pt.y) : ctx.moveTo(pt.x, pt.y));
+      }
       ctx.closePath();
     }
     draw() {
@@ -144,9 +196,10 @@
       ctx.clip();
       ctx.drawImage(image, 0, 0, displayW, displayH);
       ctx.restore();
-      if (forma === "geo") {            // contorno só no modo polígono (ajuda a ver o caco)
-        ctx.lineWidth = 1.5 / viewScale;
-        ctx.strokeStyle = "rgba(255,255,255,0.85)";
+      const sel = selectedPieces.has(this);
+      if (sel || forma !== "reto") {    // contorno: azul se selecionada; branco nos modos recortados
+        ctx.lineWidth = (sel ? 2.5 : 1.5) / viewScale;
+        ctx.strokeStyle = sel ? "rgba(80,160,255,0.95)" : "rgba(255,255,255,0.85)";
         ctx.stroke();
       }
       ctx.restore();
@@ -160,6 +213,19 @@
   // ======= GRUPOS (peças do mesmo grupo compartilham posX/posY) =======
   function moveGroupTo(id, posX, posY) {
     pieces.forEach(p => { if (p.groupId === id) { p.posX = posX; p.posY = posY; } });
+  }
+  // Multi-seleção: move os GRUPOS de todas as peças selecionadas por (dx,dy),
+  // mantendo a invariante (todo grupo move rígido, peças do grupo seguem juntas).
+  function moveSelectedBy(dx, dy) {
+    const gids = new Set();
+    selectedPieces.forEach(p => gids.add(p.groupId));
+    pieces.forEach(p => { if (gids.has(p.groupId)) { p.posX += dx; p.posY += dy; } });
+  }
+  function bringSelectedToFront() {
+    const gids = new Set();
+    selectedPieces.forEach(p => gids.add(p.groupId));
+    const sel = pieces.filter(p => gids.has(p.groupId));
+    pieces = pieces.filter(p => !gids.has(p.groupId)).concat(sel);
   }
   function bringToFront(id) {
     const grp = pieces.filter(p => p.groupId === id);
@@ -206,6 +272,18 @@
     ctx.fillStyle = "rgba(0,0,0,0.08)";
     ctx.fillRect(offsetXTarget, offsetYTarget, displayW, displayH);
     pieces.forEach(p => p.draw());
+    // retângulo do laço de seleção (rubber-band)
+    if (isSelecting && selStart && selEnd) {
+      const rx = Math.min(selStart.x, selEnd.x), ry = Math.min(selStart.y, selEnd.y);
+      const rw = Math.abs(selEnd.x - selStart.x), rh = Math.abs(selEnd.y - selStart.y);
+      ctx.fillStyle = "rgba(80,160,255,0.10)";
+      ctx.fillRect(rx, ry, rw, rh);
+      ctx.strokeStyle = "rgba(80,160,255,0.85)";
+      ctx.lineWidth = 1 / viewScale;
+      ctx.setLineDash([6 / viewScale, 3 / viewScale]);
+      ctx.strokeRect(rx, ry, rw, rh);
+      ctx.setLineDash([]);
+    }
     restoreViewTransform();
   }
 
@@ -216,6 +294,40 @@
     if (overlay) { overlay.classList.add("show"); return; }
     alert("Parabéns! Quebra-cabeça concluído!");
     location.reload();
+  }
+
+  // ======= DICA (botão direito): mostra a solução e volta =======
+  function easeInOut(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
+
+  function animateTo(targets, duration, onDone) {
+    cancelAnimationFrame(hintAnimId);
+    const starts = pieces.map(p => ({ x: p.posX, y: p.posY }));
+    const t0 = performance.now();
+    function step(now) {
+      const t = Math.min((now - t0) / duration, 1), e = easeInOut(t);
+      pieces.forEach((p, i) => {
+        p.posX = starts[i].x + (targets[i].x - starts[i].x) * e;
+        p.posY = starts[i].y + (targets[i].y - starts[i].y) * e;
+      });
+      drawAll();
+      if (t < 1) hintAnimId = requestAnimationFrame(step);
+      else if (onDone) onDone();
+    }
+    hintAnimId = requestAnimationFrame(step);
+  }
+
+  // 1º clique direito: anima todas as peças até o lugar certo (figura montada);
+  // 2º clique direito: devolve cada peça exatamente pra onde estava.
+  function toggleHint() {
+    selectedPieces.clear();
+    if (!hintActive) {
+      hintOriginal = pieces.map(p => ({ x: p.posX, y: p.posY }));
+      hintActive = true;
+      animateTo(pieces.map(() => ({ x: offsetXTarget, y: offsetYTarget })), 700);
+    } else {
+      hintActive = false;
+      animateTo(hintOriginal, 700, () => { hintOriginal = null; });
+    }
   }
 
   // ======= LAYOUT =======
@@ -277,6 +389,7 @@
     imageHeight = image.height;
 
     uvVerts = buildVerts();
+    if (forma === "encaixe") buildCuts();
     computeLayout(false);
 
     const pad = 24;
@@ -334,6 +447,9 @@
     }
   }
 
+  // Botão direito: dica (mostra a solução e volta), sem menu do navegador.
+  canvas.addEventListener("contextmenu", (e) => { e.preventDefault(); toggleHint(); });
+
   canvas.addEventListener("pointerdown", (e) => {
     e.preventDefault();
     const pos = getPos(e);
@@ -343,20 +459,54 @@
       activePointerId = e.pointerId;
       canvas.setPointerCapture(e.pointerId);
 
+      if (hintActive) return;             // durante a dica, interação travada
+      if (e.button === 2) return;         // botão direito → tratado no contextmenu
+
+      // botão do meio (rodinha): pan da câmera
+      if (e.button === 1) {
+        panning = true;
+        panStartX = pos.x; panStartY = pos.y;
+        panStartVX = viewX; panStartVY = viewY;
+        return;
+      }
+
       const world = screenToWorld(pos.x, pos.y);
+
+      // botão esquerdo: peça (sozinha/grupo), lote selecionado, ou laço no vazio
+      let hit = false;
       for (let i = pieces.length - 1; i >= 0; i--) {
-        if (pieces[i].isClicked(world.x, world.y)) {
-          draggingGroup = pieces[i].groupId;
-          grabDX = world.x - pieces[i].posX;
-          grabDY = world.y - pieces[i].posY;
+        if (!pieces[i].isClicked(world.x, world.y)) continue;
+        const clicked = pieces[i];
+        if (selectedPieces.has(clicked) && selectedPieces.size > 1) {
+          selDragging = true;             // arrasta todas as selecionadas juntas
+          selLastX = world.x; selLastY = world.y;
+          bringSelectedToFront();
+        } else {
+          selectedPieces.clear();
+          draggingGroup = clicked.groupId;
+          grabDX = world.x - clicked.posX;
+          grabDY = world.y - clicked.posY;
           bringToFront(draggingGroup);
-          drawAll();
-          break;
         }
+        hit = true;
+        drawAll();
+        break;
+      }
+
+      // vazio: inicia o laço de seleção (rubber-band)
+      if (!hit) {
+        selectedPieces.clear();
+        isSelecting = true;
+        selStart = { x: world.x, y: world.y };
+        selEnd = { x: world.x, y: world.y };
+        drawAll();
       }
     } else if (pointers.size === 2) {
       updatePinchState();
       draggingGroup = null;
+      isSelecting = false;
+      selDragging = false;
+      panning = false;
       activePointerId = null;
     }
   }, { passive: false });
@@ -367,9 +517,31 @@
     if (pointers.has(e.pointerId)) pointers.set(e.pointerId, pos);
 
     if (pointers.size >= 2) { updatePinchState(); return; }
-    if (draggingGroup === null || activePointerId !== e.pointerId) return;
+    if (activePointerId !== e.pointerId || hintActive) return;
+
+    if (panning) {                        // pan com a rodinha
+      viewX = panStartVX + (pos.x - panStartX);
+      viewY = panStartVY + (pos.y - panStartY);
+      drawAll();
+      return;
+    }
 
     const world = screenToWorld(pos.x, pos.y);
+
+    if (isSelecting) {                    // arrastando o laço
+      selEnd = { x: world.x, y: world.y };
+      drawAll();
+      return;
+    }
+
+    if (selDragging) {                    // movendo o lote selecionado
+      moveSelectedBy(world.x - selLastX, world.y - selLastY);
+      selLastX = world.x; selLastY = world.y;
+      drawAll();
+      return;
+    }
+
+    if (draggingGroup === null) return;
     moveGroupTo(draggingGroup, world.x - grabDX, world.y - grabDY);
     drawAll();
   }, { passive: false });
@@ -377,17 +549,50 @@
   function endPointer(e) {
     if (pointers.has(e.pointerId)) pointers.delete(e.pointerId);
     if (pointers.size < 2) pinch = null;
+    if (activePointerId !== e.pointerId) return;
 
-    if (activePointerId === e.pointerId) {
-      if (draggingGroup !== null) {
-        trySnapGroup(draggingGroup);
-        drawAll();
-        if (checkCompleted()) setTimeout(showWin, 10);
+    panning = false;
+
+    // finaliza o laço: marca peças (não travadas) cuja caixa cruza o retângulo
+    if (isSelecting) {
+      isSelecting = false;
+      const x1 = Math.min(selStart.x, selEnd.x), y1 = Math.min(selStart.y, selEnd.y);
+      const x2 = Math.max(selStart.x, selEnd.x), y2 = Math.max(selStart.y, selEnd.y);
+      if (x2 - x1 > 5 || y2 - y1 > 5) {
+        pieces.forEach(p => {
+          if (p.locked) return;
+          if (p.posX + p.minX < x2 && p.posX + p.maxX > x1 &&
+              p.posY + p.minY < y2 && p.posY + p.maxY > y1) selectedPieces.add(p);
+        });
       }
-      draggingGroup = null;
+      drawAll();
       activePointerId = null;
       canvas.releasePointerCapture(e.pointerId);
+      return;
     }
+
+    // finaliza o arraste do lote selecionado
+    if (selDragging) {
+      selDragging = false;
+      const gids = new Set();
+      selectedPieces.forEach(p => gids.add(p.groupId));
+      gids.forEach(id => trySnapGroup(id));
+      selectedPieces.forEach(p => { if (p.locked) selectedPieces.delete(p); });
+      drawAll();
+      if (checkCompleted()) setTimeout(showWin, 10);
+      activePointerId = null;
+      canvas.releasePointerCapture(e.pointerId);
+      return;
+    }
+
+    if (draggingGroup !== null) {
+      trySnapGroup(draggingGroup);
+      drawAll();
+      if (checkCompleted()) setTimeout(showWin, 10);
+    }
+    draggingGroup = null;
+    activePointerId = null;
+    canvas.releasePointerCapture(e.pointerId);
   }
   canvas.addEventListener("pointerup", endPointer, { passive: false });
   canvas.addEventListener("pointercancel", endPointer, { passive: false });
