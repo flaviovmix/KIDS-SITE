@@ -9,8 +9,8 @@
      </div>
      <script src="components/kids-puzzle.js"></script>
 
-   Imagem e grade vêm da URL (têm prioridade) ou do data-img:
-     ?img=historias/o-passeio-feliz/1.jpeg&linha=3&coluna=3
+   A grade vem da URL (?n=3 → 3×3) e a imagem do data-img, que a página
+   define a partir de ?h=<id>. Fallback: ?img=<caminho> direto na URL.
    Ao completar, mostra o overlay #puzzle-win se existir (senão, alert). */
 (function () {
   // ======= BASE =======
@@ -33,8 +33,8 @@
 
   // ======= PARAMS (URL > data-img) =======
   const params = new URLSearchParams(window.location.search);
-  const rows = parseInt(params.get("linha"), 10) || 3;
-  const cols = parseInt(params.get("coluna"), 10) || 3;
+  const n = parseInt(params.get("n"), 10) || 3;
+  const rows = n, cols = n;
 
   function buildImageSrc() {
     const fromUrl = params.get("img");
@@ -168,10 +168,24 @@
   }
 
   // ======= LAYOUT =======
+  // Borda inferior de TODO o cromo fixo do topo (menu + barra de níveis +
+  // Voltar/Avançar): a figura e as peças vivem na área de trabalho ABAIXO disso,
+  // com uma folga em volta, pra deixar claro o espaço pra montar.
+  function topInset() {
+    let b = 0;
+    [".kids-nav", ".pz-bar", ".menu"].forEach((s) => {
+      const el = document.querySelector(s);
+      if (el) b = Math.max(b, el.getBoundingClientRect().bottom);
+    });
+    return b;
+  }
+
   function computeLayout(preservePositions = false) {
-    const margin = 20;
-    const maxW = canvas.clientWidth  - margin * 2;
-    const maxH = canvas.clientHeight - margin * 2;
+    const margin = 28;
+    const inset = topInset();
+    // Figura ocupa no máx ~60% da tela: muito respiro em volta, bem centralizada.
+    const maxW = Math.min(canvas.clientWidth  - margin * 2, canvas.clientWidth  * 0.60);
+    const maxH = Math.max(120, Math.min(canvas.clientHeight - inset - margin * 2, (canvas.clientHeight - inset) * 0.60));
 
     const prevOffsetX = offsetXTarget;
     const prevOffsetY = offsetYTarget;
@@ -189,7 +203,9 @@
     pieceHeight = displayH / rows;
 
     offsetXTarget = Math.floor((canvas.clientWidth  - displayW) / 2);
-    offsetYTarget = Math.floor((canvas.clientHeight - displayH) / 2);
+    // Centra a figura na área de trabalho abaixo das barras (espaço igual em cima
+    // e embaixo dela), bem afastada do topo.
+    offsetYTarget = inset + Math.floor((canvas.clientHeight - inset - displayH) / 2);
 
     if (preservePositions && pieces.length) {
       pieces.forEach(p => {
@@ -210,8 +226,12 @@
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        const startX = Math.random() * (canvas.clientWidth  - pieceWidth);
-        const startY = Math.random() * (canvas.clientHeight - pieceHeight);
+        const pad = 24;
+        const inset = topInset();
+        const x0 = pad, x1 = Math.max(pad, canvas.clientWidth  - pieceWidth  - pad);
+        const y0 = inset + pad, y1 = Math.max(inset + pad, canvas.clientHeight - pieceHeight - pad);
+        const startX = x0 + Math.random() * (x1 - x0);
+        const startY = y0 + Math.random() * (y1 - y0);
         const piece = new Piece(r, c, startX, startY);
         pieces.push(piece);
         createGroup(piece);
