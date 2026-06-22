@@ -31,7 +31,7 @@
         itens: window.KIDS_STORIES.map(function (s) {
             return {
                 t: s.t, cat: s.cat, img: s.img, desc: s.desc,
-                link: 'quebra-cabeca-jogo.html?img=' + encodeURIComponent(s.img) + '&titulo=' + encodeURIComponent(s.t),
+                link: 'quebra-cabeca-jogo.html?h=' + s.id,
             };
         }),
     };
