@@ -1,7 +1,6 @@
 /* ===== kids-puzzle — motor do quebra-cabeça (canvas) =====
-   Mecânica só: peças que arrastam, encaixam (snap), agrupam, com zoom/pan
-   (roda do mouse / pinça) e rotação de grupo (dois dedos). Sem nada do
-   template original (fases/medidas/pixel_ai) — a imagem vem direto por param.
+   Mecânica só: peças que arrastam, encaixam (snap por vizinho + no tabuleiro),
+   agrupam, com zoom/pan (roda do mouse / pinça). A imagem vem direto por param.
 
    Uso (ver quebra-cabeca-jogo.html):
      <div id="game-container" data-img="img/kaco.png">
@@ -9,9 +8,18 @@
      </div>
      <script src="components/kids-puzzle.js"></script>
 
-   A grade vem da URL (?n=3 → 3×3) e a imagem do data-img, que a página
-   define a partir de ?h=<id>. Fallback: ?img=<caminho> direto na URL.
-   Ao completar, mostra o overlay #puzzle-win se existir (senão, alert). */
+   Params da URL:
+     ?n=3      → grade 3×3 (quantidade de peças)
+     ?f=geo    → FORMA dos cortes: 'geo' (polígonos irregulares, grade deslocada)
+                 ou 'reto' (padrão, retângulos). No 2×2 o 'geo' vira o corte
+                 radial (4 polígonos saindo de um ponto central).
+     ?img=...  → imagem direta (fallback); senão usa data-img (vindo de ?h=<id>).
+   Ao completar, mostra o overlay #puzzle-win se existir (senão, alert).
+
+   Modelo das peças: cada peça é um POLÍGONO definido numa grade de vértices
+   normalizada (uvVerts). Todas as peças compartilham o mesmo espaço de coords da
+   imagem, então "montado" = todas com a mesma posição-de-origem (posX/posY) =
+   (offsetXTarget, offsetYTarget). Peças do mesmo grupo compartilham posX/posY. */
 (function () {
   // ======= BASE =======
   const canvas = document.getElementById("puzzleCanvas");
@@ -35,6 +43,7 @@
   const params = new URLSearchParams(window.location.search);
   const n = parseInt(params.get("n"), 10) || 3;
   const rows = n, cols = n;
+  const forma = params.get("f") === "geo" ? "geo" : "reto";
 
   function buildImageSrc() {
     const fromUrl = params.get("img");
@@ -47,12 +56,11 @@
   // ======= VARS =======
   let imageWidth = 0, imageHeight = 0;
   let displayW = 0, displayH = 0;
-  let srcPieceW = 0, srcPieceH = 0;
-  let pieceWidth = 0, pieceHeight = 0;
   let offsetXTarget = 0, offsetYTarget = 0;
   let scale = 1;
 
   const SNAP = 30;
+  const JITTER = forma === "geo" ? 0.6 : 0; // intensidade do deslocamento dos cortes
 
   // ======= VIEWPORT (zoom/pan da câmera) =======
   let viewScale = 1;
@@ -61,91 +69,134 @@
   function restoreViewTransform() { ctx.restore(); }
   function screenToWorld(x, y) { return { x: (x - viewX) / viewScale, y: (y - viewY) / viewScale }; }
 
-  // ======= FULLSCREEN + RESIZE =======
-  function resizeCanvas() {
-    fitCanvasToWindow();
-    if (imageWidth && imageHeight) {
-      computeLayout(true);
-      pieces.forEach(p => { p.width = pieceWidth; p.height = pieceHeight; });
-      drawAll();
-    }
-  }
-  window.addEventListener("resize", resizeCanvas);
-  window.addEventListener("orientationchange", resizeCanvas);
-  resizeCanvas();
-
   // ======= IMAGEM =======
   let imageSrc = buildImageSrc();
   const image = new Image();
-  image.src = imageSrc;
 
   // ======= PEÇAS & GRUPOS =======
   let pieces = [];
-  let groups = [];
+  let uvVerts = null;            // grade de vértices normalizada (define os cortes)
   let draggingGroup = null;
-  let groupOffsetX = 0, groupOffsetY = 0;
+  let grabDX = 0, grabDY = 0;    // pega relativa à posX/posY do grupo
+  let groupSeq = 0;
 
-  class Piece {
-    constructor(row, col, startX, startY) {
-      this.row = row;
-      this.col = col;
-      this.srcX = col * srcPieceW;
-      this.srcY = row * srcPieceH;
-      this.canvasX = startX;
-      this.canvasY = startY;
-      this.width   = pieceWidth;
-      this.height  = pieceHeight;
-      this.locked = false;
-      this.groupId = null;
-    }
-    draw() {
-      ctx.drawImage(image, this.srcX, this.srcY, srcPieceW, srcPieceH, this.canvasX, this.canvasY, this.width, this.height);
-    }
-    isClicked(x, y) {
-      return !this.locked && x > this.canvasX && x < this.canvasX + this.width && y > this.canvasY && y < this.canvasY + this.height;
-    }
-    isInCorrectPosition() {
-      const expectedX = offsetXTarget + this.col * pieceWidth;
-      const expectedY = offsetYTarget + this.row * pieceHeight;
-      return Math.abs(this.canvasX - expectedX) < SNAP && Math.abs(this.canvasY - expectedY) < SNAP;
-    }
-  }
-
-  function createGroup(piece) {
-    const groupId = groups.length;
-    piece.groupId = groupId;
-    groups.push([piece]);
-  }
-
-  function mergeGroups(groupA, groupB, anchorPiece, otherPiece) {
-    if (groupA === groupB) return;
-    const dx = (otherPiece.canvasX + (anchorPiece.col - otherPiece.col) * pieceWidth) - anchorPiece.canvasX;
-    const dy = (otherPiece.canvasY + (anchorPiece.row - otherPiece.row) * pieceHeight) - anchorPiece.canvasY;
-    groups[groupA].forEach(p => { p.canvasX += dx; p.canvasY += dy; p.groupId = groupB; });
-    groups[groupB] = groups[groupB].concat(groups[groupA]);
-    groups[groupA] = [];
-  }
-
-  function moveGroup(groupId, dx, dy) {
-    groups[groupId].forEach(p => { p.canvasX += dx; p.canvasY += dy; });
-  }
-
-  function trySnap(piece) {
-    for (let other of pieces) {
-      if (piece === other || other.locked) continue;
-      const isNeighbor =
-        (piece.row === other.row && Math.abs(piece.col - other.col) === 1) ||
-        (piece.col === other.col && Math.abs(piece.row - other.row) === 1);
-      if (!isNeighbor) continue;
-
-      const dx = (other.col - piece.col) * pieceWidth;
-      const dy = (other.row - piece.row) * pieceHeight;
-
-      if (Math.abs((piece.canvasX + dx) - other.canvasX) < SNAP &&
-          Math.abs((piece.canvasY + dy) - other.canvasY) < SNAP) {
-        mergeGroups(piece.groupId, other.groupId, piece, other);
+  // Gera a grade de vértices (rows+1)×(cols+1) em coords normalizadas [0..1].
+  // Cantos fixos; vértices de borda deslizam SÓ ao longo da borda; internos em 2D.
+  // JITTER=0 → grade regular (retângulos). JITTER>0 → polígonos irregulares.
+  function buildVerts() {
+    const uv = [];
+    for (let r = 0; r <= rows; r++) {
+      uv[r] = [];
+      for (let c = 0; c <= cols; c++) {
+        let u = c / cols, v = r / rows;
+        if (c > 0 && c < cols) u += (Math.random() - 0.5) * (1 / cols) * JITTER;
+        if (r > 0 && r < rows) v += (Math.random() - 0.5) * (1 / rows) * JITTER;
+        uv[r][c] = { u: u, v: v };
       }
     }
+    return uv;
+  }
+
+  function pointInPoly(pts, x, y) {
+    let inside = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      const xi = pts[i].x, yi = pts[i].y, xj = pts[j].x, yj = pts[j].y;
+      const hit = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+      if (hit) inside = !inside;
+    }
+    return inside;
+  }
+
+  class Piece {
+    constructor(row, col) {
+      this.row = row;
+      this.col = col;
+      // 4 cantos do polígono em uv (sentido horário)
+      this.uv = [
+        uvVerts[row][col], uvVerts[row][col + 1],
+        uvVerts[row + 1][col + 1], uvVerts[row + 1][col]
+      ];
+      this.posX = 0; this.posY = 0;   // origem-da-imagem desta peça (no mundo)
+      this.locked = false;
+      this.groupId = null;
+      this.pts = [];                   // cantos em coords de display (recalc no layout)
+      this.minX = 0; this.minY = 0; this.maxX = 0; this.maxY = 0;
+      this.recalcPts();
+    }
+    recalcPts() {
+      this.pts = this.uv.map(p => ({ x: p.u * displayW, y: p.v * displayH }));
+      const xs = this.pts.map(p => p.x), ys = this.pts.map(p => p.y);
+      this.minX = Math.min(...xs); this.maxX = Math.max(...xs);
+      this.minY = Math.min(...ys); this.maxY = Math.max(...ys);
+    }
+    bboxW() { return this.maxX - this.minX; }
+    bboxH() { return this.maxY - this.minY; }
+    pathLocal() {
+      ctx.beginPath();
+      this.pts.forEach((pt, i) => i ? ctx.lineTo(pt.x, pt.y) : ctx.moveTo(pt.x, pt.y));
+      ctx.closePath();
+    }
+    draw() {
+      ctx.save();
+      ctx.translate(this.posX, this.posY);
+      this.pathLocal();
+      ctx.save();
+      ctx.clip();
+      ctx.drawImage(image, 0, 0, displayW, displayH);
+      ctx.restore();
+      if (forma === "geo") {            // contorno só no modo polígono (ajuda a ver o caco)
+        ctx.lineWidth = 1.5 / viewScale;
+        ctx.strokeStyle = "rgba(255,255,255,0.85)";
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    isClicked(x, y) {
+      if (this.locked) return false;
+      return pointInPoly(this.pts, x - this.posX, y - this.posY);
+    }
+  }
+
+  // ======= GRUPOS (peças do mesmo grupo compartilham posX/posY) =======
+  function moveGroupTo(id, posX, posY) {
+    pieces.forEach(p => { if (p.groupId === id) { p.posX = posX; p.posY = posY; } });
+  }
+  function bringToFront(id) {
+    const grp = pieces.filter(p => p.groupId === id);
+    pieces = pieces.filter(p => p.groupId !== id).concat(grp);
+  }
+  function sendToBack(id) {
+    const grp = pieces.filter(p => p.groupId === id);
+    pieces = grp.concat(pieces.filter(p => p.groupId !== id));
+  }
+
+  // Encaixa o grupo: 1) funde com vizinhos de grade alinhados; 2) trava no tabuleiro.
+  function trySnapGroup(id) {
+    let merged = true;
+    while (merged) {
+      merged = false;
+      for (const p of pieces) {
+        if (p.groupId !== id) continue;
+        for (const o of pieces) {
+          if (o.groupId === id) continue;
+          if ((Math.abs(p.row - o.row) + Math.abs(p.col - o.col)) !== 1) continue; // vizinho na grade
+          if (Math.abs(p.posX - o.posX) < SNAP && Math.abs(p.posY - o.posY) < SNAP) {
+            // alinha todo o grupo `id` ao vizinho e funde nele
+            const tgt = o.groupId, px = o.posX, py = o.posY;
+            pieces.forEach(q => { if (q.groupId === id) { q.groupId = tgt; q.posX = px; q.posY = py; } });
+            id = tgt; merged = true; break;
+          }
+        }
+        if (merged) break;
+      }
+    }
+    // trava no tabuleiro (posição-alvo da imagem montada)
+    const any = pieces.find(p => p.groupId === id);
+    if (any && Math.abs(any.posX - offsetXTarget) < SNAP && Math.abs(any.posY - offsetYTarget) < SNAP) {
+      pieces.forEach(p => { if (p.groupId === id) { p.posX = offsetXTarget; p.posY = offsetYTarget; p.locked = true; } });
+      sendToBack(id);
+    }
+    return id;
   }
 
   // ======= DRAW =======
@@ -158,7 +209,7 @@
     restoreViewTransform();
   }
 
-  function checkCompleted() { return pieces.every(p => p.isInCorrectPosition()); }
+  function checkCompleted() { return pieces.length > 0 && pieces.every(p => p.locked); }
 
   function showWin() {
     const overlay = document.getElementById("puzzle-win");
@@ -187,20 +238,12 @@
     const maxW = Math.min(canvas.clientWidth  - margin * 2, canvas.clientWidth  * 0.60);
     const maxH = Math.max(120, Math.min(canvas.clientHeight - inset - margin * 2, (canvas.clientHeight - inset) * 0.60));
 
-    const prevOffsetX = offsetXTarget;
-    const prevOffsetY = offsetYTarget;
-    const prevPieceW  = pieceWidth  || 1;
-    const prevPieceH  = pieceHeight || 1;
+    const prevOX = offsetXTarget, prevOY = offsetYTarget;
+    const prevW = displayW || 1, prevH = displayH || 1;
 
     scale = Math.min(maxW / imageWidth, maxH / imageHeight);
     displayW = Math.floor(imageWidth  * scale);
     displayH = Math.floor(imageHeight * scale);
-
-    srcPieceW = imageWidth  / cols;
-    srcPieceH = imageHeight / rows;
-
-    pieceWidth  = displayW / cols;
-    pieceHeight = displayH / rows;
 
     offsetXTarget = Math.floor((canvas.clientWidth  - displayW) / 2);
     // Centra a figura na área de trabalho abaixo das barras (espaço igual em cima
@@ -209,32 +252,47 @@
 
     if (preservePositions && pieces.length) {
       pieces.forEach(p => {
-        const relX = (p.canvasX - prevOffsetX) / prevPieceW;
-        const relY = (p.canvasY - prevOffsetY) / prevPieceH;
-        p.canvasX = offsetXTarget + relX * pieceWidth;
-        p.canvasY = offsetYTarget + relY * pieceHeight;
+        const fx = (p.posX - prevOX) / prevW, fy = (p.posY - prevOY) / prevH;
+        p.posX = offsetXTarget + fx * displayW;
+        p.posY = offsetYTarget + fy * displayH;
+        p.recalcPts();
       });
+    } else {
+      pieces.forEach(p => p.recalcPts());
     }
   }
+
+  // ======= FULLSCREEN + RESIZE =======
+  function resizeCanvas() {
+    fitCanvasToWindow();
+    if (imageWidth && imageHeight) { computeLayout(true); drawAll(); }
+  }
+  window.addEventListener("resize", resizeCanvas);
+  window.addEventListener("orientationchange", resizeCanvas);
+  resizeCanvas();
 
   // ======= INICIALIZA =======
   image.onload = function () {
     imageWidth  = image.width;
     imageHeight = image.height;
 
+    uvVerts = buildVerts();
     computeLayout(false);
 
+    const pad = 24;
+    const inset = topInset();
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        const pad = 24;
-        const inset = topInset();
-        const x0 = pad, x1 = Math.max(pad, canvas.clientWidth  - pieceWidth  - pad);
-        const y0 = inset + pad, y1 = Math.max(inset + pad, canvas.clientHeight - pieceHeight - pad);
-        const startX = x0 + Math.random() * (x1 - x0);
-        const startY = y0 + Math.random() * (y1 - y0);
-        const piece = new Piece(r, c, startX, startY);
+        const piece = new Piece(r, c);
+        piece.groupId = groupSeq++;
+        // espalha pela bbox visível (não pela origem-da-imagem) pra não sair da tela
+        const x1 = Math.max(pad, canvas.clientWidth  - piece.bboxW() - pad);
+        const y1 = Math.max(inset + pad, canvas.clientHeight - piece.bboxH() - pad);
+        const sx = pad + Math.random() * Math.max(0, x1 - pad);
+        const sy = (inset + pad) + Math.random() * Math.max(0, y1 - (inset + pad));
+        piece.posX = sx - piece.minX;
+        piece.posY = sy - piece.minY;
         pieces.push(piece);
-        createGroup(piece);
       }
     }
     drawAll();
@@ -244,6 +302,8 @@
     console.error("Falha ao carregar imagem:", imageSrc);
     alert("Não foi possível carregar a imagem do quebra-cabeça.");
   };
+
+  image.src = imageSrc;
 
   // ======= INPUT (Pointer Events) =======
   let activePointerId = null;
@@ -255,60 +315,21 @@
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   }
 
-  function angleBetween(p0, p1) { return Math.atan2(p1.y - p0.y, p1.x - p0.x); }
-
   function updatePinchState() {
     if (pointers.size < 2) { pinch = null; return; }
     const pts = Array.from(pointers.values());
     const p0 = pts[0], p1 = pts[1];
 
     const mid = { x: (p0.x + p1.x) / 2, y: (p0.y + p1.y) / 2 };
-    const dx = p1.x - p0.x, dy = p1.y - p0.y;
-    const dist = Math.hypot(dx, dy);
+    const dist = Math.hypot(p1.x - p0.x, p1.y - p0.y);
 
     if (!pinch) {
-      pinch = {
-        startDist: dist || 1,
-        startScale: viewScale,
-        startMid: mid,
-        worldCenter: screenToWorld(mid.x, mid.y),
-        startAngle: angleBetween(p0, p1)
-      };
+      pinch = { startDist: dist || 1, startScale: viewScale, worldCenter: screenToWorld(mid.x, mid.y) };
     } else {
-      const newScale = Math.max(0.2, Math.min(5, pinch.startScale * (dist / pinch.startDist || 1)));
-
-      const currentAngle = angleBetween(p0, p1);
-      let deltaAngle = currentAngle - pinch.startAngle;
-      while (deltaAngle < -Math.PI) deltaAngle += 2 * Math.PI;
-      while (deltaAngle >  Math.PI) deltaAngle -= 2 * Math.PI;
-
-      // Rotação de grupo ativo
-      if (draggingGroup !== null) {
-        const group = groups[draggingGroup];
-        const centerX = group.reduce((s, p) => s + p.canvasX + p.width / 2, 0) / group.length;
-        const centerY = group.reduce((s, p) => s + p.canvasY + p.height / 2, 0) / group.length;
-
-        const sin = Math.sin(deltaAngle);
-        const cos = Math.cos(deltaAngle);
-
-        group.forEach(p => {
-          const x = p.canvasX + p.width / 2 - centerX;
-          const y = p.canvasY + p.height / 2 - centerY;
-          const rx = x * cos - y * sin;
-          const ry = x * sin + y * cos;
-          p.canvasX = centerX + rx - p.width / 2;
-          p.canvasY = centerY + ry - p.height / 2;
-        });
-
-        pinch.startAngle = currentAngle;
-        drawAll();
-      }
-
-      // Zoom focado no centro do gesto
-      viewScale = newScale;
+      // Zoom focado no centro do gesto (sem rotação no motor de polígono)
+      viewScale = Math.max(0.2, Math.min(5, pinch.startScale * (dist / pinch.startDist || 1)));
       viewX = mid.x - pinch.worldCenter.x * viewScale;
       viewY = mid.y - pinch.worldCenter.y * viewScale;
-
       drawAll();
     }
   }
@@ -326,19 +347,9 @@
       for (let i = pieces.length - 1; i >= 0; i--) {
         if (pieces[i].isClicked(world.x, world.y)) {
           draggingGroup = pieces[i].groupId;
-
-          const groupPieces = groups[draggingGroup];
-          const minX = Math.min(...groupPieces.map(p => p.canvasX));
-          const minY = Math.min(...groupPieces.map(p => p.canvasY));
-
-          groupOffsetX = world.x - minX;
-          groupOffsetY = world.y - minY;
-
-          // traz grupo para frente
-          groupPieces.forEach(p => {
-            const idx = pieces.indexOf(p);
-            if (idx !== -1) { pieces.splice(idx, 1); pieces.push(p); }
-          });
+          grabDX = world.x - pieces[i].posX;
+          grabDY = world.y - pieces[i].posY;
+          bringToFront(draggingGroup);
           drawAll();
           break;
         }
@@ -359,13 +370,7 @@
     if (draggingGroup === null || activePointerId !== e.pointerId) return;
 
     const world = screenToWorld(pos.x, pos.y);
-    const groupPieces = groups[draggingGroup];
-    const minX = Math.min(...groupPieces.map(p => p.canvasX));
-    const minY = Math.min(...groupPieces.map(p => p.canvasY));
-    const dx = world.x - groupOffsetX - minX;
-    const dy = world.y - groupOffsetY - minY;
-
-    moveGroup(draggingGroup, dx, dy);
+    moveGroupTo(draggingGroup, world.x - grabDX, world.y - grabDY);
     drawAll();
   }, { passive: false });
 
@@ -375,7 +380,7 @@
 
     if (activePointerId === e.pointerId) {
       if (draggingGroup !== null) {
-        groups[draggingGroup].forEach(p => trySnap(p));
+        trySnapGroup(draggingGroup);
         drawAll();
         if (checkCompleted()) setTimeout(showWin, 10);
       }

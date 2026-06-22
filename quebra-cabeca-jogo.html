@@ -39,11 +39,23 @@
         .pz-nivel:hover { transform: translateY(-2px); }
         .pz-nivel.is-active { opacity: 1; transform: translateY(-1px); }
 
-        /* Telas estreitas: empilha (título em cima, níveis embaixo), tudo centrado. */
+        /* Seletor de forma do corte (Reto / Geométrico), à direita da barra. */
+        .pz-formas { grid-column: 3; justify-self: end; display: flex; gap: 8px; }
+        .pz-forma {
+            text-decoration: none; font-weight: 700; font-size: 14px; color: #0f2740;
+            background: #fff; border: 2px solid #e2e8f0; border-radius: 12px;
+            padding: 8px 14px; box-shadow: 0 4px 10px rgba(15, 39, 64, .10);
+            transition: transform .12s ease, border-color .12s ease, color .12s ease;
+        }
+        .pz-forma:hover { transform: translateY(-2px); }
+        .pz-forma.is-active { border-color: #2aa9e0; color: #2aa9e0; }
+
+        /* Telas estreitas: empilha (título, níveis e formas em linhas centradas). */
         @media (max-width: 820px) {
             .pz-bar { grid-template-columns: 1fr; justify-items: center; gap: 8px; padding: 12px 16px; }
             .pz-niveis { grid-column: auto; flex-wrap: wrap; }
             .pz-nivel { padding: 10px 22px; }
+            .pz-formas { grid-column: auto; justify-self: center; }
         }
 
         .pz-hint {
@@ -82,6 +94,7 @@
 <div class="pz-bar">
     <span class="pz-title" id="pzTitle">Quebra-cabeça</span>
     <div class="pz-niveis" id="pzNiveis"></div>
+    <div class="pz-formas" id="pzFormas"></div>
 </div>
 
 <div id="game-container" data-img="img/kaco.png">
@@ -122,6 +135,7 @@
         var params = new URLSearchParams(location.search);
         var id = params.get('h');
         var nivel = parseInt(params.get('n'), 10) || 3;
+        var forma = params.get('f') === 'geo' ? 'geo' : 'reto';
 
         // Casa o id com a fonte única (kids-stories.js); fallback: img/título legados na URL.
         var story = (window.KIDS_STORIES || []).filter(function (s) { return s.id === id; })[0];
@@ -142,17 +156,26 @@
             { n: 5, cor: '#f97316' },
             { n: 6, cor: '#ec5a5a' }
         ];
-        function urlNivel(n) {
+        // Monta a URL preservando história/imagem; n = nível, f = forma do corte.
+        function urlJogo(n, f) {
             var u = new URLSearchParams();
             if (id) u.set('h', id);                       // URL limpa: só o id da história
             else { if (img) u.set('img', img); if (titulo) u.set('titulo', titulo); }
             u.set('n', n);
+            if (f === 'geo') u.set('f', 'geo');           // 'reto' é o padrão, fica implícito
             return 'quebra-cabeca-jogo.html?' + u.toString();
         }
         document.getElementById('pzNiveis').innerHTML = niveis.map(function (nv) {
             var active = nv.n === nivel ? ' is-active' : '';
             return '<a class="pz-nivel' + active + '" style="background:' + nv.cor + '" href="'
-                + urlNivel(nv.n) + '">' + nv.n + '×' + nv.n + '</a>';
+                + urlJogo(nv.n, forma) + '">' + nv.n + '×' + nv.n + '</a>';
+        }).join('');
+
+        // Seletor de forma do corte: troca reto ↔ geométrico mantendo o nível atual.
+        var formas = [ { f: 'reto', label: 'Reto' }, { f: 'geo', label: 'Geométrico' } ];
+        document.getElementById('pzFormas').innerHTML = formas.map(function (fo) {
+            var active = fo.f === forma ? ' is-active' : '';
+            return '<a class="pz-forma' + active + '" href="' + urlJogo(nivel, fo.f) + '">' + fo.label + '</a>';
         }).join('');
 
         // "Jogar de novo" recarrega o mesmo nível.
