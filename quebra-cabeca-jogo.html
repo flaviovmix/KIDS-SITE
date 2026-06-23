@@ -77,16 +77,23 @@
             background: rgba(15, 39, 64, .55); backdrop-filter: blur(4px);
         }
         .pz-win.show { display: flex; }
+        /* Modal de vitória: a IMAGEM montada é a estrela (grande e em destaque);
+           título compacto em cima e ações embaixo. A caixa se ajusta à imagem. */
         .pz-win-box {
-            background: #fff; border-radius: 26px; padding: 34px 30px; text-align: center;
-            max-width: 360px; width: calc(100% - 48px); box-shadow: 0 24px 60px rgba(15, 39, 64, .35);
-            animation: pzpop .35s cubic-bezier(.2, 1.2, .4, 1);
+            background: #fff; border-radius: 26px; padding: 16px 16px 18px; text-align: center;
+            max-width: min(97vw, 1180px); box-shadow: 0 24px 60px rgba(15, 39, 64, .35);
+            animation: pzpop .7s cubic-bezier(.2, 1.2, .4, 1);
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
         }
         @keyframes pzpop { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .pz-win-box .emoji { font-size: 54px; }
-        .pz-win-box h2 { margin: 8px 0 4px; color: #0f2740; font-size: 26px; }
-        .pz-win-box p { margin: 0 0 20px; color: #4a5b6b; }
-        .pz-win-acoes { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .pz-win-title { margin: 0; color: #0f2740; font-size: 28px; }
+        .pz-win-img {
+            display: block; width: auto; height: auto;
+            max-width: min(95vw, 1120px); max-height: 80vh;
+            object-fit: contain; border-radius: 16px;
+            box-shadow: 0 14px 40px rgba(15, 39, 64, .30);
+        }
+        .pz-win-acoes { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
         .pz-win-acoes a {
             text-decoration: none; font-weight: 800; font-size: 15px; color: #fff;
             border-radius: 14px; padding: 12px 18px; cursor: pointer;
@@ -114,9 +121,8 @@
 
 <div class="pz-win" id="puzzle-win">
     <div class="pz-win-box">
-        <div class="emoji">🎉</div>
-        <h2>Parabéns!</h2>
-        <p>Você montou o quebra-cabeça!</p>
+        <h2 class="pz-win-title">🎉 Parabéns!</h2>
+        <img class="pz-win-img" id="pzWinImg" src="" alt="figura montada">
         <div class="pz-win-acoes">
             <a class="pz-de-novo" id="pzDeNovo" href="#">Jogar de novo</a>
             <a class="pz-voltar" href="quebra-cabeca.html">Outros</a>
@@ -144,7 +150,18 @@
         var params = new URLSearchParams(location.search);
         var id = params.get('h');
         var nivel = parseInt(params.get('n'), 10) || 3;
-        var forma = ['geo', 'encaixe'].indexOf(params.get('f')) >= 0 ? params.get('f') : 'reto';
+        // Forma do corte: URL (?f=) tem prioridade; senão a última escolhida
+        // (lembrada no navegador); senão o padrão "encaixe". A escolha é memorizada
+        // e exposta em window.PZ_FORMA pro motor (kids-puzzle.js) usar a mesma.
+        var FORMA_KEY = 'kids-puzzle-forma';
+        var FORMAS_OK = ['encaixe', 'geo', 'reto'];
+        var urlF = params.get('f');
+        var savedF = null;
+        try { savedF = localStorage.getItem(FORMA_KEY); } catch (e) {}
+        var forma = FORMAS_OK.indexOf(urlF) >= 0 ? urlF
+                  : (FORMAS_OK.indexOf(savedF) >= 0 ? savedF : 'encaixe');
+        try { localStorage.setItem(FORMA_KEY, forma); } catch (e) {}
+        window.PZ_FORMA = forma;
 
         // Casa o id com a fonte única (kids-stories.js); fallback: img/título legados na URL.
         var story = (window.KIDS_STORIES || []).filter(function (s) { return s.id === id; })[0];
@@ -159,6 +176,7 @@
 
         // Níveis fixos: grade quadrada NxN, do 2×2 ao 6×6 (verde → vermelho).
         var niveis = [
+            { n: 1, cor: '#38bdf8' },
             { n: 2, cor: '#22b07d' },
             { n: 3, cor: '#84cc16' },
             { n: 4, cor: '#f59e0b' },
@@ -171,7 +189,7 @@
             if (id) u.set('h', id);                       // URL limpa: só o id da história
             else { if (img) u.set('img', img); if (titulo) u.set('titulo', titulo); }
             u.set('n', n);
-            if (f && f !== 'reto') u.set('f', f);          // 'reto' é o padrão, fica implícito
+            if (f) u.set('f', f);                          // sempre explícito (a forma é lembrada)
             return 'quebra-cabeca-jogo.html?' + u.toString();
         }
         document.getElementById('pzNiveis').innerHTML = niveis.map(function (nv) {
@@ -181,7 +199,7 @@
         }).join('');
 
         // Seletor de forma do corte: troca reto ↔ geométrico mantendo o nível atual.
-        var formas = [ { f: 'reto', label: 'Reto' }, { f: 'encaixe', label: 'Encaixe' }, { f: 'geo', label: 'Geométrico' } ];
+        var formas = [ { f: 'encaixe', label: 'Encaixe' }, { f: 'geo', label: 'Geométrico' }, { f: 'reto', label: 'Reto' } ];
         document.getElementById('pzFormas').innerHTML = formas.map(function (fo) {
             var active = fo.f === forma ? ' is-active' : '';
             return '<a class="pz-forma' + active + '" href="' + urlJogo(nivel, fo.f) + '">' + fo.label + '</a>';

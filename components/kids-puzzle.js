@@ -48,7 +48,10 @@
   const params = new URLSearchParams(window.location.search);
   const n = parseInt(params.get("n"), 10) || 3;
   const rows = n, cols = n;
-  const forma = ["geo", "encaixe"].indexOf(params.get("f")) >= 0 ? params.get("f") : "reto";
+  // A página (quebra-cabeca-jogo.html) resolve a forma (URL > lembrada > padrão)
+  // e expõe em window.PZ_FORMA. Fallback: ?f= direto ou "encaixe".
+  const forma = window.PZ_FORMA
+    || (["geo", "encaixe", "reto"].indexOf(params.get("f")) >= 0 ? params.get("f") : "encaixe");
 
   function buildImageSrc() {
     const fromUrl = params.get("img");
@@ -291,7 +294,12 @@
 
   function showWin() {
     const overlay = document.getElementById("puzzle-win");
-    if (overlay) { overlay.classList.add("show"); return; }
+    if (overlay) {
+      const winImg = document.getElementById("pzWinImg");
+      if (winImg) winImg.src = image.src;   // mostra a figura montada no modal
+      overlay.classList.add("show");
+      return;
+    }
     alert("Parabéns! Quebra-cabeça concluído!");
     location.reload();
   }
@@ -579,7 +587,7 @@
       gids.forEach(id => trySnapGroup(id));
       selectedPieces.forEach(p => { if (p.locked) selectedPieces.delete(p); });
       drawAll();
-      if (checkCompleted()) setTimeout(showWin, 10);
+      if (checkCompleted()) setTimeout(showWin, 1000);
       activePointerId = null;
       canvas.releasePointerCapture(e.pointerId);
       return;
@@ -588,7 +596,7 @@
     if (draggingGroup !== null) {
       trySnapGroup(draggingGroup);
       drawAll();
-      if (checkCompleted()) setTimeout(showWin, 10);
+      if (checkCompleted()) setTimeout(showWin, 1000);
     }
     draggingGroup = null;
     activePointerId = null;
