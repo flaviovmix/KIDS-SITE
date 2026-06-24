@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Sobre o Projeto — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Hero (componente kids-hero) renderiza aqui -->
+<div id="kidsHero"></div>
+
+<main class="content">
+    <section class="section section-light">
+        <div class="sobre-layout">
+            <!-- Trocar img/sobre.png depois (cópia de img-cabecalho.png) -->
+            <div class="sobre-img">
+                <img src="img/sobre.png" alt="Kaco, o macaquinho do projeto">
+            </div>
+            <div class="sobre-text">
+                <p class="section-text">
+                    O <strong>Kaco</strong> nasceu pequeno e cheio de afeto. No começo era só um experimento de um pai pro próprio
+                    filho autista. <strong>Histórias</strong> curtas, ilustradas, no ritmo dele, com personagens que ele aprendeu
+                    a reconhecer e amar.
+                </p>
+                <p class="section-text">
+                    No meio do caminho a gente percebeu que o que funcionava pro nosso filho funcionava também
+                    pra muitas outras crianças. Então o projeto abriu a porta: hoje o Kaco é pra qualquer criança
+                    com alguma necessidade especial. <strong>TEA</strong>, <strong>TDAH</strong>, atraso de fala, ansiedade, deficiência visual,
+                    deficiência auditiva. E pras <strong>famílias</strong> e <strong>terapeutas</strong> que caminham junto.
+                </p>
+                <p class="section-text">
+                    A gente continua fazendo no ritmo da vida real: devagar, com carinho, escutando quem usa.
+                    Cada história, cada personagem, cada ferramenta nasce de uma conversa.
+                </p>
+                <p class="section-text">
+                    Aqui nada é apressado. Se uma criança se sentir mais segura, mais entendida ou só um
+                    pouquinho mais feliz por causa do Kaco, então já <strong>valeu a pena</strong>. E é por elas que a gente
+                    segue, um passinho de cada vez.
+                </p>
+                <p class="section-text sobre-assinatura"><strong>Flávio Passos</strong></p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+<script src="components/kids-menu.js"></script>
+<script>
+    window.kidsHeroConfig = {
+        kicker: 'DE ONDE O KACO VEIO',
+        titulo: 'Sobre o Projeto',
+        sub: 'Um experimento de um pai pro filho autista que virou ferramenta pra muitas crianças.',
+        emojis: ['💛', '🐵'],
+    };
+</script>
+<script src="components/kids-hero.js"></script>
+<script src="components/kids-toc.js"></script>
+<script src="components/kids-nav.js"></script>
+<script src="components/kids-footer.js"></script>
+</body>
+</html>

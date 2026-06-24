@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Modelos de Menu — Kaco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Lilita+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --c-blue:#2aa9e0; --c-green:#22b07d; --c-amber:#f59e0b; --c-pink:#ec4899;
+            --c-purple:#a855f7; --c-indigo:#6366f1; --c-red:#ef4444; --c-ink:#0f2740;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Baloo 2', system-ui, sans-serif;
+            background: #eef4f9;
+            color: var(--c-ink);
+            padding: 40px 0 80px;
+        }
+        .page-head { max-width: 980px; margin: 0 auto 36px; padding: 0 24px; text-align: center; }
+        .page-head h1 { font-size: 34px; margin: 0 0 8px; }
+        .page-head p { font-size: 18px; color: #56708a; margin: 0; }
+
+        .demo { margin: 0 0 40px; }              /* largura cheia, igual ao menu real */
+        .demo-label {
+            display: flex; align-items: baseline; gap: 12px;
+            max-width: 980px; margin: 0 auto 12px; padding: 0 24px;
+        }
+        .demo-num {
+            font-size: 22px; font-weight: 800; color: #fff; background: var(--c-ink);
+            width: 38px; height: 38px; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;
+        }
+        .demo-name { font-size: 22px; font-weight: 800; }
+        .demo-desc { font-size: 16px; color: #6b86a3; font-weight: 600; }
+
+        /* Barra em largura cheia (edge-to-edge), igual ao menu fixo do site */
+        .frame {
+            background: #fff;
+            box-shadow: 0 10px 26px rgba(15,39,64,0.08);
+            border-bottom: 1px solid #e6eef5;
+        }
+        .bar {
+            position: relative;
+            display: flex; align-items: center;
+            gap: 16px; padding: 26px 56px; min-height: 104px;
+        }
+        /* Links centralizados na tela, como no original (.menu-list absoluto) */
+        .links {
+            display: flex; align-items: center; gap: 16px;
+            position: absolute; left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            width: max-content;
+        }
+        /* Fonte do menu: grossa e bem definida, em caixa alta (vale p/ todos os modelos) */
+        .logo { text-decoration: none; flex: 0 0 auto; font-family: 'Lilita One', system-ui, sans-serif; }
+        .lnk {
+            text-decoration: none; cursor: pointer; white-space: nowrap;
+            font-family: 'Lilita One', system-ui, sans-serif;
+            text-transform: uppercase; letter-spacing: .07em; line-height: 1;
+        }
+
+        /* ============ MODELO 1 — Pílulas doces (botão 3D) ============ */
+        .m1 .logo { font-size: 30px; font-weight: 800; letter-spacing: .06em; color: var(--c-pink); }
+        .m1 .lnk {
+            font-size: 19px; font-weight: 700; color: #fff; padding: 13px 24px;
+            border-radius: 999px; box-shadow: 0 4px 0 rgba(0,0,0,.18);
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+        .m1 .lnk:hover { transform: translateY(-3px); box-shadow: 0 7px 0 rgba(0,0,0,.18); }
+        .m1 .lnk:nth-child(1){background:var(--c-blue)}   .m1 .lnk:nth-child(2){background:var(--c-green)}
+        .m1 .lnk:nth-child(3){background:var(--c-amber)}  .m1 .lnk:nth-child(4){background:var(--c-pink)}
+        .m1 .lnk:nth-child(5){background:var(--c-purple)} .m1 .lnk:nth-child(6){background:var(--c-indigo)}
+        .m1 .lnk:nth-child(7){background:var(--c-red)}    .m1 .lnk:nth-child(8){background:var(--c-green)}
+        .m1 .lnk:nth-child(9){background:var(--c-blue)}
+
+        /* ============ MODELO 2 — Risco de giz (sublinhado) ============ */
+        .m2 .logo { font-size: 30px; font-weight: 800; letter-spacing: .04em; color: var(--c-ink); }
+        .m2 .lnk {
+            font-size: 21px; font-weight: 700; color: var(--c-ink); padding: 10px 18px;
+            text-decoration: underline; text-decoration-style: wavy; text-decoration-thickness: 3px;
+            text-underline-offset: 7px; transition: transform .15s ease, color .15s ease;
+        }
+        .m2 .lnk:hover { transform: translateY(-2px); }
+        .m2 .lnk:nth-child(1){text-decoration-color:var(--c-blue)}   .m2 .lnk:nth-child(2){text-decoration-color:var(--c-green)}
+        .m2 .lnk:nth-child(3){text-decoration-color:var(--c-amber)}  .m2 .lnk:nth-child(4){text-decoration-color:var(--c-pink)}
+        .m2 .lnk:nth-child(5){text-decoration-color:var(--c-purple)} .m2 .lnk:nth-child(6){text-decoration-color:var(--c-indigo)}
+        .m2 .lnk:nth-child(7){text-decoration-color:var(--c-red)}    .m2 .lnk:nth-child(8){text-decoration-color:var(--c-green)}
+        .m2 .lnk:nth-child(9){text-decoration-color:var(--c-blue)}
+
+        /* ============ MODELO 3 — Adesivos (contorno + tortinho) ============ */
+        .m3 .logo { font-size: 30px; font-weight: 800; letter-spacing: .04em; color: var(--c-purple); }
+        .m3 .lnk {
+            font-size: 19px; font-weight: 800; padding: 12px 24px; border-radius: 14px;
+            background: #fff; border: 3px solid currentColor;
+            transition: transform .18s cubic-bezier(.34,1.56,.64,1);
+        }
+        .m3 .lnk:hover { transform: rotate(0deg) scale(1.07) !important; }
+        .m3 .lnk:nth-child(odd)  { transform: rotate(-3deg); }
+        .m3 .lnk:nth-child(even) { transform: rotate(3deg); }
+        .m3 .lnk:nth-child(1){color:var(--c-blue)}   .m3 .lnk:nth-child(2){color:var(--c-green)}
+        .m3 .lnk:nth-child(3){color:var(--c-amber)}  .m3 .lnk:nth-child(4){color:var(--c-pink)}
+        .m3 .lnk:nth-child(5){color:var(--c-purple)} .m3 .lnk:nth-child(6){color:var(--c-indigo)}
+        .m3 .lnk:nth-child(7){color:var(--c-red)}    .m3 .lnk:nth-child(8){color:var(--c-green)}
+        .m3 .lnk:nth-child(9){color:var(--c-blue)}
+
+        /* ============ MODELO 4 — Abas com emoji ============ */
+        .m4 .links { top: auto; bottom: 0; transform: translateX(-50%); } /* abas coladas na base */
+        .m4 .logo { font-size: 30px; font-weight: 800; color: var(--c-blue); }
+        .m4 .lnk {
+            font-size: 17px; font-weight: 700; color: var(--c-ink);
+            padding: 13px 21px 15px; border-radius: 16px 16px 0 0;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: background .18s ease, transform .15s ease;
+        }
+        .m4 .lnk .e { font-size: 19px; }
+        .m4 .lnk:hover { transform: translateY(-2px); }
+        .m4 .lnk:nth-child(1):hover{background:#d8eefb} .m4 .lnk:nth-child(2):hover{background:#d6f1e6}
+        .m4 .lnk:nth-child(3):hover{background:#fdeccf}  .m4 .lnk:nth-child(4):hover{background:#fbdcec}
+        .m4 .lnk:nth-child(5):hover{background:#eddcfb}  .m4 .lnk:nth-child(6):hover{background:#dee0fb}
+        .m4 .lnk:nth-child(7):hover{background:#fbd9d9}  .m4 .lnk:nth-child(8):hover{background:#d6f1e6}
+        .m4 .lnk:nth-child(9):hover{background:#d8eefb}
+
+        /* ============ MODELO 5 — Barra arco-íris ============ */
+        .m5 .frame .bar {
+            background: linear-gradient(90deg, #2aa9e0, #22b07d, #f59e0b, #ec4899, #a855f7);
+        }
+        .m5 .logo { font-size: 31px; font-weight: 800; letter-spacing: .06em; color: #fff;
+            text-shadow: 0 2px 6px rgba(0,0,0,.25); }
+        .m5 .lnk {
+            font-size: 19px; font-weight: 700; color: #fff; padding: 13px 24px; border-radius: 999px;
+            text-shadow: 0 1px 3px rgba(0,0,0,.25);
+            transition: background .18s ease, transform .15s ease;
+        }
+        .m5 .lnk:hover { background: rgba(255,255,255,0.28); transform: translateY(-2px); }
+
+        /* ============ MISTURA — fundo do 5 + adesivos do 3 ============ */
+        .mx .frame .bar {
+            background: linear-gradient(90deg, #2aa9e0, #22b07d, #f59e0b, #ec4899, #a855f7);
+        }
+        .mx .logo { font-size: 31px; font-weight: 800; letter-spacing: .06em; color: #fff;
+            text-shadow: 0 2px 6px rgba(0,0,0,.25); }
+        .mx .lnk {
+            font-size: 19px; font-weight: 800; padding: 12px 24px; border-radius: 14px;
+            background: #fff; border: 3px solid currentColor;
+            transition: transform .18s cubic-bezier(.34,1.56,.64,1);
+        }
+        .mx .lnk:hover { transform: rotate(0deg) scale(1.07) !important; }
+        .mx .lnk:nth-child(odd)  { transform: rotate(-3deg); }
+        .mx .lnk:nth-child(even) { transform: rotate(3deg); }
+        .mx .lnk:nth-child(1){color:var(--c-blue)}   .mx .lnk:nth-child(2){color:var(--c-green)}
+        .mx .lnk:nth-child(3){color:var(--c-amber)}  .mx .lnk:nth-child(4){color:var(--c-pink)}
+        .mx .lnk:nth-child(5){color:var(--c-purple)} .mx .lnk:nth-child(6){color:var(--c-indigo)}
+        .mx .lnk:nth-child(7){color:var(--c-red)}    .mx .lnk:nth-child(8){color:var(--c-green)}
+        .mx .lnk:nth-child(9){color:var(--c-blue)}
+
+        @media (max-width: 760px) {
+            .links { display: none; } /* no celular o menu vira hamburger; aqui só foco no desktop */
+            .demo-desc { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-head">
+    <h1>Escolha o estilo do menu 🎨</h1>
+    <p>5 modelos com os mesmos links. Me diz qual você curtiu, ou mistura pedaços (ex: "letra do 2 com cor do 5").</p>
+</div>
+
+<!-- ================= MISTURA (fundo 5 + adesivos 3) ================= -->
+<section class="demo mx">
+    <div class="demo-label"><span class="demo-num">★</span><span class="demo-name">Mistura</span><span class="demo-desc">fundo arco-íris do 5 + adesivos do 3</span></div>
+    <div class="frame"><div class="bar">
+        <a class="logo">KACO</a>
+        <nav class="links">
+            <a class="lnk">Início</a><a class="lnk">Histórias</a><a class="lnk">Personagens</a>
+            <a class="lnk">Emoções</a><a class="lnk">Colorir</a><a class="lnk">Quebra-cabeça</a>
+            <a class="lnk">Aprender</a><a class="lnk">Pra Família</a><a class="lnk">Sobre</a>
+        </nav>
+    </div></div>
+</section>
+
+<!-- ================= MODELO 1 ================= -->
+<section class="demo m1">
+    <div class="demo-label"><span class="demo-num">1</span><span class="demo-name">Pílulas doces</span><span class="demo-desc">botões coloridos 3D que afundam</span></div>
+    <div class="frame"><div class="bar">
+        <a class="logo">KACO</a>
+        <nav class="links">
+            <a class="lnk">Início</a><a class="lnk">Histórias</a><a class="lnk">Personagens</a>
+            <a class="lnk">Emoções</a><a class="lnk">Colorir</a><a class="lnk">Quebra-cabeça</a>
+            <a class="lnk">Aprender</a><a class="lnk">Pra Família</a><a class="lnk">Sobre</a>
+        </nav>
+    </div></div>
+</section>
+
+<!-- ================= MODELO 2 ================= -->
+<section class="demo m2">
+    <div class="demo-label"><span class="demo-num">2</span><span class="demo-name">Risco de giz</span><span class="demo-desc">letra grande escura, sublinhado ondulado colorido</span></div>
+    <div class="frame"><div class="bar">
+        <a class="logo">KACO</a>
+        <nav class="links">
+            <a class="lnk">Início</a><a class="lnk">Histórias</a><a class="lnk">Personagens</a>
+            <a class="lnk">Emoções</a><a class="lnk">Colorir</a><a class="lnk">Quebra-cabeça</a>
+            <a class="lnk">Aprender</a><a class="lnk">Pra Família</a><a class="lnk">Sobre</a>
+        </nav>
+    </div></div>
+</section>
+
+<!-- ================= MODELO 3 ================= -->
+<section class="demo m3">
+    <div class="demo-label"><span class="demo-num">3</span><span class="demo-name">Adesivos</span><span class="demo-desc">contorno grosso, levemente tortinhos como stickers</span></div>
+    <div class="frame"><div class="bar">
+        <a class="logo">KACO</a>
+        <nav class="links">
+            <a class="lnk">Início</a><a class="lnk">Histórias</a><a class="lnk">Personagens</a>
+            <a class="lnk">Emoções</a><a class="lnk">Colorir</a><a class="lnk">Quebra-cabeça</a>
+            <a class="lnk">Aprender</a><a class="lnk">Pra Família</a><a class="lnk">Sobre</a>
+        </nav>
+    </div></div>
+</section>
+
+<!-- ================= MODELO 4 ================= -->
+<section class="demo m4">
+    <div class="demo-label"><span class="demo-num">4</span><span class="demo-name">Abas com emoji</span><span class="demo-desc">cada item com um iconezinho, abas arredondadas</span></div>
+    <div class="frame"><div class="bar">
+        <a class="logo">KACO</a>
+        <nav class="links">
+            <a class="lnk"><span class="e">🏠</span>Início</a><a class="lnk"><span class="e">📖</span>Histórias</a><a class="lnk"><span class="e">🐵</span>Personagens</a>
+            <a class="lnk"><span class="e">💛</span>Emoções</a><a class="lnk"><span class="e">🎨</span>Colorir</a><a class="lnk"><span class="e">🧩</span>Quebra-cabeça</a>
+            <a class="lnk"><span class="e">🧠</span>Aprender</a><a class="lnk"><span class="e">👨‍👩‍👧</span>Pra Família</a><a class="lnk"><span class="e">⭐</span>Sobre</a>
+        </nav>
+    </div></div>
+</section>
+
+<!-- ================= MODELO 5 ================= -->
+<section class="demo m5">
+    <div class="demo-label"><span class="demo-num">5</span><span class="demo-name">Barra arco-íris</span><span class="demo-desc">a barra inteira é colorida, letras brancas</span></div>
+    <div class="frame"><div class="bar">
+        <a class="logo">KACO</a>
+        <nav class="links">
+            <a class="lnk">Início</a><a class="lnk">Histórias</a><a class="lnk">Personagens</a>
+            <a class="lnk">Emoções</a><a class="lnk">Colorir</a><a class="lnk">Quebra-cabeça</a>
+            <a class="lnk">Aprender</a><a class="lnk">Pra Família</a><a class="lnk">Sobre</a>
+        </nav>
+    </div></div>
+</section>
+
+</body>
+</html>

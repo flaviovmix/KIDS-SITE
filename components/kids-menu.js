@@ -15,7 +15,8 @@
         { href: 'quebra-cabeca.html',   label: 'Quebra-cabeça' },
         { href: 'aprender.html',        label: 'Aprender' },
         // { href: 'audio-historias.html', label: 'Áudio-histórias' }, // oculto até ter áudios
-        { href: 'familia.html',         label: 'Pra Família' }
+        { href: 'familia.html',         label: 'Pra Família' },
+        { href: 'sobre.html',           label: 'Sobre' }
     ];
 
     // Prefixo até a raiz do site. Páginas em subpasta (ex: MATEMATICA/somar/)
