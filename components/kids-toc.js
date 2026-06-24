@@ -9,7 +9,7 @@
 (function () {
     // Fonte única dos itens — mexer aqui reflete em todas as páginas.
     var ITEMS = [
-        { id: 'sobre',       label: 'Sobre' },
+        { id: 'sobre',       label: 'Sobre', page: 'sobre.html' },
         { id: 'personagens', label: 'Personagens' },
         { id: 'rotina',      label: 'Ser Criança' },
         { id: 'emocoes',     label: 'Lidando com Emoções' },
@@ -35,7 +35,9 @@
             '<span class="toc-icon-close" aria-hidden="true"><i></i><i></i></span>';
 
         var lis = ITEMS.map(function (it) {
-            var href = (home ? '#' : 'index.html#') + it.id;
+            // Itens com page própria (ex: Sobre) viram link normal pra essa
+            // página; o resto continua âncora pra uma seção da home.
+            var href = it.page ? it.page : (home ? '#' : 'index.html#') + it.id;
             return '<li><a href="' + href + '">' + it.label + '</a></li>';
         }).join('');
 
@@ -74,9 +76,11 @@
 
         nav.querySelectorAll('a').forEach(function (link) {
             link.addEventListener('click', function (e) {
-                // Na home: scroll suave pro alvo local. Fora dela: deixa navegar.
-                if (home) {
-                    var target = document.querySelector(link.getAttribute('href'));
+                // Na home: scroll suave só pra âncora local (#secao). Link de
+                // página própria (sobre.html) e fora da home: deixa navegar.
+                var href = link.getAttribute('href');
+                if (home && href.charAt(0) === '#') {
+                    var target = document.querySelector(href);
                     if (target) {
                         e.preventDefault();
                         target.scrollIntoView({ behavior: 'smooth', block: 'start' });

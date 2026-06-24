@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
         /* Botão central que abre o ateliê de pintura (placeholder até ter cards). */
@@ -56,7 +57,8 @@
         .paint-app * { box-sizing:border-box; }
         /* canvas no centro; o inset deixa margem pras barras flutuantes nas bordas */
         .paint-app .canvas-area { position:absolute; inset:92px 14px 92px 14px;
-            display:flex; align-items:center; justify-content:center; }
+            display:flex; align-items:center; justify-content:center; overflow:hidden; }
+        .paint-app .canvas-wrap { transition:transform .12s ease; transform-origin:center center; }
         /* meia-largura do canvas (proporção 760/470, travado pela altura) — usado pra
            colar o slider e as cores nas laterais do desenho em qualquer tamanho de tela */
         .paint-app { --canvas-edge:calc(50vw + min((100vh - 200px) * 0.808, 50vw - 22px) + 80px); }
@@ -73,10 +75,13 @@
            pointer-events:none no wrapper pra não bloquear o canvas/Fechar nas laterais vazias. */
         .paint-app .top-bars { position:absolute; top:12px; left:0; right:0; z-index:3; pointer-events:none;
             display:flex; justify-content:center; align-items:start; gap:10px; }
-        .paint-app .top-bars .bar { position:static; pointer-events:auto; }
+        /* topo sem painel: ícones soltos lado a lado (sem fundo/sombra de barra) */
+        .paint-app .top-bars .bar { position:static; pointer-events:auto;
+            background:none; box-shadow:none; padding:0; border-radius:0; gap:18px; }
         .paint-app .tools-bar { flex-wrap:nowrap; }
-        .paint-app .bar-sep { width:1px; align-self:stretch; background:rgba(255,255,255,.18); margin:0 3px; flex:none; }
-        .paint-app .colors-bar { top:50%; left:var(--canvas-edge); right:auto; transform:translateY(-50%); background:#fff; height:80vh; overflow:auto; }
+        .paint-app .bar-sep { width:2px; align-self:center; height:36px; background:rgba(0,0,0,.18); margin:0 5px; flex:none; border-radius:2px; }
+        .paint-app .colors-bar { top:50%; left:var(--canvas-edge); right:auto; transform:translateY(-50%); background:#fff; height:80vh; overflow:auto;
+            flex-direction:column; align-items:center; gap:10px; }
         /* canto superior esquerdo: salvar/imprimir/limpar/abrir — coluna; visual vem de .pill-btn */
         .paint-app .io-bar { position:absolute; z-index:3; top:12px; left:14px;
             display:flex; flex-direction:column; align-items:flex-start; gap:10px; }
@@ -84,18 +89,79 @@
             background:#fff; border-radius:14px; padding:12px 10px; box-shadow:0 8px 24px rgba(0,0,0,.20);
             display:flex; flex-direction:column; align-items:center; gap:8px; }
 
+        /* controle de zoom: faixa inferior, borda direita alinhada à borda direita do canvas */
+        .paint-app .zoom-bar { position:absolute; z-index:3; bottom:14px; right:max(14px, calc(100vw - var(--canvas-edge)));
+            display:flex; align-items:center; gap:10px; background:#fff; border-radius:14px; padding:6px 8px;
+            box-shadow:0 8px 24px rgba(0,0,0,.20); }
+        .paint-app .zoom-btn { width:42px; height:42px; display:grid; place-items:center; border:0; border-radius:10px;
+            background:#eef2f7; color:#2b2f36; font-size:18px; cursor:pointer; transition:background .12s ease; }
+        .paint-app .zoom-btn:hover { background:#e2e9f2; }
+        .paint-app .zoom-val { min-width:54px; text-align:center; font-weight:700; color:#334; font-size:15px; }
+        .paint-app .zoom-bar .tool { width:42px; height:42px; min-width:0; padding:0; background:#eef2f7; color:#2b2f36; border-radius:10px; }
+        .paint-app .zoom-bar .tool:hover { transform:none; background:#e2e9f2; }
+        .paint-app .zoom-bar .tool.sel { background:var(--accent); color:#fff; }
+
         /* cores */
         .paint-app .swatches { display:grid; grid-template-columns:repeat(2,42px); gap:8px; }
         .paint-app .swatches button { width:42px; height:42px; border:2px solid rgba(0,0,0,.10); border-radius:50%;
             cursor:pointer; padding:0; }
         .paint-app .swatches button.sel { outline:3px solid var(--accent); outline-offset:1px; transform:scale(1.12); }
+        /* botão de cor personalizada: abre o seletor nativo do navegador */
+        .paint-app .swatch-custom { position:relative; width:92px; height:42px; flex:none; border-radius:12px;
+            border:2px solid rgba(0,0,0,.10); cursor:pointer; display:grid; place-items:center;
+            font-size:20px; line-height:1; text-shadow:0 1px 2px rgba(0,0,0,.4);
+            background:conic-gradient(from .15turn,#ff3b30,#ffcc00,#34c759,#00c7be,#007aff,#af52de,#ff2d92,#ff3b30); }
+        .paint-app .swatch-custom.sel { outline:3px solid var(--accent); outline-offset:2px; }
+
+        /* Seletor de cor próprio: modal grande e centralizado (pra criança) */
+        .cpick { position:fixed; inset:0; z-index:1200; display:flex; align-items:center; justify-content:center; }
+        .cpick[hidden] { display:none; }
+        .cpick-backdrop { position:absolute; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(2px); }
+        .cpick-card { position:relative; z-index:1; background:#fff; border-radius:24px; padding:24px;
+            width:min(92vw,560px); box-shadow:0 24px 60px rgba(0,0,0,.35); font-family:'Baloo 2',system-ui,sans-serif; }
+        .cpick-x { position:absolute; top:14px; right:14px; z-index:2; }
+        .cpick-title { margin:0 56px 16px; text-align:center; font-size:1.7rem; color:#333; }
+        .cpick-sv { position:relative; width:100%; aspect-ratio:3/2; border-radius:16px; cursor:crosshair; touch-action:none;
+            background:linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,transparent),hsl(320,100%,50%); }
+        .cpick-sv-cursor { position:absolute; width:28px; height:28px; border-radius:50%; border:3px solid #fff;
+            box-shadow:0 0 0 1.5px rgba(0,0,0,.45); transform:translate(-50%,-50%); pointer-events:none; }
+        .cpick-hue { -webkit-appearance:none; appearance:none; width:100%; height:30px; margin:18px 0; border-radius:15px; cursor:pointer;
+            background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00); }
+        .cpick-hue::-webkit-slider-thumb { -webkit-appearance:none; width:36px; height:36px; border-radius:50%;
+            background:#fff; border:3px solid #888; box-shadow:0 2px 6px rgba(0,0,0,.3); cursor:pointer; }
+        .cpick-hue::-moz-range-thumb { width:36px; height:36px; border-radius:50%;
+            background:#fff; border:3px solid #888; box-shadow:0 2px 6px rgba(0,0,0,.3); cursor:pointer; }
+        .cpick-foot { display:flex; align-items:center; gap:12px; }
+        .cpick-preview { width:54px; height:54px; border-radius:50%; border:3px solid rgba(0,0,0,.12); flex:none; margin-right:auto; background:#e23ca0; }
+        .cpick-saved { margin-top:18px; border-top:2px solid #eee; padding-top:14px; }
+        .cpick-saved-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+        .cpick-saved-label { font-size:.95rem; font-weight:700; color:#888; }
+        .cpick-saved-actions { display:flex; gap:8px; }
+        .cpick-add { border:0; border-radius:999px; background:#eef2f7; color:#3a7bd5; font-family:inherit;
+            font-weight:700; font-size:.95rem; padding:8px 14px; cursor:pointer; }
+        .cpick-add:hover { background:#e2e9f2; }
+        .cpick-remove.is-active { background:#fde2e7; color:#e11d48; }
+        .cpick-saved-row { display:flex; flex-wrap:wrap; gap:10px; min-height:42px; }
+        .cpick-saved-row button { position:relative; width:42px; height:42px; border-radius:50%; border:2px solid rgba(0,0,0,.10);
+            cursor:pointer; padding:0; transition:transform .12s ease; }
+        .cpick-saved-row button:hover { transform:scale(1.12); }
+        .cpick-saved-row.removing button { outline:2px solid #e11d48; outline-offset:1px; }
+        .cpick-saved-row.removing button::after { content:'✕'; position:absolute; inset:0; display:grid; place-items:center;
+            font-size:20px; font-weight:900; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.75); }
 
         /* botões */
-        .paint-app button.tool { background:#3a3f47; color:#fff; border:0; border-radius:9px; min-width:38px; height:38px;
-            padding:0 9px; font-family:inherit; font-weight:700; font-size:17px; line-height:1; cursor:pointer; flex:none; }
-        .paint-app button.tool.sel { background:var(--accent); }
-        .paint-app button.act { background:#454b54; color:#fff; border:0; border-radius:9px; padding:9px 12px;
-            font-family:inherit; font-weight:700; font-size:13px; cursor:pointer; }
+        /* cada ferramenta = ícone solto (sem fundo); selecionado fica na cor de destaque */
+        .paint-app button.tool { width:56px; height:56px; min-width:56px; padding:0; flex:none;
+            display:inline-grid; place-items:center; background:none; color:#2b2f36; border:0;
+            font-family:inherit; font-weight:700; font-size:36px; line-height:1; cursor:pointer;
+            transition:transform .12s ease, color .12s ease; }
+        .paint-app button.tool:hover { transform:translateY(-2px); }
+        .paint-app button.tool i { font-size:34px; }
+        .paint-app button.tool.sel { color:var(--accent); }
+        .paint-app button.act { width:56px; height:56px; padding:0; display:inline-grid; place-items:center;
+            background:none; color:#2b2f36; border:0; font-family:inherit; font-weight:700; font-size:32px;
+            cursor:pointer; transition:transform .12s ease; }
+        .paint-app button.act:hover { transform:translateY(-2px); }
         /* slider vertical: fill por gradiente (enche de baixo até o thumb), thumb redondo custom */
         .paint-app input[type=range] { -webkit-appearance:none; appearance:none; cursor:pointer;
             writing-mode:vertical-lr; direction:rtl; width:16px; height:560px; border-radius:9px;
@@ -120,6 +186,12 @@
         .paint-text-input { position:fixed; z-index:1100; transform:translateY(-50%);
             border:1px dashed #7a7f87; background:rgba(255,255,255,.96); padding:3px 7px;
             border-radius:5px; outline:none; min-width:80px; box-shadow:0 6px 20px rgba(0,0,0,.2); }
+
+        /* prévia de pincel/borracha: círculo do tamanho exato do traço, ícone no centro (fundo definido por ferramenta no JS) */
+        .tool-ring { position:fixed; z-index:1150; pointer-events:none; border-radius:50%; display:none;
+            place-items:center; border:2px solid rgba(40,40,40,.85);
+            box-shadow:0 0 0 1px rgba(255,255,255,.6); transform:translate(-50%,-50%); }
+        .tool-ring i { font-size:32px; color:#2b2f36; text-shadow:0 0 3px #fff,0 0 3px #fff; }
 
         /* Telas estreitas: barras menores, slider deitado, canvas com menos margem */
         @media (max-width:820px) {
@@ -162,27 +234,27 @@
             <!-- topo: histórico (desfazer/refazer) + ferramentas, agrupados e centrados -->
             <div class="top-bars">
                 <div class="bar history-bar">
-                    <button class="act" id="undo">↶ Desfazer</button>
-                    <button class="act" id="redo">↷ Refazer</button>
+                    <button class="act" id="undo" title="Desfazer"><i class="fa-solid fa-rotate-left"></i></button>
+                    <button class="act" id="redo" title="Refazer"><i class="fa-solid fa-rotate-right"></i></button>
                 </div>
                 <div class="bar tools-bar">
-                    <button class="tool sel" data-tool="bucket" title="Balde">🪣 Balde</button>
-                    <button class="tool" data-tool="brush" title="Pincel">🖌️ Pincel</button>
-                    <button class="tool" data-tool="eraser" title="Borracha">🧽 Borracha</button>
+                    <button class="tool sel" data-tool="bucket" title="Balde"><i class="fa-solid fa-fill-drip"></i></button>
+                    <button class="tool" data-tool="brush" title="Pincel"><i class="fa-solid fa-paintbrush"></i></button>
+                    <button class="tool" data-tool="eraser" title="Borracha"><i class="fa-solid fa-eraser"></i></button>
                     <span class="bar-sep"></span>
-                    <button class="tool shape" data-tool="line" title="Linha">╱</button>
-                    <button class="tool shape" data-tool="curve" title="Curva">∿</button>
+                    <button class="tool shape" data-tool="line" title="Linha"><i class="fa-solid fa-slash"></i></button>
+                    <button class="tool shape" data-tool="curve" title="Curva"><i class="fa-solid fa-bezier-curve"></i></button>
                     <button class="tool shape" data-tool="triangle" title="Triângulo">△</button>
-                    <button class="tool shape" data-tool="rect" title="Quadrado">▭</button>
+                    <button class="tool shape" data-tool="rect" title="Quadrado"><i class="fa-regular fa-square"></i></button>
                     <button class="tool shape" data-tool="rrect" title="Retângulo arredondado">▢</button>
-                    <button class="tool shape" data-tool="ellipse" title="Círculo">◯</button>
+                    <button class="tool shape" data-tool="ellipse" title="Círculo"><i class="fa-regular fa-circle"></i></button>
                     <button class="tool shape" data-tool="pentagon" title="Pentágono">⬠</button>
                     <button class="tool shape" data-tool="hexagon" title="Hexágono">⬡</button>
-                    <button class="tool shape" data-tool="star" title="Estrela">☆</button>
-                    <button class="tool shape" data-tool="heart" title="Coração">♡</button>
-                    <button class="tool shape" data-tool="arrow" title="Seta">➜</button>
-                    <button class="tool shape" data-tool="speech" title="Balão de fala">🗨</button>
-                    <button class="tool shape" data-tool="text" title="Texto (clique pra escrever)">A</button>
+                    <button class="tool shape" data-tool="star" title="Estrela"><i class="fa-regular fa-star"></i></button>
+                    <button class="tool shape" data-tool="heart" title="Coração"><i class="fa-regular fa-heart"></i></button>
+                    <button class="tool shape" data-tool="arrow" title="Seta"><i class="fa-solid fa-arrow-right"></i></button>
+                    <button class="tool shape" data-tool="speech" title="Balão de fala"><i class="fa-regular fa-comment"></i></button>
+                    <button class="tool shape" data-tool="text" title="Texto (clique pra escrever)"><i class="fa-solid fa-font"></i></button>
                 </div>
             </div>
 
@@ -195,11 +267,14 @@
             </div>
 
             <!-- topo-direita: cores -->
-            <div class="bar colors-bar"><div class="swatches" id="swatches"></div></div>
+            <div class="bar colors-bar">
+                <div class="swatches" id="swatches"></div>
+                <button class="swatch-custom" id="customColor" type="button" title="Cor personalizada">🎨</button>
+            </div>
 
             <!-- lateral esquerda: tamanho do pincel -->
             <div class="size-bar">
-                <input type="range" id="size" min="2" max="60" value="14">
+                <input type="range" id="size" min="2" max="150" value="14">
             </div>
 
             <!-- canto superior esquerdo: salvar / imprimir / limpar / abrir arquivo -->
@@ -209,6 +284,43 @@
                 <button class="pill-btn pill-btn--red" id="clear" type="button"><span class="pill-btn__icon" aria-hidden="true">🗑</span>Limpar</button>
                 <label class="pill-btn pill-btn--violet"><span class="pill-btn__icon" aria-hidden="true">📁</span>Abrir arquivo<input type="file" id="upload" accept="image/png,image/jpeg" hidden></label>
             </div>
+
+            <!-- canto inferior direito: zoom -->
+            <div class="zoom-bar">
+                <button class="tool" data-tool="hand" title="Mover / Mãozinha (H)"><i class="fa-solid fa-hand"></i></button>
+                <button class="zoom-btn" id="zoomOut" type="button" title="Diminuir zoom"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                <span class="zoom-val" id="zoomVal">100%</span>
+                <button class="zoom-btn" id="zoomIn" type="button" title="Aumentar zoom"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                <button class="zoom-btn" id="zoomReset" type="button" title="Encaixar"><i class="fa-solid fa-expand"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Seletor de cor grande e centralizado (próprio, amigável pra criança) -->
+<div class="cpick" id="colorPicker" hidden>
+    <div class="cpick-backdrop"></div>
+    <div class="cpick-card">
+        <button class="pill-btn pill-btn--amber cpick-x" type="button" data-cpick-close aria-label="Fechar">
+            <span class="pill-btn__icon" aria-hidden="true">✕</span>Fechar
+        </button>
+        <h2 class="cpick-title">Escolha uma cor</h2>
+        <div class="cpick-sv" id="cpickSV"><div class="cpick-sv-cursor" id="cpickCursor"></div></div>
+        <input type="range" class="cpick-hue" id="cpickHue" min="0" max="360" value="320">
+        <div class="cpick-foot">
+            <span class="cpick-preview" id="cpickPreview"></span>
+            <button class="pill-btn pill-btn--red" type="button" data-cpick-close><span class="pill-btn__icon" aria-hidden="true">✕</span>Cancelar</button>
+            <button class="pill-btn pill-btn--green" id="cpickOk" type="button"><span class="pill-btn__icon" aria-hidden="true">✓</span>Usar esta cor</button>
+        </div>
+        <div class="cpick-saved" id="cpickSaved">
+            <div class="cpick-saved-head">
+                <span class="cpick-saved-label">Suas cores</span>
+                <span class="cpick-saved-actions">
+                    <button class="cpick-add" id="cpickAdd" type="button">➕ Adicionar</button>
+                    <button class="cpick-add cpick-remove" id="cpickRemove" type="button">🗑 Remover</button>
+                </span>
+            </div>
+            <div class="cpick-saved-row" id="cpickSavedRow"></div>
         </div>
     </div>
 </div>
@@ -233,6 +345,19 @@
         semCarrossel: true,   // 1 personagem só: ícone do Kaco sozinho, sem slide
         semTodos: true,       // e sem o botão "Todos"
         itens: [
+            // 1º card especial: começa em branco e é o ÚNICO que aceita abrir arquivo.
+            { t: 'Desenhe ou carregue', cat: 'Colorir', blank: true, filtros: ['kaco'],
+              link: '#', desc: 'Comece do zero ou abra uma imagem sua.',
+              img: 'data:image/svg+xml,' + encodeURIComponent(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">' +
+                '<rect width="400" height="300" fill="#eaf4ff"/>' +
+                '<rect x="116" y="64" width="168" height="172" rx="16" fill="#fff" stroke="#9cc3f0" stroke-width="4" stroke-dasharray="11 9"/>' +
+                '<g transform="rotate(38 200 150)">' +
+                '<rect x="186" y="84" width="28" height="104" rx="6" fill="#ffd166"/>' +
+                '<rect x="186" y="84" width="28" height="13" fill="#ef476f"/>' +
+                '<polygon points="186,188 214,188 200,214" fill="#f4c98a"/>' +
+                '<polygon points="195,204 205,204 200,214" fill="#333"/>' +
+                '</g></svg>') },
             { t: 'Desenho 1', cat: 'Colorir', img: 'colorir/desenho1.jpeg',
               link: '#', desc: 'Clique e pinte do seu jeito!', filtros: ['kaco'] },
         ],
@@ -246,9 +371,26 @@
 <script>
 /* ===== Modal: abrir/fechar ===== */
 const paintModal = document.getElementById('paintModal');
-function abrirAtelie(){ paintModal.hidden = false; document.body.style.overflow = 'hidden'; }
+const uploadField = document.getElementById('upload').closest('.pill-btn'); // label "Abrir arquivo"
+let blankMode = false;
+// opts: { blank:true } abre canvas em branco + botão de upload; { img:'...' } carrega a imagem e esconde upload.
+function abrirAtelie(opts){
+    opts = opts || {};
+    blankMode = !!opts.blank;
+    loadedImg = null;
+    uploadField.style.display = opts.blank ? '' : 'none';   // "Abrir arquivo" só no card em branco
+    if(opts.blank){
+        blankCanvas();
+    } else {
+        const img = new Image();
+        img.onload  = ()=>{ loadedImg = img; drawImg(img); };
+        img.onerror = ()=> drawSample();
+        img.src = opts.img || 'colorir/desenho1.jpeg';
+    }
+    paintModal.hidden = false; document.body.style.overflow = 'hidden';
+}
 function fecharAtelie(){ paintModal.hidden = true; document.body.style.overflow = ''; }
-document.getElementById('abrirAtelie').addEventListener('click', abrirAtelie);
+document.getElementById('abrirAtelie').addEventListener('click', () => abrirAtelie({ blank:true }));
 paintModal.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', fecharAtelie));
 
 // Clicar no fundo (fora do card) NÃO fecha: o card balança avisando.
@@ -263,11 +405,15 @@ document.addEventListener('keydown', e => {
     if(paintModal.hidden) return;
     if(e.key === 'Enter' && pendingShape){ commitPending(); return; }   // Enter fixa a forma flutuante
     if(e.key === 'Escape'){ if(pendingShape){ cancelPending(); return; } if(curvePhase!==0){ endCurve(false); return; } fecharAtelie(); }
+    if((e.key==='h'||e.key==='H') && e.target.tagName!=='INPUT'){ const hb=document.querySelector('.tool[data-tool="hand"]'); if(hb){ hb.click(); e.preventDefault(); } return; }
 });
-// Quando houver cards p&b, clicar num card abre o mesmo ateliê (sem navegar).
+// Clicar num card abre o ateliê: o card "blank" começa em branco (com upload);
+// os demais carregam a própria imagem (sem upload).
 document.addEventListener('click', e => {
     const card = e.target.closest('.hist-card');
-    if(card){ e.preventDefault(); abrirAtelie(); }
+    if(card){ e.preventDefault();
+        if(card.dataset.blank) abrirAtelie({ blank:true });
+        else abrirAtelie({ img: card.dataset.img }); }
 });
 
 /* ===== Ferramenta de pintura (flood-fill por luminância) ===== */
@@ -276,6 +422,7 @@ const ctx = cv.getContext('2d', { willReadFrequently:true });
 
 let color = [226,60,160,255];   // rgba atual
 let tool = 'bucket';
+let panX=0, panY=0, panning=false, panLast=null;
 let brushSize = 14;
 let txtBold=false, txtItalic=false, txtUnder=false, txtSize=48;   // estilo da ferramenta Texto
 
@@ -284,15 +431,72 @@ const PALETTE = ['#e63946','#f4791f','#ffb703','#ffd60a','#90be6d','#43aa8b','#4
   '#4361ee','#7209b7','#b5179e','#e23ca0','#ff6392','#ff9b85','#7f5539','#000000',
   '#ffffff','#adb5bd','#6c757d','#212529','#caffbf','#bdb2ff','#a0c4ff','#ffc6ff'];
 const sw = document.getElementById('swatches');
+const customBtn = document.getElementById('customColor');
+function clearColorSel(){ [...sw.children].forEach(c=>c.classList.remove('sel')); customBtn.classList.remove('sel'); }
 PALETTE.forEach((hex,i)=>{
   const b=document.createElement('button');
   b.style.background=hex; b.title=hex;
   if(i===11) b.classList.add('sel');
-  b.onclick=()=>{ color=hexToRgba(hex); [...sw.children].forEach(c=>c.classList.remove('sel')); b.classList.add('sel');
+  b.onclick=()=>{ color=hexToRgba(hex); clearColorSel(); b.classList.add('sel');
     if(pendingShape) renderPending(); };   // recolore a forma flutuante na hora
   sw.appendChild(b);
 });
+// cor personalizada: o botão abre o seletor PRÓPRIO (modal grande e central)
+customBtn.onclick=()=>abrirColorPicker();
 function hexToRgba(h){ const n=parseInt(h.slice(1),16); return [(n>>16)&255,(n>>8)&255,n&255,255]; }
+
+// ---- seletor de cor próprio (modal grande e central): quadrado saturação/brilho + barra de matiz ----
+const cpick=document.getElementById('colorPicker'), cpickSV=document.getElementById('cpickSV'),
+  cpickCursor=document.getElementById('cpickCursor'), cpickHue=document.getElementById('cpickHue'),
+  cpickPreview=document.getElementById('cpickPreview');
+let cpHue=320, cpSat=1, cpVal=1, cpDrag=false;
+function hsvToRgb(h,s,v){ const c=v*s, x=c*(1-Math.abs((h/60)%2-1)), m=v-c; let r=0,g=0,b=0;
+  if(h<60){r=c;g=x;} else if(h<120){r=x;g=c;} else if(h<180){g=c;b=x;}
+  else if(h<240){g=x;b=c;} else if(h<300){r=x;b=c;} else {r=c;b=x;}
+  return [Math.round((r+m)*255),Math.round((g+m)*255),Math.round((b+m)*255)]; }
+function rgbToHsv(r,g,b){ r/=255;g/=255;b/=255; const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn; let h=0;
+  if(d){ if(mx===r)h=((g-b)/d)%6; else if(mx===g)h=(b-r)/d+2; else h=(r-g)/d+4; h*=60; if(h<0)h+=360; }
+  return [h, mx?d/mx:0, mx]; }
+function cpickRender(){
+  cpickSV.style.background='linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,transparent),hsl('+cpHue+',100%,50%)';
+  cpickCursor.style.left=(cpSat*100)+'%'; cpickCursor.style.top=((1-cpVal)*100)+'%';
+  const [r,g,b]=hsvToRgb(cpHue,cpSat,cpVal); cpickPreview.style.background='rgb('+r+','+g+','+b+')'; }
+function cpickFromEvent(e){ const r=cpickSV.getBoundingClientRect();
+  cpSat=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width));
+  cpVal=1-Math.min(1,Math.max(0,(e.clientY-r.top)/r.height)); cpickRender(); }
+cpickSV.addEventListener('pointerdown',e=>{ cpDrag=true; cpickSV.setPointerCapture(e.pointerId); cpickFromEvent(e); });
+cpickSV.addEventListener('pointermove',e=>{ if(cpDrag) cpickFromEvent(e); });
+cpickSV.addEventListener('pointerup',()=>{ cpDrag=false; });
+cpickHue.addEventListener('input',()=>{ cpHue=+cpickHue.value; cpickRender(); });
+function abrirColorPicker(){ const [h,s,v]=rgbToHsv(color[0],color[1],color[2]);   // começa na cor atual
+  cpHue=h; cpSat=s; cpVal=v; cpickHue.value=Math.round(h); cpickRender(); cpick.hidden=false; }
+function fecharColorPicker(){ cpick.hidden=true; }
+cpick.querySelectorAll('[data-cpick-close]').forEach(el=>el.addEventListener('click',fecharColorPicker));
+// cores personalizadas salvas (persistem no navegador via localStorage) — salvar é MANUAL (botão Adicionar)
+const cpickSavedRow=document.getElementById('cpickSavedRow');
+function rgbToHex(r,g,b){ return '#'+[r,g,b].map(n=>n.toString(16).padStart(2,'0')).join(''); }
+let savedColors=[];
+try{ savedColors=JSON.parse(localStorage.getItem('kids-colorir-cores')||'[]'); }catch(_){ savedColors=[]; }
+function renderSaved(){ cpickSavedRow.innerHTML='';
+  savedColors.forEach(hex=>{ const b=document.createElement('button'); b.type='button';
+    b.style.background=hex; b.title=hex; b.dataset.hex=hex; cpickSavedRow.appendChild(b); }); }
+function persistSaved(){ try{ localStorage.setItem('kids-colorir-cores',JSON.stringify(savedColors)); }catch(_){} renderSaved(); }
+function salvarCor(hex){ savedColors=savedColors.filter(c=>c!==hex); savedColors.unshift(hex);   // mais recente na frente, sem repetir
+  if(savedColors.length>12) savedColors.length=12; persistSaved(); }
+let removeMode=false;
+const cpickRemoveBtn=document.getElementById('cpickRemove');
+cpickRemoveBtn.addEventListener('click',()=>{ removeMode=!removeMode;   // liga/desliga o X nas cores
+  cpickSavedRow.classList.toggle('removing',removeMode); cpickRemoveBtn.classList.toggle('is-active',removeMode); });
+cpickSavedRow.addEventListener('click',e=>{ const btn=e.target.closest('button'); if(!btn) return;
+  if(removeMode){ savedColors=savedColors.filter(c=>c!==btn.dataset.hex); persistSaved(); return; }   // modo remover: clique apaga
+  const rgb=hexToRgba(btn.dataset.hex), [h,s,v]=rgbToHsv(rgb[0],rgb[1],rgb[2]);   // modo normal: recarrega no seletor
+  cpHue=h; cpSat=s; cpVal=v; cpickHue.value=Math.round(h); cpickRender(); });
+document.getElementById('cpickAdd').addEventListener('click',()=>{   // salva a cor atual do seletor
+  const [r,g,b]=hsvToRgb(cpHue,cpSat,cpVal); salvarCor(rgbToHex(r,g,b)); });
+renderSaved();
+document.getElementById('cpickOk').addEventListener('click',()=>{
+  const [r,g,b]=hsvToRgb(cpHue,cpSat,cpVal); color=[r,g,b,255];
+  clearColorSel(); customBtn.classList.add('sel'); if(pendingShape) renderPending(); fecharColorPicker(); });
 
 // ---- desenho de exemplo (line-art simples desenhado no canvas) ----
 function drawSample(){
@@ -484,9 +688,56 @@ const HANDLE_R=14, ROT_OFF=36;                              // raio de toque das
 // cursor de girar (SVG inline) + vetor de saída de cada alça (pra escolher a seta de redimensionar)
 const ROT_SVG='<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z" fill="#111" stroke="#fff" stroke-width="1"/></svg>';
 const ROTATE_CURSOR='url("data:image/svg+xml,'+encodeURIComponent(ROT_SVG)+'") 12 12, auto';
+// cursores das ferramentas balde/borracha: gerados a partir dos MESMOS ícones FontAwesome
+// da barra (fa-fill-drip / fa-eraser). Rasteriza o glyph da fonte num canvas e usa como cursor — sem PNG.
+let BUCKET_CURSOR='crosshair', BUCKET_CURSOR_DOWN='crosshair', ERASER_CURSOR='crosshair', BRUSH_CURSOR='crosshair';
+function faCursor(glyph, fill, size, hotX, hotY){
+  const c=document.createElement('canvas'); c.width=c.height=size;
+  const x=c.getContext('2d');
+  x.font='900 '+Math.round(size*0.72)+"px 'Font Awesome 6 Free'";   // 900 = peso do estilo solid
+  x.textAlign='center'; x.textBaseline='middle';
+  x.lineJoin='round'; x.lineWidth=Math.max(2,size*0.10); x.strokeStyle='#fff';   // contorno branco pra contraste
+  x.strokeText(glyph, size/2, size/2);
+  x.fillStyle=fill; x.fillText(glyph, size/2, size/2);
+  return "url('"+c.toDataURL()+"') "+hotX+" "+hotY+", auto";
+}
+function buildToolCursors(){
+  BUCKET_CURSOR      = faCursor('', '#2b2f36', 44, 36, 26);   // fa-fill-drip (clique na pontinha da gota)
+  BUCKET_CURSOR_DOWN = faCursor('', '#a23ca0', 44, 36, 26);   // pressionado: cor de destaque
+  ERASER_CURSOR      = faCursor('', '#2b2f36', 44, 10, 38);   // fa-eraser
+  BRUSH_CURSOR       = faCursor('', '#2b2f36', 44, 8, 38);   // fa-paintbrush (clique na ponta das cerdas)
+  if(tool==='bucket'||tool==='eraser'||tool==='brush') cv.style.cursor=toolCursor();   // atualiza se a ferramenta já estiver ativa
+}
+// espera o FontAwesome carregar antes de rasterizar os glyphs (senão sai vazio)
+if(document.fonts && document.fonts.load){
+  document.fonts.load("900 24px 'Font Awesome 6 Free'").then(buildToolCursors, buildToolCursors);
+} else { buildToolCursors(); }
+// cursor do canvas por ferramenta (balde = ícone; pincel/borracha = anel; resto = crosshair)
+function toolCursor(){ return tool==='hand' ? 'grab' : tool==='bucket' ? BUCKET_CURSOR : (tool==='eraser'||tool==='brush') ? 'none' : 'crosshair'; }
+
+// ---- prévia de pincel/borracha: círculo do tamanho exato do traço, com o ícone da ferramenta no centro
+//      (cursor escondido — o anel é o ponteiro, centrado no ponto que pinta/apaga) ----
+const toolRing=document.createElement('div'); toolRing.className='tool-ring';
+const toolRingIcon=document.createElement('i'); toolRing.appendChild(toolRingIcon); document.body.appendChild(toolRing);
+let lastRingEvt=null;
+function updateToolRing(e){
+  if(e) lastRingEvt=e;
+  if((tool!=='eraser'&&tool!=='brush') || !lastRingEvt){ toolRing.style.display='none'; return; }
+  const r=cv.getBoundingClientRect(), d=brushSize*(r.width/cv.width);   // diâmetro na tela = tamanho do pincel × escala do canvas (já inclui o zoom)
+  toolRing.style.width=d+'px'; toolRing.style.height=d+'px';
+  toolRing.style.left=lastRingEvt.clientX+'px'; toolRing.style.top=lastRingEvt.clientY+'px';
+  if(tool==='eraser'){ toolRing.style.background='rgba(255,255,255,.5)'; toolRingIcon.className='fa-solid fa-eraser'; toolRingIcon.style.transform=''; }
+  else { toolRing.style.background=`rgba(${color[0]},${color[1]},${color[2]},.45)`; toolRingIcon.className='fa-solid fa-paintbrush';
+    toolRingIcon.style.transform='translate(8px,-11px)'; }   // pincel: anel na cor atual; ícone deslocado pra ponta das cerdas cair no centro
+  toolRing.style.display='grid';
+}
+cv.addEventListener('pointermove', updateToolRing);
+cv.addEventListener('pointerdown', updateToolRing);
+cv.addEventListener('pointerenter', updateToolRing);
+cv.addEventListener('pointerleave', ()=>{ toolRing.style.display='none'; lastRingEvt=null; });
 const HVEC={ e:[1,0], w:[-1,0], n:[0,-1], s:[0,1], ne:[1,-1], nw:[-1,-1], se:[1,1], sw:[-1,1] };
 function applyCursor(mode){                                 // troca o cursor pra deixar claro a ação
-  if(!mode){ cv.style.cursor='crosshair'; return; }
+  if(!mode){ cv.style.cursor=toolCursor(); return; }
   if(mode==='rotate'){ cv.style.cursor=ROTATE_CURSOR; return; }
   if(mode==='move'){ cv.style.cursor='move'; return; }
   const [vx,vy]=HVEC[mode], r=pendingShape?pendingShape.rot:0;            // gira o vetor da alça pra tela
@@ -519,9 +770,9 @@ function renderPending(){ ctx.putImageData(pendingSnapshot,0,0);
   ctx.restore(); }
 function commitPending(){ if(!pendingShape) return;        // fixa: redesenha SEM as alças e grava no undo
   ctx.putImageData(pendingSnapshot,0,0); drawShapeT(pendingShape);
-  pushUndo(); pendingShape=null; pendingSnapshot=null; cv.style.cursor='crosshair'; }
+  pushUndo(); pendingShape=null; pendingSnapshot=null; cv.style.cursor=toolCursor(); }
 function cancelPending(){ if(!pendingShape) return;        // descarta: volta ao snapshot anterior
-  ctx.putImageData(pendingSnapshot,0,0); pendingShape=null; pendingSnapshot=null; cv.style.cursor='crosshair'; }
+  ctx.putImageData(pendingSnapshot,0,0); pendingShape=null; pendingSnapshot=null; cv.style.cursor=toolCursor(); }
 
 // ---- curva estilo Paint: arrasta a base, depois arrasta 2x pra moldar; ao terminar
 //      vira a MESMA forma flutuante (mover/redimensionar/girar) das demais. ----
@@ -548,7 +799,8 @@ function curveToShape(){                           // os 4 pontos da bézier vir
   return { type:'curve', cx, cy, w, h, rot:0, pts:[n(cP0),n(cC1),n(cC2),n(cP3)] };
 }
 
-cv.addEventListener('pointerdown',e=>{ const p=pos(e);
+cv.addEventListener('pointerdown',e=>{ if(tool==='hand'||e.button===1){ panning=true; panLast={x:e.clientX,y:e.clientY}; cv.setPointerCapture(e.pointerId); cv.style.cursor='grabbing'; e.preventDefault(); return; }
+  const p=pos(e);
   if(pendingShape){                          // forma flutuante: alças têm prioridade (qualquer ferramenta)
     const hit=hitHandle(pendingShape,p);
     if(hit){ dragMode=hit; dragLast=p; applyCursor(hit); cv.setPointerCapture(e.pointerId); return; }
@@ -567,7 +819,7 @@ cv.addEventListener('pointerdown',e=>{ const p=pos(e);
     snapshot=ctx.getImageData(0,0,cv.width,cv.height); cv.setPointerCapture(e.pointerId); return; }
   drawing=true; last=p; paintDot(p.x,p.y); cv.setPointerCapture(e.pointerId); });
 
-cv.addEventListener('pointermove',e=>{
+cv.addEventListener('pointermove',e=>{ if(panning){ panX+=e.clientX-panLast.x; panY+=e.clientY-panLast.y; panLast={x:e.clientX,y:e.clientY}; applyView(); return; }
   if(pendingShape && !dragMode && !shaping) applyCursor(hitHandle(pendingShape,pos(e)));
   if(tool==='curve' && curveDrag){ const p=pos(e);
     if(curvePhase===0) cP3={x:p.x,y:p.y};
@@ -588,7 +840,7 @@ cv.addEventListener('pointermove',e=>{
   if(shaping){ ctx.putImageData(snapshot,0,0); drawShapeT(shapeFromPoints(shapeStart,pos(e),tool)); return; }
   if(!drawing) return; const p=pos(e); paintLine(last,p); last=p; });
 
-cv.addEventListener('pointerup',e=>{
+cv.addEventListener('pointerup',e=>{ if(panning){ panning=false; cv.style.cursor=toolCursor(); return; }
   if(tool==='curve' && curveDrag){ const p=pos(e); curveDrag=false;
     if(curvePhase===0){ cP3={x:p.x,y:p.y};
       cC1={x:cP0.x+(cP3.x-cP0.x)/3, y:cP0.y+(cP3.y-cP0.y)/3};      // controles na linha base
@@ -607,6 +859,14 @@ cv.addEventListener('pointerup',e=>{
     pendingShape=shapeFromPoints(shapeStart,end,tool);
     pendingSnapshot=snapshot; snapshot=null; renderPending(); return; }  // vira forma flutuante
   if(drawing){ drawing=false; pushUndo(); } });
+
+// balde: ao clicar troca na hora pra versão "clicando"; ao soltar espera 150ms antes de voltar ao normal
+// (pointerup no window pra restaurar mesmo soltando fora do canvas; novo clique cancela o timer de volta)
+let bucketUpTimer=null;
+cv.addEventListener('pointerdown',e=>{ if(tool!=='bucket'||panning||e.button===1) return;
+  clearTimeout(bucketUpTimer); cv.style.cursor=BUCKET_CURSOR_DOWN; });
+window.addEventListener('pointerup',()=>{ if(tool!=='bucket') return;
+  bucketUpTimer=setTimeout(()=>{ if(tool==='bucket') cv.style.cursor=BUCKET_CURSOR; },150); });   // re-checa: se já trocou de ferramenta, não força o balde de volta
 
 // ---- controles ----
 // ---- mini-barra de texto (Negrito / Itálico / Sublinhado / Tamanho) ----
@@ -628,17 +888,21 @@ document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>{
   if(curvePhase!==0) endCurve(false);            // descarta curva incompleta ao trocar de ferramenta
   if(pendingShape) commitPending();              // fixa a forma flutuante ao trocar de ferramenta
   tool=b.dataset.tool;
+  clearTimeout(bucketUpTimer);                    // cancela o timer do balde pra ele não sobrescrever o novo cursor
   textTools.hidden = (tool!=='text');            // a mini-barra de texto só aparece na ferramenta Texto
+  cv.style.cursor=toolCursor();                  // balde/pincel mostram o ícone no ponteiro; borracha esconde (usa o anel)
+  if(tool!=='eraser'&&tool!=='brush') toolRing.style.display='none';
   document.querySelectorAll('.tool').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); });
+cv.style.cursor=toolCursor();                    // ferramenta inicial (balde) já entra com o ícone
 const sizeEl=document.getElementById('size');
 function syncSizeFill(){ const pct=(sizeEl.value-sizeEl.min)/(sizeEl.max-sizeEl.min)*100;
   sizeEl.style.setProperty('--p', pct+'%'); }                 // preenche de baixo até o thumb
 sizeEl.oninput=()=>{ brushSize=+sizeEl.value; syncSizeFill();
-  if(pendingShape) renderPending(); };   // redimensiona a forma flutuante na hora
+  if(pendingShape) renderPending(); updateToolRing(); };   // redimensiona a forma flutuante e o anel na hora
 syncSizeFill();
 document.getElementById('clear').onclick=()=>{ pendingShape=null; pendingSnapshot=null;
   curvePhase=0; curveDrag=false; curveSnap=null;
-  if(loadedImg) drawImg(loadedImg); else drawSample(); };
+  if(loadedImg) drawImg(loadedImg); else if(blankMode) blankCanvas(); else drawSample(); };
 document.getElementById('save').onclick=()=>{ if(curvePhase!==0) endCurve(true); if(pendingShape) commitPending(); const a=document.createElement('a');
   a.download='colorir.png'; a.href=cv.toDataURL('image/png'); a.click(); };
 document.getElementById('print').onclick=()=>{ if(curvePhase!==0) endCurve(true); if(pendingShape) commitPending(); const w=window.open('');
@@ -657,16 +921,27 @@ function drawImg(img){ // encaixa mantendo proporção, fundo branco
   ctx.drawImage(img,0,0,cv.width,cv.height);
   undoStack.length=0; pushUndo();
 }
+function blankCanvas(){ // tela branca no tamanho padrão (card "desenhe ou carregue")
+  pendingShape=null; pendingSnapshot=null;
+  cv.width=760; cv.height=470;
+  const wrap=cv.closest('.canvas-wrap'); if(wrap) wrap.style.aspectRatio='760 / 470';
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,cv.width,cv.height);
+  undoStack.length=0; pushUndo();
+}
 document.getElementById('upload').onchange=e=>{ const f=e.target.files[0]; if(!f) return;
   const img=new Image(); img.onload=()=>{ loadedImg=img; drawImg(img); }; img.src=URL.createObjectURL(f); };
 
-// ---- imagem única pra colorir (abre por padrão; cai no exemplo se falhar) ----
-(function(){
-  const img=new Image();
-  img.onload=()=>{ loadedImg=img; drawImg(img); };
-  img.onerror=()=>drawSample();
-  img.src='colorir/desenho1.jpeg';
-})();
+// ---- zoom: escala visual do canvas (pos() usa getBoundingClientRect, então o clique acompanha o zoom) ----
+const zoomWrap=cv.closest('.canvas-wrap'), zoomValEl=document.getElementById('zoomVal');
+let zoom=1;
+function applyView(){ zoomWrap.style.transform = (zoom===1 && !panX && !panY) ? '' : 'translate('+panX+'px,'+panY+'px) scale('+zoom+')'; }
+function setZoom(z){ zoom=Math.min(4,Math.max(1,Math.round(z*20)/20));   // trava entre 100% e 400%
+  applyView();
+  zoomValEl.textContent=Math.round(zoom*100)+'%'; }
+document.getElementById('zoomIn').onclick =()=>setZoom(zoom+0.25);
+document.getElementById('zoomOut').onclick=()=>setZoom(zoom-0.25);
+document.getElementById('zoomReset').onclick=()=>{ panX=0; panY=0; setZoom(1); };
+cv.addEventListener('mousedown',e=>{ if(e.button===1) e.preventDefault(); });
 </script>
 </body>
 </html>

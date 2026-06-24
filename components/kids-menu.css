@@ -2,7 +2,13 @@
    Cópia PORTÁTIL das regras .menu do style.css, com fallback de cor e reset local
    (margin/padding) pra funcionar em páginas que NÃO carregam os design tokens nem o
    reset global do site — ex: o sub-app MATEMATICA, que tem style.css próprio.
-   O componente injeta este arquivo só quando a página define window.kidsMenuBase. */
+   O componente injeta este arquivo só quando a página define window.kidsMenuBase.
+
+   Visual atual (★ Mistura): barra arco-íris (fundo do modelo 5) com itens "adesivo"
+   (pílula branca, borda colorida grossa, levemente tortos — modelo 3), fonte
+   Lilita One em CAIXA ALTA. A fonte vem do @import abaixo (vale em qualquer página). */
+@import url('https://fonts.googleapis.com/css2?family=Lilita+One&display=swap');
+
 .menu {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -10,25 +16,29 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 48px;
+    padding: 18px 48px;
     font-family: 'Baloo 2', system-ui, sans-serif;
     background: rgba(255,255,255,0.72);
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
     border-bottom: 1px solid rgba(255,255,255,0.4);
 }
+
+/* Logo KACO — escuro sobre o fundo branco translúcido */
 .menu-logo {
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.18em;
+    font-family: 'Lilita One', system-ui, sans-serif;
+    font-size: 30px;
+    font-weight: 400;
+    letter-spacing: 0.06em;
     color: var(--c-ink, #0f2740);
     text-decoration: none;
-    transition: opacity 0.25s ease;
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1);
 }
-.menu-logo:hover { opacity: 0.6; }
+.menu-logo:hover { transform: scale(1.08); }
+
 .menu-list {
     display: flex;
-    gap: 4px;
+    gap: 14px;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -37,37 +47,53 @@
     transform: translateX(-50%);
     width: max-content;
 }
+
+/* Item "adesivo": pílula branca, borda grossa colorida, caixa alta. A cor mora
+   em --mc (uma por item, mais abaixo). */
 .menu-link {
+    --mc: var(--c-blue, #2aa9e0);
     position: relative;
     display: inline-block;
-    padding: 6px 16px;
-    font-size: 17px;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    color: rgba(var(--shadow-rgb, 15, 39, 64), 0.65);
+    padding: 12px 24px;
+    border-radius: 14px;
+    font-family: 'Lilita One', system-ui, sans-serif;
+    font-size: 19px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    line-height: 1;
+    color: var(--mc);
+    background: #fff;
+    border: 3px solid var(--mc);
     text-decoration: none;
-    transition: color 0.25s ease;
+    transition: transform 0.18s cubic-bezier(.34,1.56,.64,1), background 0.18s ease, color 0.18s ease;
 }
-.menu-link::after {
-    content: '';
-    position: absolute;
-    left: 14px; right: 14px; bottom: 2px;
-    height: 1px;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: center;
-    transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+/* Levemente tortos, como stickers */
+.menu-list li:nth-child(odd)  .menu-link { transform: rotate(-3deg); }
+.menu-list li:nth-child(even) .menu-link { transform: rotate(3deg); }
+.menu-link:hover,
+.menu-link.active {
+    background: var(--mc);
+    color: #fff;
+    transform: rotate(0deg) scale(1.06) !important;
 }
-.menu-link:hover { color: var(--c-ink, #0f2740); }
-.menu-link:hover::after { transform: scaleX(1); }
-.menu-link.active { color: var(--c-ink, #0f2740); font-weight: 700; }
-.menu-link.active::after { transform: scaleX(1); }
 
-/* Hamburger (escondido por padrão) */
+/* Arco-íris: uma cor por item (cicla a paleta do site) */
+.menu-list li:nth-child(1) .menu-link { --mc: var(--c-blue,   #2aa9e0); }
+.menu-list li:nth-child(2) .menu-link { --mc: var(--c-green,  #22b07d); }
+.menu-list li:nth-child(3) .menu-link { --mc: var(--c-amber,  #f59e0b); }
+.menu-list li:nth-child(4) .menu-link { --mc: var(--c-pink,   #ec4899); }
+.menu-list li:nth-child(5) .menu-link { --mc: var(--c-purple, #a855f7); }
+.menu-list li:nth-child(6) .menu-link { --mc: var(--c-indigo, #6366f1); }
+.menu-list li:nth-child(7) .menu-link { --mc: var(--c-red,    #ef4444); }
+.menu-list li:nth-child(8) .menu-link { --mc: var(--c-green,  #22b07d); }
+.menu-list li:nth-child(9) .menu-link { --mc: var(--c-blue,   #2aa9e0); }
+
+/* Hamburger (escondido por padrão) — barras brancas sobre a barra colorida */
 .menu-burger {
     display: none;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     border: 0;
     background: transparent;
@@ -76,22 +102,22 @@
 }
 .menu-burger span {
     position: absolute;
-    left: 7px;
-    right: 7px;
-    height: 2px;
+    left: 8px;
+    right: 8px;
+    height: 3px;
     background: var(--c-ink, #0f2740);
-    border-radius: 2px;
+    border-radius: 3px;
     transition: transform 0.3s ease, opacity 0.2s ease, top 0.3s ease;
 }
-.menu-burger span:nth-child(1) { top: 11px; }
-.menu-burger span:nth-child(2) { top: 17px; }
-.menu-burger span:nth-child(3) { top: 23px; }
-.menu-burger[aria-expanded="true"] span:nth-child(1) { top: 17px; transform: rotate(45deg); }
+.menu-burger span:nth-child(1) { top: 12px; }
+.menu-burger span:nth-child(2) { top: 19px; }
+.menu-burger span:nth-child(3) { top: 26px; }
+.menu-burger[aria-expanded="true"] span:nth-child(1) { top: 19px; transform: rotate(45deg); }
 .menu-burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
-.menu-burger[aria-expanded="true"] span:nth-child(3) { top: 17px; transform: rotate(-45deg); }
+.menu-burger[aria-expanded="true"] span:nth-child(3) { top: 19px; transform: rotate(-45deg); }
 
 @media (max-width: 700px) {
-    .menu { padding: 10px 20px; }
+    .menu { padding: 12px 20px; }
     .menu-burger { display: block; }
     .menu-list {
         position: absolute;
@@ -102,22 +128,24 @@
         width: auto;
         flex-direction: column;
         align-items: stretch;
-        gap: 0;
-        padding: 8px 0;
-        background: rgba(255,255,255,0.92);
+        gap: 8px;
+        padding: 12px;
+        background: rgba(255,255,255,0.96);
         backdrop-filter: saturate(180%) blur(20px);
         -webkit-backdrop-filter: saturate(180%) blur(20px);
-        border-bottom: 1px solid rgba(var(--shadow-rgb, 15, 39, 64),0.08);
-        box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.12);
         max-height: 0;
         overflow: hidden;
         opacity: 0;
         pointer-events: none;
         transition: max-height 0.32s ease, opacity 0.22s ease;
     }
-    .menu.open .menu-list { max-height: 400px; opacity: 1; pointer-events: auto; }
-    .menu-link { display: block; padding: 14px 24px; font-size: 18px; }
-    .menu-link::after { display: none; }
-    .menu-link:hover { background: rgba(var(--shadow-rgb, 15, 39, 64),0.05); }
-    .menu-link.active { background: rgba(var(--shadow-rgb, 15, 39, 64),0.06); }
+    .menu.open .menu-list { max-height: 640px; opacity: 1; pointer-events: auto; }
+    /* No mobile a pílula vira linha cheia e reta (sem tortinho que treme) */
+    .menu-link {
+        display: block;
+        padding: 14px 20px;
+        font-size: 20px;
+        transform: none !important;
+    }
 }

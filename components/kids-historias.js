@@ -139,6 +139,8 @@
             a.dataset.filtros = chavesCard.join(' ');
             a.style.setProperty('--accent', cat.cor);
             a.href = h.link || '#';
+            a.dataset.img = h.img || '';      // imagem que o card carrega no ateliê
+            if (h.blank) a.dataset.blank = '1';  // card "desenhe ou carregue": canvas em branco + upload
             a.innerHTML = `
                 <div class="hist-head">
                     <img src="${h.img}" alt="${h.t}">

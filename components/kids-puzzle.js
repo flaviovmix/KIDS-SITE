@@ -344,7 +344,7 @@
   // com uma folga em volta, pra deixar claro o espaço pra montar.
   function topInset() {
     let b = 0;
-    [".kids-nav", ".pz-bar", ".menu"].forEach((s) => {
+    [".kids-nav", ".pz-bar", ".menu", ".pz-trocar"].forEach((s) => {
       const el = document.querySelector(s);
       if (el) b = Math.max(b, el.getBoundingClientRect().bottom);
     });
@@ -402,15 +402,24 @@
 
     const pad = 24;
     const inset = topInset();
+    // Espalha as peças numa FAIXA em volta da figura (caixa central), não pela
+    // tela toda: a folga máxima é proporcional ao tamanho da figura e fica presa
+    // na área de trabalho visível. Em telas largas isso evita peças nos cantos.
+    const spreadX = displayW * 0.5;   // folga lateral máxima além da figura
+    const spreadY = displayH * 0.4;   // folga vertical máxima além da figura
+    const zoneL = Math.max(pad,                       offsetXTarget - spreadX);
+    const zoneR = Math.min(canvas.clientWidth  - pad, offsetXTarget + displayW + spreadX);
+    const zoneT = Math.max(inset + pad,               offsetYTarget - spreadY);
+    const zoneB = Math.min(canvas.clientHeight - pad, offsetYTarget + displayH + spreadY);
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const piece = new Piece(r, c);
         piece.groupId = groupSeq++;
-        // espalha pela bbox visível (não pela origem-da-imagem) pra não sair da tela
-        const x1 = Math.max(pad, canvas.clientWidth  - piece.bboxW() - pad);
-        const y1 = Math.max(inset + pad, canvas.clientHeight - piece.bboxH() - pad);
-        const sx = pad + Math.random() * Math.max(0, x1 - pad);
-        const sy = (inset + pad) + Math.random() * Math.max(0, y1 - (inset + pad));
+        // posiciona a bbox visível dentro da zona (não sai dela nem da tela)
+        const x1 = Math.max(zoneL, zoneR - piece.bboxW());
+        const y1 = Math.max(zoneT, zoneB - piece.bboxH());
+        const sx = zoneL + Math.random() * Math.max(0, x1 - zoneL);
+        const sy = zoneT + Math.random() * Math.max(0, y1 - zoneT);
         piece.posX = sx - piece.minX;
         piece.posY = sy - piece.minY;
         pieces.push(piece);

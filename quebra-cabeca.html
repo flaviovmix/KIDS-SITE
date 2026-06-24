@@ -14,6 +14,9 @@
 <!-- Componente kids-historias (hero + filtros + grid) renderiza aqui -->
 <div id="kidsHistorias"></div>
 
+<!-- Seletor de arquivo do card "Quebra-cabeça livre" (escondido; o card o aciona). -->
+<input type="file" id="livreUpload" accept="image/*" hidden>
+
 <script src="script.js"></script>
 <script src="components/kids-menu.js"></script>
 <script src="components/kids-stories.js"></script>
@@ -28,12 +31,27 @@
         acaoLabel: 'Montar →',
         emojis: ['🧩', '🐵'],
         categorias: window.KIDS_CATEGORIAS,
-        itens: window.KIDS_STORIES.map(function (s) {
+        // 1º card especial: começa em branco e abre uma foto do computador pra
+        // montar o quebra-cabeça com ela (ver script no fim da página).
+        itens: [{
+            t: 'Quebra-cabeça livre', cat: 'Livre', blank: true, link: '#',
+            desc: 'Use uma foto sua e monte o quebra-cabeça com ela.',
+            img: 'data:image/svg+xml,' + encodeURIComponent(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">' +
+                '<rect width="400" height="300" fill="#eaf4fb"/>' +
+                '<rect x="96" y="64" width="208" height="168" rx="18" fill="#fff" stroke="#9cc3f0" stroke-width="4" stroke-dasharray="12 9"/>' +
+                '<circle cx="150" cy="112" r="20" fill="#ffd166"/>' +
+                '<polygon points="112,206 178,134 218,172 252,140 288,206" fill="#7ec8a0"/>' +
+                '<g transform="translate(258 188)"><circle r="30" fill="#2aa9e0"/>' +
+                '<rect x="-4" y="-16" width="8" height="32" rx="4" fill="#fff"/>' +
+                '<rect x="-16" y="-4" width="32" height="8" rx="4" fill="#fff"/></g>' +
+                '</svg>'),
+        }].concat(window.KIDS_STORIES.map(function (s) {
             return {
                 t: s.t, cat: s.cat, img: s.img, desc: s.desc,
                 link: 'quebra-cabeca-jogo.html?h=' + s.id,
             };
-        }),
+        })),
     };
 </script>
 <script src="components/kids-hero.js"></script>
@@ -41,5 +59,58 @@
 <script src="components/kids-toc.js"></script>
 <script src="components/kids-nav.js"></script>
 <script src="components/kids-footer.js"></script>
+
+<script>
+    // Card "Quebra-cabeça livre" (data-blank): em vez de navegar, abre o seletor
+    // de arquivo. A foto é reduzida num canvas (pra caber no sessionStorage e o
+    // motor ficar leve), guardada, e abrimos a página de jogo em modo ?livre=1.
+    (function () {
+        var input = document.getElementById('livreUpload');
+        if (!input) return;
+
+        // Delegação: os cards são montados pelo componente depois do DOM pronto.
+        document.addEventListener('click', function (e) {
+            var card = e.target.closest('.hist-card[data-blank]');
+            if (!card) return;
+            e.preventDefault();
+            input.click();
+        });
+
+        input.addEventListener('change', function () {
+            var file = input.files && input.files[0];
+            input.value = '';                       // permite reabrir a mesma foto
+            if (file) carregarImagemLivre(file);
+        });
+
+        function carregarImagemLivre(file) {
+            var reader = new FileReader();
+            reader.onload = function (ev) {
+                var img = new Image();
+                img.onload = function () {
+                    var MAX = 1400;                 // teto de lado maior (qualidade x peso)
+                    var w = img.width, h = img.height;
+                    if (Math.max(w, h) > MAX) {
+                        var s = MAX / Math.max(w, h);
+                        w = Math.round(w * s); h = Math.round(h * s);
+                    }
+                    var c = document.createElement('canvas');
+                    c.width = w; c.height = h;
+                    c.getContext('2d').drawImage(img, 0, 0, w, h);
+                    var out = c.toDataURL('image/jpeg', 0.85);
+                    try {
+                        sessionStorage.setItem('kids-puzzle-livre', out);
+                    } catch (err) {
+                        alert('Essa imagem é muito grande. Tente uma menor.');
+                        return;
+                    }
+                    location.href = 'quebra-cabeca-jogo.html?livre=1';
+                };
+                img.onerror = function () { alert('Não consegui abrir essa imagem.'); };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    })();
+</script>
 </body>
 </html>
