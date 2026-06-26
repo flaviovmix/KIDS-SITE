@@ -27,14 +27,16 @@
         kicker: 'MONTE E DIVIRTA-SE',
         titulo: 'Quebra-cabeça',
         sub: 'Arraste as peças e monte as figuras do mundo do Kaco, um pouquinho de cada vez.',
-        hint: 'Clique pra montar ↗',
+        hint: 'Clique num personagem pra filtrar ↗',
         acaoLabel: 'Montar →',
         emojis: ['🧩', '🐵'],
-        categorias: window.KIDS_CATEGORIAS,
+        categorias: window.KIDS_CATEGORIAS,   // selo/cor do card
+        filtros: window.KIDS_PERSONAGENS,     // chips: filtra por personagem
         // 1º card especial: começa em branco e abre uma foto do computador pra
-        // montar o quebra-cabeça com ela (ver script no fim da página).
+        // montar o quebra-cabeça com ela (ver script no fim da página). Sem personagem
+        // (filtros:[]) → é ferramenta, aparece só no "Todos".
         itens: [{
-            t: 'Quebra-cabeça livre', cat: 'Livre', blank: true, link: '#',
+            t: 'Quebra-cabeça livre', cat: 'Livre', blank: true, link: '#', filtros: [],
             desc: 'Use uma foto sua e monte o quebra-cabeça com ela.',
             img: 'data:image/svg+xml,' + encodeURIComponent(
                 '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">' +
@@ -50,6 +52,7 @@
             return {
                 t: s.t, cat: s.cat, img: s.img, desc: s.desc,
                 link: 'quebra-cabeca-jogo.html?h=' + s.id,
+                filtros: s.personagens || [],
             };
         })),
     };

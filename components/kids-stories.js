@@ -82,4 +82,23 @@
             tx: 'Na terapia, o Kaco chega tímido e se irrita na hora de guardar os brinquedos. Com o Tio Thiago ele respira, coopera e termina o dia orgulhoso.',
         },
     ];
+
+    // Desenhos pra colorir (linha preta sobre branco). Fonte única: tanto colorir.html
+    // quanto o feed de personagens.html leem desta lista. Cada desenho marca os
+    // personagens que aparecem nele (alimenta o filtro por personagem). Por ora só o
+    // Kaco tem desenho — é o que o torna o único personagem com os 3 tipos (história,
+    // colorir, quebra-cabeça). Adicionar desenho de outro personagem é só incluir aqui.
+    //   id  — identificador estável do desenho (arquivo em colorir/<id>.jpeg)
+    //   t   — título do card
+    //   img — imagem do desenho
+    //   personagens — slugs (ver KIDS_PERSONAGENS) que aparecem no desenho
+    // OBS: o card "Desenhe ou carregue" (canvas em branco + upload) NÃO entra aqui —
+    // ele é uma ferramenta da página colorir.html, não um desenho de personagem.
+    window.KIDS_COLORIR = [
+        {
+            id: 'desenho1', t: 'Desenho 1', img: 'colorir/desenho1.jpeg',
+            personagens: ['kaco'],
+            desc: 'Clique e pinte do seu jeito!',
+        },
+    ];
 })();

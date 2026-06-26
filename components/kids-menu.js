@@ -6,17 +6,25 @@
 
    Fonte única: mexer nos links AQUI reflete em todas as páginas. */
 (function () {
+    // Itens do topo. Quando tem `children`, vira dropdown (o pai não navega, só abre).
     var LINKS = [
-        { href: 'index.html',           label: 'Início' },
-        { href: 'historias.html',       label: 'Histórias' },
-        { href: 'personagens.html',     label: 'Personagens' },
-        { href: 'emocoes.html',         label: 'Emoções' },
-        { href: 'colorir.html',         label: 'Colorir' },
-        { href: 'quebra-cabeca.html',   label: 'Quebra-cabeça' },
-        { href: 'aprender.html',        label: 'Aprender' },
+        { href: 'index.html',     label: 'Início' },
+        { href: 'historias.html', label: 'Histórias' },
         // { href: 'audio-historias.html', label: 'Áudio-histórias' }, // oculto até ter áudios
-        { href: 'familia.html',         label: 'Pra Família' },
-        { href: 'sobre.html',           label: 'Sobre' }
+        { label: 'Brincar', children: [
+            { href: 'colorir.html',       label: 'Colorir' },
+            { href: 'quebra-cabeca.html', label: 'Quebra-cabeça' },
+            { href: 'aprender.html',      label: 'Aprender' }
+        ] },
+        { label: 'Mundo do Kaco', children: [
+            { href: 'personagens.html',  label: 'Personagens' },
+            { href: 'emocoes.html',      label: 'Emoções' },
+            { href: 'index.html#rotina', label: 'Rotina' }
+        ] },
+        { label: 'Pra Família', children: [
+            { href: 'familia.html', label: 'Como usar' },
+            { href: 'sobre.html',   label: 'Sobre' }
+        ] }
     ];
 
     // Prefixo até a raiz do site. Páginas em subpasta (ex: MATEMATICA/somar/)
@@ -47,6 +55,19 @@
         var logoHref = page === 'index.html' ? '#' : BASE + 'index.html';
 
         var items = LINKS.map(function (l) {
+            if (l.children) {
+                var anyActive = l.children.some(function (c) { return c.href === page; });
+                var kids = l.children.map(function (c) {
+                    var ca = c.href === page ? ' active' : '';
+                    return '<li><a href="' + BASE + c.href + '" class="menu-link menu-sub' + ca + '">' + c.label + '</a></li>';
+                }).join('');
+                return '<li class="menu-group' + (anyActive ? ' active' : '') + '">' +
+                    '<button type="button" class="menu-link menu-trigger' + (anyActive ? ' active' : '') + '" aria-expanded="false">' +
+                        l.label + '<span class="menu-caret" aria-hidden="true">▾</span>' +
+                    '</button>' +
+                    '<ul class="menu-dropdown">' + kids + '</ul>' +
+                '</li>';
+            }
             var active = l.href === page ? ' active' : '';
             return '<li><a href="' + BASE + l.href + '" class="menu-link' + active + '">' + l.label + '</a></li>';
         }).join('');
@@ -75,18 +96,58 @@
             burger.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
         }
 
+        function closeGroups() {
+            menu.querySelectorAll('.menu-group.open').forEach(function (g) {
+                g.classList.remove('open');
+                var t = g.querySelector('.menu-trigger');
+                if (t) t.setAttribute('aria-expanded', 'false');
+            });
+        }
+
+        // Dropdowns: clique no pai abre/fecha; abrir um fecha os outros.
+        menu.querySelectorAll('.menu-trigger').forEach(function (trig) {
+            trig.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var li = trig.closest('.menu-group');
+                var wasOpen = li.classList.contains('open');
+                closeGroups();
+                if (!wasOpen) {
+                    li.classList.add('open');
+                    trig.setAttribute('aria-expanded', 'true');
+                }
+            });
+        });
+
+        // Passar o mouse por um item do topo abre o dropdown dele (e fecha os
+        // outros); por um link simples, fecha o que estiver aberto. O clique
+        // continua valendo pro touch/celular (onde não há hover).
+        menu.querySelectorAll('.menu-list > li').forEach(function (li) {
+            li.addEventListener('mouseenter', function () {
+                if (li.classList.contains('open')) return; // já é o aberto
+                closeGroups();
+                var trig = li.querySelector('.menu-trigger');
+                if (trig) {
+                    li.classList.add('open');
+                    trig.setAttribute('aria-expanded', 'true');
+                }
+            });
+        });
+
         burger.addEventListener('click', function () {
             setOpen(!menu.classList.contains('open'));
         });
         list.addEventListener('click', function (e) {
-            if (e.target.closest('.menu-link')) setOpen(false);
+            // só links de navegação fecham o menu mobile; o pai (trigger) só abre a sanfona
+            if (e.target.closest('.menu-link') && !e.target.closest('.menu-trigger')) setOpen(false);
         });
         document.addEventListener('click', function (e) {
-            if (!menu.classList.contains('open')) return;
-            if (!menu.contains(e.target)) setOpen(false);
+            if (menu.contains(e.target)) return;
+            setOpen(false);
+            closeGroups();
         });
         window.addEventListener('resize', function () {
-            if (window.innerWidth > 700) setOpen(false);
+            if (window.innerWidth > 700) { setOpen(false); closeGroups(); }
         });
     }
 

@@ -35,6 +35,8 @@
 
         const categorias = cfg.categorias || {};
         const itens = cfg.itens || [];
+        // Rótulo do botão: default da página (cfg.acaoLabel). Num grid misto cada card
+        // pode sobrescrever com h.acao ("Ler →" / "Colorir →" / "Montar →").
         const acaoLabel = cfg.acaoLabel || 'Ler →';
 
         // Dois modos de filtro:
@@ -150,7 +152,7 @@
                 <div class="hist-body">
                     <h3>${h.t}</h3>
                     <p>${h.desc || ''}</p>
-                    <span class="hist-go">${acaoLabel}</span>
+                    <span class="hist-go">${h.acao || acaoLabel}</span>
                 </div>`;
             grid.appendChild(a);
         });
