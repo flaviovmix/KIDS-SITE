@@ -19,15 +19,23 @@
 <script src="components/kids-stories.js"></script>
 <script>
     // Tudo (título, categoria, capa, descrição) vem de kids-stories.js (fonte única).
+    // Os chips filtram por PERSONAGEM (KIDS_PERSONAGENS); a categoria segue só como
+    // selo/cor do card. Cada história herda seus personagens (s.personagens) pro filtro.
     window.kidsHistoriasConfig = {
         kicker: 'AS AVENTURAS DO KACO',
         titulo: 'Histórias',
         sub: 'Cada história é curtinha, ilustrada e no ritmo de quem lê.',
-        hint: 'Clique numa história pra ler ↗',
+        hint: 'Clique num personagem pra filtrar ↗',
         acaoLabel: 'Ler →',
-        categorias: window.KIDS_CATEGORIAS,
+        categorias: window.KIDS_CATEGORIAS,   // selo/cor do card
+        filtros: window.KIDS_PERSONAGENS,     // chips: filtra por personagem
         itens: window.KIDS_STORIES.map(function (s) {
-            return { t: s.t, cat: s.cat, img: s.img, link: 'historia.html?id=' + s.id, status: 'no ar', desc: s.desc };
+            return {
+                t: s.t, cat: s.cat, img: s.img,
+                link: 'historia.html?id=' + s.id,
+                status: 'no ar', desc: s.desc,
+                filtros: s.personagens || [],
+            };
         }),
     };
 </script>

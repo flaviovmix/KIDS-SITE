@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Histórias por personagem — Kaco</title>
+    <title>Tudo por personagem — Kaco</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,32 +12,82 @@
 <body>
 
 <!-- Componente kids-historias (hero + filtros + grid) renderiza aqui.
-     Aqui os chips são PERSONAGENS (filtro por inclusão), não categorias. -->
+     Chips = PERSONAGENS. Grid = portais: 1 card por TIPO (História/Colorir/Quebra-
+     cabeça) que o personagem tem; cada card leva pra coleção do tipo já filtrada. -->
 <div id="kidsHistorias"></div>
 
 <script src="script.js"></script>
 <script src="components/kids-menu.js"></script>
 <script src="components/kids-stories.js"></script>
 <script>
-    // Tudo vem de kids-stories.js (fonte única). Os chips usam KIDS_PERSONAGENS;
-    // cada card guarda os personagens da história (s.personagens) pro filtro.
-    window.kidsHistoriasConfig = {
-        kicker: 'AS AVENTURAS DO KACO',
-        titulo: 'Histórias por personagem',
-        sub: 'Escolha um personagem e veja as histórias em que ele aparece.',
-        hint: 'Clique num personagem pra filtrar ↗',
-        acaoLabel: 'Ler →',
-        categorias: window.KIDS_CATEGORIAS,        // continua dando o selo/cor do card
-        filtros: window.KIDS_PERSONAGENS,          // os chips: filtra por personagem
-        itens: window.KIDS_STORIES.map(function (s) {
-            return {
-                t: s.t, cat: s.cat, img: s.img,
-                link: 'historia.html?id=' + s.id,
-                status: 'no ar', desc: s.desc,
-                filtros: s.personagens || [],      // personagens daquela história
-            };
-        }),
-    };
+    // Feed PORTAL por personagem: pra cada personagem, até 3 cards — um por TIPO que
+    // ele tem (História, Colorir, Quebra-cabeça). Cada card NÃO é um item solto: é UM
+    // SÓ por tipo e representa o DESTINO daquele tipo, levando pra página da coleção já
+    // filtrada nele (?p=<slug>). Como cada card é de um personagem só, o ?p vai embutido
+    // no próprio link (sem interceptar clique). O selo (cat) dá nome/cor: categoria real
+    // na história; "Colorir"/"Quebra-cabeça" nos outros. Fonte única: kids-stories.js.
+    //   • Kaco tem os 3; quem não tem desenho fica só com História + Quebra-cabeça.
+    (function () {
+        var P = window.KIDS_PERSONAGENS;
+        var itens = [];
+
+        Object.keys(P).forEach(function (slug) {
+            var nome = P[slug].nome;
+            var hist = window.KIDS_STORIES.filter(function (s) {
+                return (s.personagens || []).indexOf(slug) !== -1;
+            });
+            var des = window.KIDS_COLORIR.filter(function (d) {
+                return (d.personagens || []).indexOf(slug) !== -1;
+            });
+
+            // 1) HISTÓRIAS — capa/título de uma história sua; selo = categoria dela.
+            if (hist.length) {
+                itens.push({
+                    t: hist[0].t, cat: hist[0].cat, img: hist[0].img,
+                    link: 'historias.html?p=' + slug,
+                    acao: 'Ler →', status: 'no ar',
+                    desc: 'Todas as histórias com ' + nome + '.',
+                    filtros: [slug],
+                });
+            }
+            // 2) COLORIR — só quem tem desenho (hoje só o Kaco).
+            if (des.length) {
+                itens.push({
+                    t: des[0].t, cat: 'colorir', img: des[0].img,
+                    link: 'colorir.html?p=' + slug,
+                    acao: 'Colorir →', status: 'no ar',
+                    desc: 'Desenhos de ' + nome + ' pra pintar.',
+                    filtros: [slug],
+                });
+            }
+            // 3) QUEBRA-CABEÇA — reusa a capa de uma história (a 2ª quando dá, pra não
+            //    repetir a imagem da #1).
+            if (hist.length) {
+                var q = hist.length > 1 ? hist[1] : hist[0];
+                itens.push({
+                    t: q.t, cat: 'quebra-cabeca', img: q.img,
+                    link: 'quebra-cabeca.html?p=' + slug,
+                    acao: 'Montar →', status: 'no ar',
+                    desc: 'Monte os quebra-cabeças com ' + nome + '.',
+                    filtros: [slug],
+                });
+            }
+        });
+
+        window.kidsHistoriasConfig = {
+            kicker: 'AS AVENTURAS DO KACO',
+            titulo: 'Tudo por personagem',
+            sub: 'Escolha um personagem e veja tudo dele: histórias, desenhos pra colorir e quebra-cabeças.',
+            hint: 'Clique num personagem pra filtrar ↗',
+            acaoLabel: 'Ver →',
+            categorias: Object.assign({}, window.KIDS_CATEGORIAS, {
+                colorir:         { nome: 'Colorir',       cor: '#2aa9e0' },
+                'quebra-cabeca': { nome: 'Quebra-cabeça', cor: '#7c3aed' },
+            }),
+            filtros: window.KIDS_PERSONAGENS,
+            itens: itens,
+        };
+    })();
 </script>
 <script src="components/kids-hero.js"></script>
 <script src="components/kids-historias.js"></script>

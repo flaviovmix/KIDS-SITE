@@ -1465,6 +1465,19 @@ body {
     border-radius: 50%;
     background: var(--accent);
 }
+/* Cards QUEBRA-CABEÇA (portais de personagens.html): malha de peças jigsaw por cima
+   da capa, pra a imagem "virar" quebra-cabeça mesmo sem arte própria. Só pega
+   data-cat="quebra-cabeca" (exclusivo desses portais). As linhas ficam no miolo
+   (interior), não cruzam os selos dos cantos. */
+.hist-card[data-cat="quebra-cabeca"] .hist-head::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400' preserveAspectRatio='none'><path d='M0,200 L78,200 A22,22 0 0 1 122,200 L278,200 A22,22 0 0 0 322,200 L478,200 A22,22 0 0 1 522,200 L600,200 M200,0 L200,78 A22,22 0 0 0 200,122 L200,278 A22,22 0 0 1 200,322 L200,400 M400,0 L400,78 A22,22 0 0 1 400,122 L400,278 A22,22 0 0 0 400,322 L400,400' fill='none' stroke='rgba(0,0,0,0.20)' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/><path d='M0,200 L78,200 A22,22 0 0 1 122,200 L278,200 A22,22 0 0 0 322,200 L478,200 A22,22 0 0 1 522,200 L600,200 M200,0 L200,78 A22,22 0 0 0 200,122 L200,278 A22,22 0 0 1 200,322 L200,400 M400,0 L400,78 A22,22 0 0 1 400,122 L400,278 A22,22 0 0 0 400,322 L400,400' fill='none' stroke='rgba(255,255,255,0.95)' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
 .hist-body {
     display: flex;
     flex-direction: column;
