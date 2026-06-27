@@ -25,9 +25,9 @@
         .paint-modal-card { position:relative; z-index:1; background:#fff; border-radius:0; padding:8px;
             width:100vw; max-width:none; height:100vh; max-height:100vh; overflow:auto; box-shadow:0 24px 60px rgba(0,0,0,.35);
             display:flex; flex-direction:column; }
-        /* Pílula com bolinha de ícone — base compartilhada (Fechar / Salvar / Imprimir).
+        /* Pílula com bolinha de ícone — base compartilhada (Sair / Salvar / Imprimir).
            Geometria + ícone + hover/active aqui; cor é só um modificador --amber/--green/--blue;
-           posição fica na classe de cada botão (.paint-modal-close, .io-bar). */
+           posição fica na classe de cada botão (.io-bar). */
         .pill-btn { display:inline-flex; align-items:center; gap:10px; height:52px; padding:0 22px 0 8px;
             border:0; border-radius:999px; color:#fff; font-family:'Baloo 2',system-ui,sans-serif;
             font-size:1.15rem; font-weight:700; line-height:1; cursor:pointer; transition:transform .15s ease; }
@@ -40,8 +40,6 @@
         .pill-btn--blue   { background:linear-gradient(135deg,#38bdf8,#2563eb); box-shadow:0 12px 28px rgba(37,99,235,0.38); }
         .pill-btn--red    { background:linear-gradient(135deg,#fb7185,#e11d48); box-shadow:0 12px 28px rgba(225,29,72,0.38); }
         .pill-btn--violet { background:linear-gradient(135deg,#a78bfa,#7c3aed); box-shadow:0 12px 28px rgba(124,58,237,0.38); }
-        /* botão fechar: só posicionamento (visual vem de .pill-btn .pill-btn--amber) */
-        .paint-modal-close { position:absolute; top:12px; right:14px; z-index:2; }
         /* Clicar fora não fecha: o card dá uma "tremidinha" avisando. */
         @keyframes paintShake {
             10%,90% { transform:translateX(-2px); }
@@ -82,9 +80,12 @@
         .paint-app .bar-sep { width:2px; align-self:center; height:36px; background:rgba(0,0,0,.18); margin:0 5px; flex:none; border-radius:2px; }
         .paint-app .colors-bar { top:50%; left:var(--canvas-edge); right:auto; transform:translateY(-50%); background:#fff; height:80vh; overflow:auto;
             flex-direction:column; align-items:center; gap:10px; }
-        /* canto superior esquerdo: salvar/imprimir/limpar/abrir — coluna; visual vem de .pill-btn */
-        .paint-app .io-bar { position:absolute; z-index:3; top:12px; left:14px;
+        /* coluna à esquerda (fora do canvas), centralizada na vertical: salvar/imprimir/limpar/abrir + sair; visual vem de .pill-btn */
+        .paint-app .io-bar { position:absolute; z-index:3; top:50%; left:14px; transform:translateY(-50%);
             display:flex; flex-direction:column; align-items:flex-start; gap:10px; }
+        /* Voltar do ateliê: canto superior esquerdo; fecha o modal e volta pra galeria (data-close) */
+        .paint-app .atelie-voltar { position:absolute; top:12px; left:14px; z-index:4; }
+        .paint-app .atelie-voltar .pill-btn__icon svg { width:22px; height:22px; display:block; }
         .paint-app .size-bar { position:absolute; z-index:3; top:50%; right:var(--canvas-edge); left:auto; transform:translateY(-50%);
             background:#fff; border-radius:14px; padding:12px 10px; box-shadow:0 8px 24px rgba(0,0,0,.20);
             display:flex; flex-direction:column; align-items:center; gap:8px; }
@@ -162,6 +163,32 @@
             background:none; color:#2b2f36; border:0; font-family:inherit; font-weight:700; font-size:32px;
             cursor:pointer; transition:transform .12s ease; }
         .paint-app button.act:hover { transform:translateY(-2px); }
+        /* botão "Desenhos prontos" (galeria) + painel de desenhos pré-definidos */
+        .paint-app .gallery-btn i { font-size:32px; }
+        .paint-app .gallery-btn.on { color:var(--accent); }
+        .paint-app .predef-panel { position:absolute; z-index:5; top:78px; left:50%; transform:translateX(-50%);
+            background:#fff; border-radius:16px; padding:14px; box-shadow:0 12px 30px rgba(0,0,0,.25);
+            display:grid; grid-template-columns:repeat(3,86px); gap:12px; max-width:92vw; max-height:70vh; overflow:auto;
+            transform-origin:top center; animation:predefPop .26s cubic-bezier(.34,1.45,.5,1) backwards; }
+        .paint-app .predef-panel[hidden] { display:none; }
+        /* abertura elegante: o painel "salta" do botão (escala+fade) e os cards sobem em cascata */
+        @keyframes predefPop { from { opacity:0; transform:translateX(-50%) translateY(-10px) scale(.9); }
+                               to   { opacity:1; transform:translateX(-50%) translateY(0)     scale(1);  } }
+        @keyframes predefItemUp { from { opacity:0; transform:translateY(8px) scale(.95); }
+                                  to   { opacity:1; transform:none; } }
+        .paint-app .predef-item { display:flex; flex-direction:column; align-items:center; gap:6px;
+            border:2px solid #e3e8ef; border-radius:12px; background:#fff; padding:8px 6px; cursor:pointer;
+            transition:transform .12s ease, border-color .12s ease; font-family:inherit;
+            animation:predefItemUp .3s ease backwards; }
+        .paint-app .predef-item:nth-child(1){ animation-delay:.08s; }
+        .paint-app .predef-item:nth-child(2){ animation-delay:.13s; }
+        .paint-app .predef-item:nth-child(3){ animation-delay:.18s; }
+        .paint-app .predef-item:nth-child(4){ animation-delay:.23s; }
+        .paint-app .predef-item:nth-child(5){ animation-delay:.28s; }
+        .paint-app .predef-item:nth-child(6){ animation-delay:.33s; }
+        .paint-app .predef-item:hover { transform:translateY(-2px); border-color:var(--accent); }
+        .paint-app .predef-item img { width:62px; height:62px; object-fit:contain; }
+        .paint-app .predef-item span { font-size:13px; font-weight:700; color:#334; }
         /* slider vertical: fill por gradiente (enche de baixo até o thumb), thumb redondo custom */
         .paint-app input[type=range] { -webkit-appearance:none; appearance:none; cursor:pointer;
             writing-mode:vertical-lr; direction:rtl; width:16px; height:560px; border-radius:9px;
@@ -196,6 +223,7 @@
         /* Telas estreitas: barras menores, slider deitado, canvas com menos margem */
         @media (max-width:820px) {
             .paint-app .canvas-area { inset:110px 8px 66px 8px; }
+            .paint-app .atelie-voltar { left:8px; }
             .paint-app .tools-bar { max-width:calc(100% - 24px); }
             .paint-app .colors-bar { top:60px; right:12px; left:auto; height:auto; max-width:calc(100% - 24px); transform:none; max-height:none; }
             .paint-app .text-tools { top:auto; bottom:64px; left:12px; }
@@ -220,10 +248,13 @@
 <div class="paint-modal" id="paintModal" hidden>
     <div class="paint-modal-backdrop"></div>
     <div class="paint-modal-card">
-        <button class="pill-btn pill-btn--amber paint-modal-close" type="button" data-close aria-label="Fechar">
-            <span class="pill-btn__icon" aria-hidden="true">✕</span>Fechar
-        </button>
         <div class="paint-app">
+            <!-- Voltar (canto sup. esquerdo): fecha o ateliê e volta pra galeria de desenhos -->
+            <button class="pill-btn pill-btn--amber atelie-voltar" type="button" data-close aria-label="Voltar">
+                <span class="pill-btn__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"></polyline></svg>
+                </span>Voltar
+            </button>
             <!-- canvas grande no centro -->
             <div class="canvas-area">
                 <div class="canvas-wrap">
@@ -242,6 +273,7 @@
                     <button class="tool" data-tool="brush" title="Pincel"><i class="fa-solid fa-paintbrush"></i></button>
                     <button class="tool" data-tool="eraser" title="Borracha"><i class="fa-solid fa-eraser"></i></button>
                     <span class="bar-sep"></span>
+                    <button class="act gallery-btn" id="galleryBtn" type="button" title="Desenhos prontos"><i class="fa-solid fa-stamp"></i></button>
                     <button class="tool shape" data-tool="line" title="Linha"><i class="fa-solid fa-slash"></i></button>
                     <button class="tool shape" data-tool="curve" title="Curva"><i class="fa-solid fa-bezier-curve"></i></button>
                     <button class="tool shape" data-tool="triangle" title="Triângulo">△</button>
@@ -257,6 +289,9 @@
                     <button class="tool shape" data-tool="text" title="Texto (clique pra escrever)"><i class="fa-solid fa-font"></i></button>
                 </div>
             </div>
+
+            <!-- painel de desenhos prontos (flor, etc.): clicar carimba a figura no centro pra mover/redimensionar/colorir -->
+            <div class="predef-panel" id="predefPanel" hidden></div>
 
             <!-- mini-barra de texto (aparece só com a ferramenta Texto) -->
             <div class="bar text-tools" id="textTools" hidden>
@@ -277,7 +312,7 @@
                 <input type="range" id="size" min="2" max="150" value="14">
             </div>
 
-            <!-- canto superior esquerdo: salvar / imprimir / limpar / abrir arquivo -->
+            <!-- coluna à esquerda: salvar / imprimir / limpar / abrir arquivo -->
             <div class="io-bar">
                 <button class="pill-btn pill-btn--green" id="save" type="button"><span class="pill-btn__icon" aria-hidden="true">💾</span>Salvar</button>
                 <button class="pill-btn pill-btn--blue" id="print" type="button"><span class="pill-btn__icon" aria-hidden="true">🖨</span>Imprimir</button>
@@ -403,7 +438,9 @@ paintModal.querySelector('.paint-modal-backdrop').addEventListener('click', () =
 paintCard.addEventListener('animationend', () => paintCard.classList.remove('shake'));
 document.addEventListener('keydown', e => {
     if(paintModal.hidden) return;
+    if(!predefPanel.hidden && e.key==='Escape'){ closePredef(); return; }   // Esc fecha primeiro o painel de desenhos prontos
     if(e.key === 'Enter' && pendingShape){ commitPending(); return; }   // Enter fixa a forma flutuante
+    if((e.key==='Delete'||e.key==='Backspace') && pendingShape && e.target.tagName!=='INPUT'){ e.preventDefault(); cancelPending(); return; }   // Delete apaga a forma flutuante
     if(e.key === 'Escape'){ if(pendingShape){ cancelPending(); return; } if(curvePhase!==0){ endCurve(false); return; } fecharAtelie(); }
     if((e.key==='h'||e.key==='H') && e.target.tagName!=='INPUT'){ const hb=document.querySelector('.tool[data-tool="hand"]'); if(hb){ hb.click(); e.preventDefault(); } return; }
 });
@@ -625,6 +662,11 @@ function drawShapeT(s){
       ctx.beginPath(); ctx.moveTo(-w/2,y); ctx.lineTo(w/2,y); ctx.stroke(); }
     ctx.restore(); return;
   }
+  if(s.type==='predef'){                                     // desenho pronto (line-art PNG): carimba a imagem na caixa
+    const p=PREDEF[s.draw];
+    if(p && p.img) ctx.drawImage(p.img, -s.w/2, -s.h/2, s.w, s.h);
+    ctx.restore(); return;
+  }
   ctx.strokeStyle=`rgb(${color[0]},${color[1]},${color[2]})`;
   ctx.lineWidth=brushSize; ctx.lineCap='round'; ctx.lineJoin='round';
   const hw=s.w/2, hh=s.h/2;
@@ -739,6 +781,7 @@ const HVEC={ e:[1,0], w:[-1,0], n:[0,-1], s:[0,1], ne:[1,-1], nw:[-1,-1], se:[1,
 function applyCursor(mode){                                 // troca o cursor pra deixar claro a ação
   if(!mode){ cv.style.cursor=toolCursor(); return; }
   if(mode==='rotate'){ cv.style.cursor=ROTATE_CURSOR; return; }
+  if(mode==='delete'){ cv.style.cursor='pointer'; return; }
   if(mode==='move'){ cv.style.cursor='move'; return; }
   const [vx,vy]=HVEC[mode], r=pendingShape?pendingShape.rot:0;            // gira o vetor da alça pra tela
   const wx=vx*Math.cos(r)-vy*Math.sin(r), wy=vx*Math.sin(r)+vy*Math.cos(r);
@@ -749,6 +792,7 @@ function toLocal(s,p){ const dx=p.x-s.cx, dy=p.y-s.cy;      // ponteiro no espa�
   const c=Math.cos(-s.rot), sn=Math.sin(-s.rot);
   return { x:dx*c - dy*sn, y:dx*sn + dy*c }; }
 function hitHandle(s,p){ const l=toLocal(s,p), hw=s.w/2, hh=s.h/2;
+  if(Math.hypot(l.x-(hw+24), l.y+hh+24)<=28) return 'delete';            // ✕ vermelho gigante fora do canto sup. direito
   if(Math.hypot(l.x, l.y+hh+ROT_OFF)<=HANDLE_R) return 'rotate';
   const pts=[['nw',-hw,-hh],['ne',hw,-hh],['se',hw,hh],['sw',-hw,hh],     // cantos (largura+altura)
              ['n',0,-hh],['s',0,hh],['e',hw,0],['w',-hw,0]];              // lados (só largura OU altura)
@@ -767,6 +811,12 @@ function renderPending(){ ctx.putImageData(pendingSnapshot,0,0);
   ctx.fillStyle='#fff'; ctx.strokeStyle='#7a7f87'; ctx.lineWidth=1.5;            // alças de canto + lado = tamanho
   [[-hw,-hh],[hw,-hh],[hw,hh],[-hw,hh],[0,-hh],[0,hh],[hw,0],[-hw,0]].forEach(([x,y])=>{
     ctx.beginPath(); ctx.rect(x-7,y-7,14,14); ctx.fill(); ctx.stroke(); });
+  const dlx=hw+24, dly=-hh-24;                                                   // botão ✕ vermelho GIGANTE = apagar a forma
+  ctx.beginPath(); ctx.arc(dlx,dly,26,0,Math.PI*2); ctx.fillStyle='#ef4444'; ctx.fill();
+  ctx.lineWidth=3; ctx.strokeStyle='#fff'; ctx.stroke();
+  ctx.lineCap='round'; ctx.lineWidth=5;
+  ctx.beginPath(); ctx.moveTo(dlx-10,dly-10); ctx.lineTo(dlx+10,dly+10);
+  ctx.moveTo(dlx+10,dly-10); ctx.lineTo(dlx-10,dly+10); ctx.stroke();
   ctx.restore(); }
 function commitPending(){ if(!pendingShape) return;        // fixa: redesenha SEM as alças e grava no undo
   ctx.putImageData(pendingSnapshot,0,0); drawShapeT(pendingShape);
@@ -803,6 +853,7 @@ cv.addEventListener('pointerdown',e=>{ if(tool==='hand'||e.button===1){ panning=
   const p=pos(e);
   if(pendingShape){                          // forma flutuante: alças têm prioridade (qualquer ferramenta)
     const hit=hitHandle(pendingShape,p);
+    if(hit==='delete'){ cancelPending(); return; }   // ✕: apaga a forma flutuante escolhida errada
     if(hit){ dragMode=hit; dragLast=p; applyCursor(hit); cv.setPointerCapture(e.pointerId); return; }
     commitPending();                         // clicou fora: fixa a forma e segue pro comportamento da ferramenta
     if(tool==='text') return;                // não abre novo prompt no mesmo clique que fixou a forma
@@ -829,13 +880,32 @@ cv.addEventListener('pointermove',e=>{ if(panning){ panX+=e.clientX-panLast.x; p
   if(dragMode){ const p=pos(e);
     if(dragMode==='move'){ pendingShape.cx+=p.x-dragLast.x; pendingShape.cy+=p.y-dragLast.y; dragLast=p; }
     else if(dragMode==='rotate'){ pendingShape.rot=Math.atan2(p.y-pendingShape.cy,p.x-pendingShape.cx)+Math.PI/2; }
-    else if(pendingShape.type==='text'){                  // texto: alça escala a fonte (mantém proporção)
-      const l=toLocal(pendingShape,p);
-      const d=Math.hypot(l.x,l.y), d0=Math.hypot(pendingShape.w/2,pendingShape.h/2)||1;
-      pendingShape.fontSize=Math.max(8, pendingShape.fontSize*d/d0); measureText(pendingShape); }
-    else { const l=toLocal(pendingShape,p), m=dragMode;   // canto/lado: redimensiona ancorado no centro
-      if(m!=='n'&&m!=='s') pendingShape.w=Math.max(8,Math.abs(l.x)*2);   // lados n/s não mexem na largura
-      if(m!=='e'&&m!=='w') pendingShape.h=Math.max(8,Math.abs(l.y)*2); } // lados e/w não mexem na altura
+    else if(pendingShape.type==='text'){                  // texto: escala a fonte, ancorando a alça oposta
+      const s=pendingShape, l=toLocal(s,p), h=HVEC[dragMode], hx=h[0], hy=h[1];
+      const hw=s.w/2, hh=s.h/2, ax=-hx*hw, ay=-hy*hh;     // alça oposta (fixa), em local, no tamanho atual
+      const nx=hx?Math.abs(l.x+hx*hw)/2:hw, ny=hy?Math.abs(l.y+hy*hh)/2:hh;
+      const scale = hx&&hy ? Math.hypot(nx,ny)/Math.hypot(hw,hh) : hx ? nx/hw : ny/hh;
+      const c=Math.cos(s.rot), sn=Math.sin(s.rot);
+      const awx=s.cx+(ax*c-ay*sn), awy=s.cy+(ax*sn+ay*c); // alça oposta no mundo (antes de mudar)
+      s.fontSize=Math.max(8, s.fontSize*scale); measureText(s);
+      const bx=-hx*s.w/2, by=-hy*s.h/2;                   // alça oposta no novo tamanho
+      s.cx=awx-(bx*c-by*sn); s.cy=awy-(bx*sn+by*c); }     // recoloca pra a alça oposta ficar parada
+    else { const s=pendingShape, l=toLocal(s,p), h=HVEC[dragMode], hx=h[0], hy=h[1];   // resize ancorado na alça oposta
+      const hw=s.w/2, hh=s.h/2; let nhw=hw, nhh=hh;
+      if(s.type==='predef'){                               // desenho pronto: trava a proporção (não pode esmagar)
+        const ar=hw/hh;
+        if(hx&&hy){ const cw=Math.abs(l.x+hx*hw)/2, ch=Math.abs(l.y+hy*hh)/2;
+          if(cw/hw>=ch/hh){ nhw=cw; nhh=cw/ar; } else { nhh=ch; nhw=ch*ar; } }   // canto: segue o eixo dominante
+        else if(hx){ nhw=Math.abs(l.x+hx*hw)/2; nhh=nhw/ar; }                    // lado E/W: a altura acompanha
+        else { nhh=Math.abs(l.y+hy*hh)/2; nhw=nhh*ar; }                          // lado N/S: a largura acompanha
+        nhw=Math.max(4,nhw); nhh=Math.max(4,nhh);
+      } else {                                             // formas normais: cada eixo livre (pode distorcer)
+        if(hx) nhw=Math.max(4, Math.abs(l.x+hx*hw)/2);
+        if(hy) nhh=Math.max(4, Math.abs(l.y+hy*hh)/2);
+      }
+      const dx=hx*(nhw-hw), dy=hy*(nhh-hh);               // desloca o centro pra borda oposta não sair do lugar
+      const c=Math.cos(s.rot), sn=Math.sin(s.rot);
+      s.cx+=dx*c-dy*sn; s.cy+=dx*sn+dy*c; s.w=nhw*2; s.h=nhh*2; }
     renderPending(); return; }
   if(shaping){ ctx.putImageData(snapshot,0,0); drawShapeT(shapeFromPoints(shapeStart,pos(e),tool)); return; }
   if(!drawing) return; const p=pos(e); paintLine(last,p); last=p; });
@@ -894,6 +964,44 @@ document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>{
   if(tool!=='eraser'&&tool!=='brush') toolRing.style.display='none';
   document.querySelectorAll('.tool').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); });
 cv.style.cursor=toolCursor();                    // ferramenta inicial (balde) já entra com o ícone
+
+/* ===== Desenhos prontos (galeria): carimba uma figura pronta (line-art PNG) como forma flutuante ===== */
+// pra somar mais desenhos depois: é só acrescentar uma entrada { name, src } aqui (PNG preto, fundo branco/transparente).
+const PREDEF = {
+  flower:  { name:'Flor',     src:'colorir/desenhos-prontos/flor.png' },
+  kaco:    { name:'Kaco',     src:'colorir/desenhos-prontos/kaco.png' },
+  cloud:   { name:'Nuvem',    src:'colorir/desenhos-prontos/nuvem.png' },
+  grass:   { name:'Matinho',  src:'colorir/desenhos-prontos/matinho.png' },
+};
+// pré-carrega as imagens e guarda a proporção (pra carimbar sem distorcer)
+Object.values(PREDEF).forEach(p=>{ const img=new Image();
+  img.onload=()=>{ p.img=img; p.ar=img.naturalWidth/img.naturalHeight; }; img.src=p.src; });
+
+// carimba o desenho escolhido no centro do canvas como forma flutuante (mover/girar/escalar/colorir depois)
+function insertPredef(id){ const p=PREDEF[id]; if(!p||!p.img) return;
+  if(curvePhase!==0) endCurve(false);
+  if(pendingShape) commitPending();
+  let w=p.img.naturalWidth, h=p.img.naturalHeight;               // tamanho original do PNG (1:1)
+  const fit=Math.min(1, cv.width*0.9/w, cv.height*0.9/h);        // só reduz se não couber no canvas; nunca amplia
+  w*=fit; h*=fit;
+  if(h<150){ w*=1.5; h*=1.5; }                                   // desenho pequeno (<150px de altura): +50% pra ficar visível
+  pendingSnapshot=ctx.getImageData(0,0,cv.width,cv.height);
+  const m=16;                                                    // entra encostado no canto superior esquerdo (com folga)
+  pendingShape={ type:'predef', draw:id, cx:m+w/2, cy:m+h/2, w, h, rot:0 };
+  renderPending(); }
+
+// painel: um botão por desenho, usando o próprio PNG como prévia
+const galleryBtn=document.getElementById('galleryBtn'), predefPanel=document.getElementById('predefPanel');
+Object.keys(PREDEF).forEach(id=>{ const p=PREDEF[id];
+  const b=document.createElement('button'); b.type='button'; b.className='predef-item';
+  b.innerHTML='<img alt="" src="'+p.src+'"><span>'+p.name+'</span>';
+  b.onclick=()=>{ insertPredef(id); closePredef(); };
+  predefPanel.appendChild(b); });
+function openPredef(){ predefPanel.hidden=false; galleryBtn.classList.add('on'); }
+function closePredef(){ predefPanel.hidden=true; galleryBtn.classList.remove('on'); }
+galleryBtn.onclick=e=>{ e.stopPropagation(); predefPanel.hidden ? openPredef() : closePredef(); };
+predefPanel.addEventListener('click',e=>e.stopPropagation());
+document.addEventListener('click',()=>{ if(!predefPanel.hidden) closePredef(); });   // clicar fora (canvas/ferramenta) fecha
 const sizeEl=document.getElementById('size');
 function syncSizeFill(){ const pct=(sizeEl.value-sizeEl.min)/(sizeEl.max-sizeEl.min)*100;
   sizeEl.style.setProperty('--p', pct+'%'); }                 // preenche de baixo até o thumb

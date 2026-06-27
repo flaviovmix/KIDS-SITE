@@ -6,7 +6,7 @@
     <title>Kaco — Histórias do Macaquinho</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Chewy&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -123,7 +123,7 @@
 <!-- (resto da página vem depois) -->
 <main class="content">
 
-    <section id="personagens" class="section section-tint">
+    <section id="personagens" class="section section-light">
         <div class="section-inner">
             <h2 class="section-title">Personagens</h2>
             <p class="section-text section-intro">
@@ -184,6 +184,14 @@
 
             <!-- palco do detalhe (desliza conforme a miniatura ativa) -->
             <div class="char-stage">
+                <!-- setas pra trocar de personagem sem subir até as miniaturas (dão a volta).
+                     Estilo da família kids-back/kids-fwd: prev = Voltar (âmbar/rosa), next = Avançar (azul/índigo) -->
+                <button class="char-nav prev" type="button" data-char-nav="prev" aria-label="Personagem anterior">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"></polyline></svg>
+                </button>
+                <button class="char-nav next" type="button" data-char-nav="next" aria-label="Próximo personagem">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"></polyline></svg>
+                </button>
                 <!-- imagem solta do carrossel, posicionada fora do card -->
                 <div class="char-float-frame" data-char-float-frame>
                     <img class="char-float" data-char-float alt="">
@@ -195,56 +203,56 @@
                             <div class="char-panel-text">
                                 <h3 class="char-panel-name">Kaco</h3>
                                 <p class="char-panel-desc">Curioso e cheio de energia, o Kaco sente tudo com intensidade. No tempo dele, ele aprende a lidar com cada emoção do dia.</p>
-                                <a class="btn-saiba-mais" href="personagens.html?p=kaco">Ver histórias</a>
+                                <a class="btn-saiba-mais" href="personagens.html?p=kaco">Vamos brincar?</a>
                             </div>
                         </article>
                         <article class="char-panel" style="--accent:#e0729e;--accent2:#f7d9e8;">
                             <div class="char-panel-text">
                                 <h3 class="char-panel-name">Mãe</h3>
                                 <p class="char-panel-desc">Carinhosa e paciente, a Mãe acolhe o Kaco e ajuda ele a entender o que sente. Um colo seguro pra qualquer hora.</p>
-                                <a class="btn-saiba-mais" href="personagens.html?p=mae">Ver histórias</a>
+                                <a class="btn-saiba-mais" href="personagens.html?p=mae">Vem pro meu colo!</a>
                             </div>
                         </article>
                         <article class="char-panel" style="--accent:#f0922b;--accent2:#fbe3c4;">
                             <div class="char-panel-text">
                                 <h3 class="char-panel-name">Gato</h3>
                                 <p class="char-panel-desc">Esperto e brincalhão, o Gato adora uma boa correria pelo jardim. Sempre pronto pra mais uma travessura.</p>
-                                <a class="btn-saiba-mais" href="personagens.html?p=gato">Ver histórias</a>
+                                <a class="btn-saiba-mais" href="personagens.html?p=gato">Bora aprontar?</a>
                             </div>
                         </article>
                         <article class="char-panel" style="--accent:#6f7bd1;--accent2:#d3d8f5;">
                             <div class="char-panel-text">
                                 <h3 class="char-panel-name">Rato</h3>
                                 <p class="char-panel-desc">Pequeno e ligeiro, o Rato escapa de qualquer enrascada com um sorriso. Vive inventando brincadeira no mato.</p>
-                                <a class="btn-saiba-mais" href="personagens.html?p=rato">Ver histórias</a>
+                                <a class="btn-saiba-mais" href="personagens.html?p=rato">Vem me pegar!</a>
                             </div>
                         </article>
                         <article class="char-panel" style="--accent:#2aa9e0;--accent2:#c7e9f7;">
                             <div class="char-panel-text">
                                 <h3 class="char-panel-name">Pato</h3>
                                 <p class="char-panel-desc">Animado e tagarela, o Pato faz a maior algazarra por onde passa. Adora rir alto com os amigos.</p>
-                                <a class="btn-saiba-mais" href="personagens.html?p=pato">Ver histórias</a>
+                                <a class="btn-saiba-mais" href="personagens.html?p=pato">Vem fazer bagunça!</a>
                             </div>
                         </article>
                         <article class="char-panel" style="--accent:#ec5a5a;--accent2:#fad1d1;">
                             <div class="char-panel-text">
                                 <h3 class="char-panel-name">Pai</h3>
                                 <p class="char-panel-desc">Paciente e presente, o Pai ensina sem pressa e segura firme até o Kaco conseguir sozinho. Um colo seguro pra cair e tentar de novo.</p>
-                                <a class="btn-saiba-mais" href="personagens.html?p=pai">Ver histórias</a>
+                                <a class="btn-saiba-mais" href="personagens.html?p=pai">Vem que eu te ajudo!</a>
                             </div>
                         </article>
                         <article class="char-panel" style="--accent:#9b6fd1;--accent2:#e0cdf5;">
                             <div class="char-panel-text">
                                 <h3 class="char-panel-name">Motorista</h3>
                                 <p class="char-panel-desc">Simpático e tranquilo, o Motorista leva todo mundo em segurança e sempre tem um aceno gentil. Uma capivara que conhece cada paradinha do caminho.</p>
-                                <a class="btn-saiba-mais" href="personagens.html?p=motorista">Ver histórias</a>
+                                <a class="btn-saiba-mais" href="personagens.html?p=motorista">Bora dar uma volta?</a>
                             </div>
                         </article>
                         <article class="char-panel" style="--accent:#5bbf6a;--accent2:#c4ecca;">
                             <div class="char-panel-text">
                                 <h3 class="char-panel-name">Tio Thiago</h3>
                                 <p class="char-panel-desc">Calmo e atencioso, o Tio Thiago transforma a terapia em brincadeira e ajuda o Kaco a lidar com o que sente. Cada conquista vira motivo de festa.</p>
-                                <a class="btn-saiba-mais" href="personagens.html?p=terapeuta">Ver histórias</a>
+                                <a class="btn-saiba-mais" href="personagens.html?p=terapeuta">Vem brincar comigo!</a>
                             </div>
                         </article>
                     </div>

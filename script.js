@@ -379,12 +379,14 @@ function createInfiniteCarousel(config) {
             // índices (data-index) dos personagens visíveis no filtro atual, em ordem.
             // O slide do painel é por posição VISÍVEL: o N-ésimo visível fica em N*100%.
             let order = [];
+            let current = null;   // personagem (data-index) ativo, pra navegar prev/next
 
             const thumbByIndex = (idx) => allOriginalThumbs.find(t => Number(t.dataset.index) === idx);
 
             function select(charIndex) {
                 const pos = order.indexOf(charIndex);
                 if (pos < 0) return;
+                current = charIndex;
                 track.style.marginLeft = '-' + (pos * 100) + '%';
                 // marca ativo em TODAS as cópias (original + clones do loop) do personagem
                 thumbsTrack.querySelectorAll('.char-thumb').forEach((t) => {
@@ -452,6 +454,19 @@ function createInfiniteCarousel(config) {
             chips.forEach((chip) => {
                 chip.addEventListener('click', () => applyFilter(chip.dataset.cond || 'all'));
             });
+
+            // setas prev/next do palco: andam pela ordem visível do filtro, dando a volta
+            function step(dir) {
+                if (!order.length) return;
+                const pos = order.indexOf(current);
+                const base = pos < 0 ? 0 : pos;
+                const next = (base + dir + order.length) % order.length;
+                select(order[next]);
+            }
+            const navPrev = showcase.querySelector('[data-char-nav="prev"]');
+            const navNext = showcase.querySelector('[data-char-nav="next"]');
+            if (navPrev) navPrev.addEventListener('click', () => step(-1));
+            if (navNext) navNext.addEventListener('click', () => step(1));
 
             applyFilter('all');
         });
