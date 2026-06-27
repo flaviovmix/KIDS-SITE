@@ -356,7 +356,8 @@ function createInfiniteCarousel(config) {
             const thumbsCarousel = showcase.querySelector('[data-char-thumbs-carousel]');
             const thumbsViewport = showcase.querySelector('.char-thumbs-viewport');
             const thumbsTrack = showcase.querySelector('.char-thumbs');
-            const allOriginalThumbs = Array.from(showcase.querySelectorAll('.char-thumb'));
+            // só as miniaturas dentro do track (exclui o ★Todos, que fica fora da fileira)
+            const allOriginalThumbs = Array.from(showcase.querySelectorAll('.char-thumbs .char-thumb'));
             const panels = Array.from(showcase.querySelectorAll('.char-panel'));
             const chips = Array.from(showcase.querySelectorAll('[data-char-filtros] .chip'));
             const float = showcase.querySelector('[data-char-float]');

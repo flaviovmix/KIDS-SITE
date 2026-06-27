@@ -18,6 +18,21 @@
         /* Divisória entre a imagem e o texto do card. */
         .hist-body { border-top:2px solid rgba(var(--shadow-rgb),0.55); }
 
+        /* Grid centralizado: com poucos desenhos os cards não ficam jogados à esquerda.
+           Colunas com teto de largura (~340px) + justify-content centram tanto 1 card
+           quanto a fileira cheia de 3 (e as 2 fileiras quando chega a 6). */
+        .hist-grid { justify-content:center; }
+        @media (min-width:640px){ .hist-grid { grid-template-columns:repeat(2, minmax(0,340px)); } }
+        @media (min-width:980px){ .hist-grid { grid-template-columns:repeat(3, minmax(0,340px)); } }
+        /* Filtro sem desenho: a mensagem de vazio fica AO LADO do card "Desenhe ou
+           carregue" (ele aparece sempre), ocupando as colunas restantes da fileira —
+           não numa faixa embaixo. Estica na altura do card e centra o conteúdo. No
+           mobile (1 coluna) volta pra baixo, largura cheia (regra base do style.css). */
+        @media (min-width:640px){
+            .hist-empty { grid-column:2 / -1; display:flex; flex-direction:column;
+                align-items:center; justify-content:center; }
+        }
+
         /* ===== Modal do ateliê de pintura ===== */
         .paint-modal { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; padding:0; }
         .paint-modal[hidden] { display:none; }
@@ -376,12 +391,17 @@
         hint: 'Clique num personagem pra filtrar ↗',
         acaoLabel: 'Colorir →',
         categorias: window.KIDS_CATEGORIAS,
-        filtros: { kaco: window.KIDS_PERSONAGENS.kaco },   // só Kaco por enquanto (add outros quando tiver desenho deles)
-        semCarrossel: true,   // 1 personagem só: ícone do Kaco sozinho, sem slide
-        semTodos: true,       // e sem o botão "Todos"
+        filtros: window.KIDS_PERSONAGENS,   // todos os personagens; quem não tem desenho cai na mensagem de vazio
+        max: 5,                             // teto de desenhos reais; + o card "Desenhe ou carregue" (sempre) = 6 no total
+        vazio: {                            // mensagem quando o personagem não tem nenhum desenho
+            emoji: '🎨🐵✨',
+            titulo: 'Ainda não tem desenho do {nome} pra colorir!',
+            sub: 'Logo logo vem mais. Que tal desenhar o seu? 👇',
+        },
         itens: [
-            // 1º card especial: começa em branco e é o ÚNICO que aceita abrir arquivo.
-            { t: 'Desenhe ou carregue', cat: 'Colorir', blank: true, filtros: ['kaco'],
+            // Card universal (blank): começa em branco, aceita abrir arquivo e aparece
+            // em QUALQUER personagem; não conta como desenho pra mensagem de vazio.
+            { t: 'Desenhe ou carregue', cat: 'Colorir', blank: true,
               link: '#', desc: 'Comece do zero ou abra uma imagem sua.',
               img: 'data:image/svg+xml,' + encodeURIComponent(
                 '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">' +

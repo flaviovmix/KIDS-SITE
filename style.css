@@ -40,7 +40,9 @@
 
 /* ===== Reset básico ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; overflow-x: hidden; }
+/* overflow-x: clip (não hidden) — clipa o vazamento horizontal do hero SEM criar
+   scroll container, senão o position:sticky da barra de personagem não engata. */
+html, body { width: 100%; overflow-x: clip; }
 body {
     font-family: 'Baloo 2', system-ui, sans-serif;
     color: #1a3a5c;
@@ -619,6 +621,39 @@ body {
 .char-showcase {
     margin-top: 36px;
 }
+
+/* ===== Seletor de personagem — barra sticky no topo da home ===== */
+.char-bar {
+    position: sticky;
+    top: 80px;                       /* fallback; o JS mede a altura real do menu e ajusta */
+    z-index: 40;                     /* abaixo do menu (50), acima do conteúdo */
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: saturate(180%) blur(16px);
+    -webkit-backdrop-filter: saturate(180%) blur(16px);
+    border-bottom: 1px solid rgba(var(--shadow-rgb),0.08);
+    box-shadow: 0 8px 20px rgba(var(--shadow-rgb),0.06);
+}
+.char-bar-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 8px 24px 10px;
+}
+.char-bar .char-filtros { margin: 0 0 6px; max-width: none; left: 0; justify-content: center; }
+.char-thumbs-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+}
+.char-thumbs-row .char-thumbs-carousel { flex: 1 1 auto; min-width: 0; margin-top: 0; }
+/* miniaturas compactas dentro da barra (menores = cabem mais personagens) */
+.char-bar .char-thumb { gap: 4px; padding: 2px; }
+.char-bar .char-thumbs { gap: 10px; }
+.char-bar .char-thumb-pic { width: 50px; height: 50px; border-width: 2px; }
+.char-bar .char-thumb-name { font-size: 0.72rem; }
+.char-bar .char-thumb-all { --accent: var(--c-ink); }
+.char-bar .char-thumb-allmark { font-size: 24px; }
+.char-bar .char-thumbs-viewport { padding: 6px 0 4px; }
 /* filtros por condição (chips) acima das miniaturas */
 .char-filtros {
     display: flex;
@@ -716,6 +751,9 @@ body {
     max-width: 1100px;
     overflow: visible;             /* deixa a imagem vazar pra fora do card */
 }
+/* o sticker do personagem vaza pra cima (~250px); empurra o destaque pra baixo
+   pra não bater na barra sticky logo no topo. ajuste o nº se cortar/sobrar. */
+#personagens .char-stage { margin-top: 220px; }
 /* setas prev/next do palco: trocam de personagem sem subir até as miniaturas.
    Mesmo estilo divertido da família kids-back/kids-fwd (gradiente + chevron branco).
    Gigantes, coladas na base dos personagens. prev = Voltar (âmbar/rosa), next = Avançar (azul/índigo). */
@@ -1436,6 +1474,67 @@ body {
 }
 @media (min-width: 980px) {
     .hist-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Home "Colorir": aqui o .hist-grid fica full-bleed na section (sem o wrapper de
+   1100px das páginas dedicadas), então as 3 colunas esticam e 1 card sozinho
+   estoura. Limita largura, centraliza e cap nas colunas — igual aos outros grids
+   da home (.familia-cards). ID pra não vazar pras páginas de coleção. */
+/* Grids das seções da home que espelham as páginas dedicadas (Colorir e Brincar de
+   Montar): contidos em 1100px, centrados, colunas com teto de 340px e cards com a
+   mesma borda das páginas. Mensagem de vazio fica ao lado do card "livre" (blank). */
+#homeColorirGrid, #homeMontarGrid, #homeHistoriasGrid { max-width: 1100px; margin: 28px auto 0; justify-content: center; }
+@media (min-width: 640px) {
+    #homeColorirGrid, #homeMontarGrid, #homeHistoriasGrid { grid-template-columns: repeat(2, minmax(0, 340px)); }
+}
+@media (min-width: 980px) {
+    #homeColorirGrid, #homeMontarGrid, #homeHistoriasGrid { grid-template-columns: repeat(3, minmax(0, 340px)); }
+}
+#homeColorirGrid .hist-card, #homeMontarGrid .hist-card, #homeHistoriasGrid .hist-card { border: 4px solid rgba(var(--shadow-rgb), 0.55); }
+#homeColorirGrid .hist-body, #homeMontarGrid .hist-body, #homeHistoriasGrid .hist-body { border-top: 2px solid rgba(var(--shadow-rgb), 0.55); }
+/* Mensagem de vazio ao lado do card "livre" (colunas restantes), não numa faixa
+   embaixo. No mobile (1 coluna) volta pra baixo, largura cheia (regra base). */
+@media (min-width: 640px) {
+    #homeColorirGrid .hist-empty, #homeMontarGrid .hist-empty { grid-column: 2 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+}
+
+/* Estado vazio do grid (filtro sem nenhum card) — alegre e colorido, ocupa a linha toda */
+.hist-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 48px 24px;
+    border-radius: 28px;
+    background: linear-gradient(135deg, #fff4d6, #ffe0ef 45%, #e3f0ff);
+    border: 4px dashed #ffb3d1;
+    animation: histEmptyPop 0.4s cubic-bezier(.34,1.56,.64,1) both;
+}
+.hist-empty-emoji {
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 14px;
+    animation: histEmptyWiggle 2.4s ease-in-out infinite;
+}
+.hist-empty-title {
+    margin: 0 auto 6px;
+    max-width: 24ch;
+    font-family: 'Baloo 2', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    color: #d6336c;
+}
+.hist-empty-sub {
+    margin: 0 auto;
+    max-width: 32ch;
+    font-size: 1.05rem;
+    color: #56708a;
+}
+@keyframes histEmptyPop {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+}
+@keyframes histEmptyWiggle {
+    0%, 100% { transform: rotate(-6deg); }
+    50%      { transform: rotate(6deg); }
 }
 
 .hist-card {
@@ -2299,6 +2398,9 @@ a.home-audio-title:hover { text-decoration: underline; text-decoration-color: va
     text-decoration: none;
 }
 .home-audio-more:hover { color: var(--c-ink); }
+/* Mensagem de vazio da Áudio-histórias: ocupa a fileira toda da lista flex (como o
+   "Ouvir todas"), pra a seção não sumir quando o personagem não tem áudio. */
+.home-audio-list .hist-empty { flex-basis: 100%; }
 
 /* Intro mais largo que o padrão (640px) pra dar respiro lateral ao texto. */
 .section-inner .section-intro { max-width: 880px; }

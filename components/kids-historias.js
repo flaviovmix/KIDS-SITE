@@ -38,6 +38,8 @@
         // Rótulo do botão: default da página (cfg.acaoLabel). Num grid misto cada card
         // pode sobrescrever com h.acao ("Ler →" / "Colorir →" / "Montar →").
         const acaoLabel = cfg.acaoLabel || 'Ler →';
+        const MAX = cfg.max || Infinity;     // teto de cards por filtro (mostra os últimos)
+        const vazioCfg = cfg.vazio || null;  // mensagem quando o filtro não tem nenhum card
 
         // Dois modos de filtro:
         //  - categoria (default): chips = cfg.categorias, 1 valor por card (h.cat)
@@ -121,10 +123,7 @@
                 // marca ativo em TODAS as cópias do filtro (original + clones do carrossel)
                 chips.querySelectorAll('[data-filter]').forEach(c => c.classList.remove(classeAtiva));
                 chips.querySelectorAll('[data-filter="' + f + '"]').forEach(c => c.classList.add(classeAtiva));
-                grid.querySelectorAll('.hist-card').forEach(c => {
-                    const chavesCard = (c.dataset.filtros || '').split(' ');
-                    c.style.display = (f === 'all' || chavesCard.indexOf(f) !== -1) ? '' : 'none';
-                });
+                applyFilter(f);
             });
         } else {
             section.querySelector('.hist-controls').style.display = 'none';
@@ -156,6 +155,53 @@
                 </div>`;
             grid.appendChild(a);
         });
+
+        /* Estado vazio + teto de cards. O card "Desenhe ou carregue" (h.blank) é
+           universal: aparece em QUALQUER filtro e NÃO conta como desenho (por isso a
+           mensagem de vazio o ignora). O teto mostra só os ÚLTIMOS MAX que batem. */
+        const vazio = document.createElement('div');
+        vazio.className = 'hist-empty';
+        vazio.style.display = 'none';
+        grid.appendChild(vazio);
+
+        function applyFilter(f) {
+            const visiveis = [];
+            grid.querySelectorAll('.hist-card').forEach(c => {
+                if (c.dataset.blank === '1') { c.style.display = ''; return; }  // blank: sempre
+                const chavesCard = (c.dataset.filtros || '').split(' ');
+                const bate = f === 'all' || chavesCard.indexOf(f) !== -1;
+                if (bate) { visiveis.push(c); c.style.display = ''; }
+                else { c.style.display = 'none'; }
+            });
+            // teto: dos que batem, mostra só os últimos MAX
+            if (visiveis.length > MAX) {
+                const corte = visiveis.length - MAX;
+                visiveis.forEach((c, i) => { c.style.display = i < corte ? 'none' : ''; });
+            }
+            // vazio: nenhum desenho de verdade (o blank não conta)
+            if (visiveis.length === 0) {
+                const nome = (chipDefs[f] && chipDefs[f].nome) || '';
+                vazio.innerHTML = renderVazio(nome);
+                vazio.style.display = '';
+            } else {
+                vazio.style.display = 'none';
+            }
+        }
+
+        function renderVazio(nome) {
+            const tpl = vazioCfg || {
+                emoji: '🐵✨',
+                titulo: nome ? 'Ainda não tem nada do {nome} aqui!' : 'Ainda não tem nada aqui!',
+                sub: 'Logo logo vem mais. 💛',
+            };
+            const titulo = (tpl.titulo || '').replace('{nome}', nome);
+            const sub = (tpl.sub || '').replace('{nome}', nome);
+            return '<div class="hist-empty-emoji">' + (tpl.emoji || '✨') + '</div>' +
+                   '<p class="hist-empty-title">' + titulo + '</p>' +
+                   (sub ? '<p class="hist-empty-sub">' + sub + '</p>' : '');
+        }
+
+        applyFilter('all');  // estado inicial: teto + vazio já valendo no load
 
         // Pré-seleção via URL (?p=<chave>) — DEPOIS de montar os cards (senão não há
         // card pra filtrar). Ex: "Ver histórias" de um personagem abre já filtrado.
