@@ -121,22 +121,23 @@
 </header>
 
 <!-- (resto da página vem depois) -->
-<main class="content">
+<main class="content" data-char-showcase>
 
-    <section id="personagens" class="section section-light">
-        <div class="section-inner">
-            <h2 class="section-title">Personagens</h2>
-            <p class="section-text section-intro">
-                Conhece a turma do Kaco. Cada um com seu jeito de ser.
-            </p>
-        </div>
-        <div class="char-showcase" data-char-showcase>
+    <!-- Seletor de personagem: barra sticky no topo. ★Todos (sem filtro) + avatares.
+         Escolher um personagem destaca ele abaixo; o filtro das seções entra no passo 4. -->
+    <div class="char-bar" data-char-bar>
+        <div class="char-bar-inner">
             <!-- filtros por condição (reusa .chip da página de histórias) -->
             <div class="char-filtros" data-char-filtros role="group" aria-label="Filtrar personagens">
                 <button class="chip active" type="button" data-cond="all">Todos</button>
                 <button class="chip" type="button" data-cond="autismo">Autismo</button>
                 <button class="chip" type="button" data-cond="paralisia">Paralisia</button>
             </div>
+            <div class="char-thumbs-row">
+                <button class="char-thumb char-thumb-all" type="button" data-char-pick="all" aria-label="Mostrar todos os personagens">
+                    <span class="char-thumb-pic"><span class="char-thumb-allmark">★</span></span>
+                    <span class="char-thumb-name">Todos</span>
+                </button>
             <!-- fileira de miniaturas (carrossel infinito; passe o mouse / arraste) -->
             <div class="char-thumbs-carousel" data-char-thumbs-carousel>
               <div class="char-thumbs-stage">
@@ -181,9 +182,13 @@
                 <button class="carousel-arrow right" id="charThumbsRight" type="button" aria-label="Mover para a direita">›</button>
               </div>
             </div>
+            </div><!-- /.char-thumbs-row -->
+        </div><!-- /.char-bar-inner -->
+    </div><!-- /.char-bar -->
 
-            <!-- palco do detalhe (desliza conforme a miniatura ativa) -->
-            <div class="char-stage">
+    <section id="personagens" class="section section-light">
+        <!-- palco do detalhe (desliza conforme a miniatura ativa) -->
+        <div class="char-stage">
                 <!-- setas pra trocar de personagem sem subir até as miniaturas (dão a volta).
                      Estilo da família kids-back/kids-fwd: prev = Voltar (âmbar/rosa), next = Avançar (azul/índigo) -->
                 <button class="char-nav prev" type="button" data-char-nav="prev" aria-label="Personagem anterior">
@@ -270,7 +275,6 @@
                     <div class="char-stage-video"><iframe src="https://www.youtube.com/embed/zmoG7P3nanM" title="Vídeo do personagem" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
                 </div>
             </div>
-        </div>
         <div class="familia-cta">
             <a class="familia-btn" href="personagens.html">Ver todos os personagens →</a>
         </div>
@@ -290,7 +294,161 @@
         </div>
     </section>
 
-    <section id="rotina" class="section section-light">
+    <section id="colorir" class="section section-light" data-filter-section>
+        <div class="section-inner">
+            <h2 class="section-title">Colorir</h2>
+            <p class="section-text section-intro">
+                Desenhos de linha pra pintar do jeito da criança: clique e escolha a cor, ou
+                carregue um desenho seu. No ritmo de cada um.
+            </p>
+        </div>
+        <!-- Cards reais de colorir, montados de KIDS_COLORIR (fonte única em kids-stories.js) -->
+        <div class="hist-grid" id="homeColorirGrid"></div>
+        <div class="familia-cta">
+            <a class="familia-btn" href="colorir.html">Abrir o ateliê de pintura →</a>
+        </div>
+    </section>
+
+    <section id="quebra-cabeca" class="section section-tint" data-filter-section>
+        <div class="section-inner">
+            <h2 class="section-title">Brincar de Montar</h2>
+            <p class="section-text section-intro">
+                Quebra-cabeças com as figuras do mundo do Kaco. Arrastar e encaixar as peças
+                ajuda na atenção e na coordenação, no ritmo da criança.
+            </p>
+        </div>
+        <!-- Cards reais de quebra-cabeça, montados de KIDS_STORIES (mesma fonte da
+             página quebra-cabeca.html) + card "Quebra-cabeça livre". -->
+        <div class="hist-grid" id="homeMontarGrid"></div>
+        <div class="familia-cta">
+            <a class="familia-btn" href="quebra-cabeca.html">Ver todos os quebra-cabeças →</a>
+        </div>
+    </section>
+
+    <section id="historias" class="section section-light" data-filter-section>
+        <div class="section-inner">
+            <h2 class="section-title">Histórias</h2>
+            <p class="section-text section-intro">
+                Histórias curtinhas e ilustradas do Kaco e da turma. Cada uma no ritmo de quem lê.
+            </p>
+        </div>
+        <!-- Cards reais de histórias, montados de KIDS_STORIES (mesma fonte da
+             página historias.html). Sem card "livre" (não dá pra criar história). -->
+        <div class="hist-grid" id="homeHistoriasGrid"></div>
+        <div class="familia-cta">
+            <a class="familia-btn" href="historias.html">Ver todas as histórias →</a>
+        </div>
+    </section>
+
+    <section id="audios" class="section section-tint" data-filter-section>
+        <div class="section-inner">
+            <h2 class="section-title">Áudio-histórias</h2>
+            <p class="section-text section-intro">
+                Modo de escutar pra quem cansa visualmente, está aprendendo a ler, ou prefere ouvir.
+                Transcrição sempre visível pra acompanhar.
+            </p>
+        </div>
+        <div class="home-audio-list">
+            <div class="home-audio-item" data-chars="kaco mae" style="--c:var(--c-blue)">
+                <img class="home-audio-thumb" src="img-slide/0 (1).png" alt="O Passeio Feliz">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">O Passeio Feliz</a>
+                    <span class="home-audio-desc">Um passeio com a mamãe que vira brincadeira no caminho.</span>
+                    <span class="home-audio-row">
+                        <small>Rotina · 3:12</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/o-passeio-feliz.m4a"></audio>
+            </div>
+            <div class="home-audio-item" data-chars="kaco" style="--c:var(--c-blue)">
+                <img class="home-audio-thumb" src="img-slide/0 (2).png" alt="A Mochila Esquecida">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">A Mochila Esquecida</a>
+                    <span class="home-audio-desc">Esquecer faz parte, e quase tudo tem solução com calma.</span>
+                    <span class="home-audio-row">
+                        <small>Rotina · 2:48</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/a-mochila-esquecida.m4a"></audio>
+            </div>
+            <div class="home-audio-item" data-chars="gato rato pato" style="--c:var(--c-green)">
+                <img class="home-audio-thumb" src="img-slide/0 (3).png" alt="Brincando no Parque">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">Brincando no Parque</a>
+                    <span class="home-audio-desc">Esperar a vez e dividir o balanço com a turma toda.</span>
+                    <span class="home-audio-row">
+                        <small>Aventura · 4:05</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/brincando-no-parque.m4a"></audio>
+            </div>
+            <div class="home-audio-item" data-chars="kaco" style="--c:var(--c-amber)">
+                <img class="home-audio-thumb" src="img-slide/0 (4).png" alt="Aniversário Surpresa">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">Aniversário Surpresa</a>
+                    <span class="home-audio-desc">Uma festa inesperada e o coração batendo forte de surpresa.</span>
+                    <span class="home-audio-row">
+                        <small>Emoções · 3:30</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/aniversario-surpresa.m4a"></audio>
+            </div>
+            <div class="home-audio-item" data-chars="kaco" style="--c:var(--c-amber)">
+                <img class="home-audio-thumb" src="img-slide/0 (5).png" alt="Dia de Chuva">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">Dia de Chuva</a>
+                    <span class="home-audio-desc">O passeio foi cancelado, mas dá pra achar diversão dentro de casa.</span>
+                    <span class="home-audio-row">
+                        <small>Emoções · 2:55</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/dia-de-chuva.m4a"></audio>
+            </div>
+            <!-- Mensagem quando o personagem filtrado não tem áudio (toggle em apply()).
+                 Sem card "livre" aqui (não dá pra criar áudio); só a mensagem segura a seção. -->
+            <div class="hist-empty" style="display:none"
+                 data-emoji="🎧🐵✨"
+                 data-titulo="Ainda não tem áudio-história do {nome}!"
+                 data-sub="Logo logo vem mais. 💛"></div>
+            <a class="home-audio-more" href="audio-historias.html">Ouvir todas →</a>
+        </div>
+    </section>
+
+    <section id="aprender" class="section section-light">
+        <div class="section-inner">
+            <h2 class="section-title">Aprender</h2>
+            <p class="section-text section-intro">
+                Números e continhas brincando com o Kaco, um pouquinho de cada vez, no ritmo da criança.
+            </p>
+        </div>
+        <div class="familia-cards">
+            <a class="familia-card" href="aprender.html" style="--c:var(--c-green)">
+                <span class="familia-emoji">➕</span>
+                <h3>Somar</h3>
+                <p>Juntar quantidades, um pouquinho de cada vez, em três níveis.</p>
+            </a>
+            <a class="familia-card" href="aprender.html" style="--c:var(--c-blue)">
+                <span class="familia-emoji">➖</span>
+                <h3>Subtrair</h3>
+                <p>Tirar e descobrir quanto sobra, no ritmo do Kaco.</p>
+            </a>
+        </div>
+        <div class="familia-cta">
+            <a class="familia-btn" href="aprender.html">Abrir o Aprender →</a>
+        </div>
+    </section>
+
+    <section id="rotina" class="section section-tint">
         <div class="section-inner">
             <h2 class="section-title">Criança tem que ser Criança</h2>
             <p class="section-text section-intro">
@@ -403,84 +561,6 @@
         </div>
     </section>
 
-    <section id="audios" class="section section-tint">
-        <div class="section-inner">
-            <h2 class="section-title">Áudio-histórias</h2>
-            <p class="section-text section-intro">
-                Modo de escutar pra quem cansa visualmente, está aprendendo a ler, ou prefere ouvir.
-                Transcrição sempre visível pra acompanhar.
-            </p>
-        </div>
-        <div class="home-audio-list">
-            <div class="home-audio-item" style="--c:var(--c-blue)">
-                <img class="home-audio-thumb" src="img-slide/0 (1).png" alt="O Passeio Feliz">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">O Passeio Feliz</a>
-                    <span class="home-audio-desc">Um passeio com a mamãe que vira brincadeira no caminho.</span>
-                    <span class="home-audio-row">
-                        <small>Rotina · 3:12</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/o-passeio-feliz.m4a"></audio>
-            </div>
-            <div class="home-audio-item" style="--c:var(--c-blue)">
-                <img class="home-audio-thumb" src="img-slide/0 (2).png" alt="A Mochila Esquecida">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">A Mochila Esquecida</a>
-                    <span class="home-audio-desc">Esquecer faz parte, e quase tudo tem solução com calma.</span>
-                    <span class="home-audio-row">
-                        <small>Rotina · 2:48</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/a-mochila-esquecida.m4a"></audio>
-            </div>
-            <div class="home-audio-item" style="--c:var(--c-green)">
-                <img class="home-audio-thumb" src="img-slide/0 (3).png" alt="Brincando no Parque">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">Brincando no Parque</a>
-                    <span class="home-audio-desc">Esperar a vez e dividir o balanço com a turma toda.</span>
-                    <span class="home-audio-row">
-                        <small>Aventura · 4:05</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/brincando-no-parque.m4a"></audio>
-            </div>
-            <div class="home-audio-item" style="--c:var(--c-amber)">
-                <img class="home-audio-thumb" src="img-slide/0 (4).png" alt="Aniversário Surpresa">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">Aniversário Surpresa</a>
-                    <span class="home-audio-desc">Uma festa inesperada e o coração batendo forte de surpresa.</span>
-                    <span class="home-audio-row">
-                        <small>Emoções · 3:30</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/aniversario-surpresa.m4a"></audio>
-            </div>
-            <div class="home-audio-item" style="--c:var(--c-amber)">
-                <img class="home-audio-thumb" src="img-slide/0 (5).png" alt="Dia de Chuva">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">Dia de Chuva</a>
-                    <span class="home-audio-desc">O passeio foi cancelado, mas dá pra achar diversão dentro de casa.</span>
-                    <span class="home-audio-row">
-                        <small>Emoções · 2:55</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/dia-de-chuva.m4a"></audio>
-            </div>
-            <a class="home-audio-more" href="audio-historias.html">Ouvir todas →</a>
-        </div>
-    </section>
-
     <section id="emocoes" class="section section-light">
         <div class="section-inner">
             <h2 class="section-title">Lidando com Emoções</h2>
@@ -575,36 +655,6 @@
         </div>
     </section>
 
-    <section id="quebra-cabeca" class="section section-light">
-        <div class="section-inner">
-            <h2 class="section-title">Brincar de Montar</h2>
-            <p class="section-text section-intro">
-                Quebra-cabeças com as figuras do mundo do Kaco. Arrastar e encaixar as peças
-                ajuda na atenção e na coordenação, no ritmo da criança.
-            </p>
-        </div>
-        <div class="familia-cards">
-            <a class="familia-card" href="quebra-cabeca-jogo.html?h=o-passeio-feliz" style="--c:var(--c-green)">
-                <span class="familia-emoji">🧩</span>
-                <h3>O Passeio Feliz</h3>
-                <p>Monte a figura da história com peças grandes, bem fácil pra começar.</p>
-            </a>
-            <a class="familia-card" href="quebra-cabeca-jogo.html?h=o-gato-o-rato-e-o-pato" style="--c:var(--c-amber)">
-                <span class="familia-emoji">🐱</span>
-                <h3>O Gato, o Rato e o Pato</h3>
-                <p>Os amigos do jardim viraram quebra-cabeça pra você montar.</p>
-            </a>
-            <a class="familia-card" href="quebra-cabeca-jogo.html?h=kaco-anda-de-bicicleta" style="--c:var(--c-blue)">
-                <span class="familia-emoji">🚲</span>
-                <h3>Kaco Anda de Bicicleta</h3>
-                <p>Encaixe as peças e veja o Kaco pedalando feliz da vida.</p>
-            </a>
-        </div>
-        <div class="familia-cta">
-            <a class="familia-btn" href="quebra-cabeca.html">Ver todos os quebra-cabeças →</a>
-        </div>
-    </section>
-
     <section id="familia" class="section section-tint">
         <div class="section-inner">
             <h2 class="section-title">Pra Família</h2>
@@ -639,6 +689,174 @@
 
 
 <script src="script.js"></script>
+<script src="components/kids-stories.js"></script>
+<script>
+    /* Seção "Colorir" da home: monta os cards reais a partir de KIDS_COLORIR
+       (mesma fonte do colorir.html e personagens.html — sem hardcode). Cada card
+       leva pro ateliê filtrado no personagem e carrega data-chars pro filtro global. */
+    (function () {
+        var grid = document.getElementById('homeColorirGrid');
+        if (!grid) return;
+
+        // Card "Desenhe ou carregue" (blank): sempre presente, em qualquer filtro de
+        // personagem — inclusive quando o filtro não retorna nenhum desenho. Sem
+        // data-chars, o filtro global o ignora (nunca esconde); o data-blank segura a
+        // seção aberta (ver apply()). Mesma arte do colorir.html. Leva pro ateliê.
+        var blankSvg = 'data:image/svg+xml,' + encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">' +
+            '<rect width="400" height="300" fill="#eaf4ff"/>' +
+            '<rect x="116" y="64" width="168" height="172" rx="16" fill="#fff" stroke="#9cc3f0" stroke-width="4" stroke-dasharray="11 9"/>' +
+            '<g transform="rotate(38 200 150)">' +
+            '<rect x="186" y="84" width="28" height="104" rx="6" fill="#ffd166"/>' +
+            '<rect x="186" y="84" width="28" height="13" fill="#ef476f"/>' +
+            '<polygon points="186,188 214,188 200,214" fill="#f4c98a"/>' +
+            '<polygon points="195,204 205,204 200,214" fill="#333"/>' +
+            '</g></svg>');
+        var blank = document.createElement('a');
+        blank.className = 'hist-card';
+        blank.href = 'colorir.html';
+        blank.dataset.blank = '1';
+        blank.style.setProperty('--accent', '#2aa9e0');
+        blank.innerHTML =
+            '<div class="hist-head">' +
+                '<img src="' + blankSvg + '" alt="Desenhe ou carregue">' +
+                '<span class="hist-badge">Colorir</span>' +
+            '</div>' +
+            '<div class="hist-body">' +
+                '<h3>Desenhe ou carregue</h3>' +
+                '<p>Comece do zero ou abra uma imagem sua.</p>' +
+                '<span class="hist-go">Colorir →</span>' +
+            '</div>';
+        grid.appendChild(blank);
+
+        (window.KIDS_COLORIR || []).forEach(function (d) {
+            var alvo = (d.personagens && d.personagens[0]) || 'kaco';
+            var a = document.createElement('a');
+            a.className = 'hist-card';
+            a.href = 'colorir.html?p=' + alvo;
+            a.dataset.chars = (d.personagens || []).join(' ');
+            a.style.setProperty('--accent', '#2aa9e0');
+            a.innerHTML =
+                '<div class="hist-head">' +
+                    '<img src="' + d.img + '" alt="' + d.t + '">' +
+                    '<span class="hist-badge">Colorir</span>' +
+                '</div>' +
+                '<div class="hist-body">' +
+                    '<h3>' + d.t + '</h3>' +
+                    '<p>' + (d.desc || '') + '</p>' +
+                    '<span class="hist-go">Colorir →</span>' +
+                '</div>';
+            grid.appendChild(a);
+        });
+
+        // Mensagem "ainda não tem desenho do X": fica ao lado do card de desenhar
+        // quando o filtro de personagem não casa com nenhum desenho (toggle em apply()).
+        // Texto via data-* ({nome} é trocado pelo personagem do filtro).
+        var vazio = document.createElement('div');
+        vazio.className = 'hist-empty';
+        vazio.dataset.emoji = '🎨🐵✨';
+        vazio.dataset.titulo = 'Ainda não tem desenho do {nome} pra colorir!';
+        vazio.dataset.sub = 'Logo logo vem mais. Que tal desenhar o seu? 👇';
+        vazio.style.display = 'none';
+        grid.appendChild(vazio);
+    })();
+
+    /* Seção "Brincar de Montar" da home: espelha a quebra-cabeca.html — card
+       "Quebra-cabeça livre" (leva pro ateliê de montar, onde a foto é carregada) +
+       os quebra-cabeças reais de KIDS_STORIES (capa da história, com a malha de peças
+       via data-cat="quebra-cabeca"), com data-chars pro filtro global. */
+    (function () {
+        var grid = document.getElementById('homeMontarGrid');
+        if (!grid) return;
+
+        // Card "Quebra-cabeça livre" (blank): sempre presente, leva pra quebra-cabeca.html
+        // (igual o blank do Colorir leva pro colorir.html). Mesma arte da página dedicada.
+        var livreSvg = 'data:image/svg+xml,' + encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">' +
+            '<rect width="400" height="300" fill="#eaf4fb"/>' +
+            '<rect x="96" y="64" width="208" height="168" rx="18" fill="#fff" stroke="#9cc3f0" stroke-width="4" stroke-dasharray="12 9"/>' +
+            '<circle cx="150" cy="112" r="20" fill="#ffd166"/>' +
+            '<polygon points="112,206 178,134 218,172 252,140 288,206" fill="#7ec8a0"/>' +
+            '<g transform="translate(258 188)"><circle r="30" fill="#2aa9e0"/>' +
+            '<rect x="-4" y="-16" width="8" height="32" rx="4" fill="#fff"/>' +
+            '<rect x="-16" y="-4" width="32" height="8" rx="4" fill="#fff"/></g>' +
+            '</svg>');
+        var livre = document.createElement('a');
+        livre.className = 'hist-card';
+        livre.href = 'quebra-cabeca.html';
+        livre.dataset.blank = '1';
+        livre.style.setProperty('--accent', '#2aa9e0');
+        livre.innerHTML =
+            '<div class="hist-head">' +
+                '<img src="' + livreSvg + '" alt="Quebra-cabeça livre">' +
+                '<span class="hist-badge">Livre</span>' +
+            '</div>' +
+            '<div class="hist-body">' +
+                '<h3>Quebra-cabeça livre</h3>' +
+                '<p>Use uma foto sua e monte o quebra-cabeça com ela.</p>' +
+                '<span class="hist-go">Montar →</span>' +
+            '</div>';
+        grid.appendChild(livre);
+
+        (window.KIDS_STORIES || []).slice(0, 5).forEach(function (s) {
+            var a = document.createElement('a');
+            a.className = 'hist-card';
+            a.dataset.cat = 'quebra-cabeca';   // ativa a malha de peças por cima da capa
+            a.href = 'quebra-cabeca-jogo.html?h=' + s.id;
+            a.dataset.chars = (s.personagens || []).join(' ');
+            a.style.setProperty('--accent', '#6f4cd1');
+            a.innerHTML =
+                '<div class="hist-head">' +
+                    '<img src="' + s.img + '" alt="' + s.t + '">' +
+                    '<span class="hist-badge">Quebra-cabeça</span>' +
+                '</div>' +
+                '<div class="hist-body">' +
+                    '<h3>' + s.t + '</h3>' +
+                    '<p>Monte o quebra-cabeça com as peças.</p>' +
+                    '<span class="hist-go">Montar →</span>' +
+                '</div>';
+            grid.appendChild(a);
+        });
+
+        // Mensagem de vazio (mesma lógica do Colorir): fallback se o filtro não casar
+        // com nenhum quebra-cabeça (hoje todo personagem tem ao menos um).
+        var vazioM = document.createElement('div');
+        vazioM.className = 'hist-empty';
+        vazioM.dataset.emoji = '🧩🐵✨';
+        vazioM.dataset.titulo = 'Ainda não tem quebra-cabeça do {nome} pra montar!';
+        vazioM.dataset.sub = 'Logo logo vem mais. 💛';
+        vazioM.style.display = 'none';
+        grid.appendChild(vazioM);
+    })();
+
+    /* Seção "Histórias" da home: espelha a historias.html — cards reais de KIDS_STORIES
+       (capa + selo da categoria), SEM card "livre" (não dá pra criar história). Levam
+       pra historia.html?id=<id> e carregam data-chars pro filtro global. */
+    (function () {
+        var grid = document.getElementById('homeHistoriasGrid');
+        if (!grid) return;
+        var cats = window.KIDS_CATEGORIAS || {};
+        (window.KIDS_STORIES || []).slice(0, 5).forEach(function (s) {
+            var c = cats[s.cat] || { nome: s.cat, cor: '#2aa9e0' };
+            var a = document.createElement('a');
+            a.className = 'hist-card';
+            a.href = 'historia.html?id=' + s.id;
+            a.dataset.chars = (s.personagens || []).join(' ');
+            a.style.setProperty('--accent', c.cor);
+            a.innerHTML =
+                '<div class="hist-head">' +
+                    '<img src="' + s.img + '" alt="' + s.t + '">' +
+                    '<span class="hist-badge">' + c.nome + '</span>' +
+                '</div>' +
+                '<div class="hist-body">' +
+                    '<h3>' + s.t + '</h3>' +
+                    '<p>' + (s.desc || '') + '</p>' +
+                    '<span class="hist-go">Ler →</span>' +
+                '</div>';
+            grid.appendChild(a);
+        });
+    })();
+</script>
 <script src="components/kids-menu.js"></script>
 <script src="components/kids-toc.js"></script>
 <script src="components/kids-nav.js"></script>
@@ -676,6 +894,100 @@
         charFiltros.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
         b.classList.add('active');
     });
+</script>
+<script>
+    /* ===== Filtro global por personagem (seletor do topo) =====
+       O ★Todos + os avatares filtram as seções marcadas com data-filter-section
+       (Colorir, Quebra-cabeça, Histórias, Áudio). Cada card carrega
+       data-chars="slug1 slug2"; escolher um personagem esconde os cards que não têm
+       ele e recolhe a seção que ficar vazia. ★Todos limpa o filtro (mostra tudo).
+       O destaque (painel/vídeo) é controlado pelo showcase em script.js; aqui só o
+       filtro das seções. A ordem dos slugs casa com o data-index das miniaturas. */
+    (function () {
+        function init() {
+            const SLUGS = ['kaco','mae','gato','rato','pato','pai','motorista','terapeuta'];
+            const bar = document.querySelector('[data-char-bar]');
+            if (!bar) return;
+
+            // Gruda a barra logo abaixo do menu fixo: mede a altura real do menu (injetado
+            // pelo kids-menu.js) e ajusta o top; -2px pra tucar sob ele sem deixar fresta.
+            const menu = document.querySelector('.menu');
+            function setBarTop() {
+                if (menu) bar.style.top = Math.max(0, menu.offsetHeight - 2) + 'px';
+            }
+            setBarTop();
+            window.addEventListener('resize', setBarTop);
+            window.addEventListener('load', setBarTop);
+
+            const sections = Array.from(document.querySelectorAll('[data-filter-section]'));
+            const todos = bar.querySelector('.char-thumb-all');
+            const thumbsTrack = bar.querySelector('.char-thumbs');
+
+            function apply(slug) {
+                sections.forEach((sec) => {
+                    let anyVisible = false;
+                    sec.querySelectorAll('[data-chars]').forEach((card) => {
+                        const has = !slug || card.dataset.chars.split(' ').indexOf(slug) !== -1;
+                        card.style.display = has ? '' : 'none';
+                        if (has) anyVisible = true;
+                    });
+                    // Uma seção não recolhe se tiver card "sempre" (blank, ex.: Desenhe ou
+                    // carregue) OU uma mensagem de vazio (.hist-empty) pra mostrar no lugar.
+                    const temSempre = sec.querySelector('[data-blank]');
+                    const vazio = sec.querySelector('.hist-empty');
+                    sec.style.display = (anyVisible || temSempre || vazio) ? '' : 'none';
+                    // mensagem "ainda não tem ... do X": some quando há card; aparece quando o
+                    // filtro não casa com nenhum. Texto/emoji vêm de data-* no elemento.
+                    if (vazio) {
+                        if (!anyVisible) {
+                            const p = window.KIDS_PERSONAGENS || {};
+                            const nome = (slug && p[slug] && p[slug].nome) || '';
+                            const emoji = vazio.dataset.emoji || '🐵✨';
+                            const titulo = (vazio.dataset.titulo || 'Ainda não tem nada do {nome} aqui!').replace('{nome}', nome);
+                            const sub = (vazio.dataset.sub || 'Logo logo vem mais. 💛').replace('{nome}', nome);
+                            vazio.innerHTML =
+                                '<div class="hist-empty-emoji">' + emoji + '</div>' +
+                                '<p class="hist-empty-title">' + titulo + '</p>' +
+                                '<p class="hist-empty-sub">' + sub + '</p>';
+                            vazio.style.display = '';
+                        } else {
+                            vazio.style.display = 'none';
+                        }
+                    }
+                });
+            }
+
+            function selectTodos() {
+                apply(null);
+                if (todos) todos.classList.add('is-active');
+                // filtro = todos: nenhuma miniatura fica destacada como "filtro ativo"
+                if (thumbsTrack) thumbsTrack.querySelectorAll('.char-thumb').forEach(t => t.classList.remove('is-active'));
+            }
+
+            if (todos) todos.addEventListener('click', selectTodos);
+
+            // clique numa miniatura (original ou clone do loop) → filtra por aquele
+            // personagem. O destaque é tratado pelo showcase (script.js); aqui só o filtro.
+            if (thumbsTrack) thumbsTrack.addEventListener('click', (e) => {
+                const b = e.target.closest('.char-thumb');
+                if (!b) return;
+                const slug = SLUGS[Number(b.dataset.index)];
+                if (!slug) return;
+                apply(slug);
+                if (todos) todos.classList.remove('is-active');
+            });
+
+            // estado inicial: ★Todos (mostra tudo). Roda depois do showcase pra
+            // sobrepor o is-active que ele põe no 1º personagem.
+            selectTodos();
+        }
+
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
 </script>
 <script src="components/kids-footer.js"></script>
 </body>
