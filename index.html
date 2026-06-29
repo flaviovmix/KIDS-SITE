@@ -340,111 +340,97 @@
         </div>
     </section>
 
-    <section id="audios" class="section section-tint" data-filter-section>
+    <section id="emocoes" class="section section-light">
         <div class="section-inner">
-            <h2 class="section-title">Áudio-histórias</h2>
+            <h2 class="section-title">Lidando com Emoções</h2>
             <p class="section-text section-intro">
-                Modo de escutar pra quem cansa visualmente, está aprendendo a ler, ou prefere ouvir.
-                Transcrição sempre visível pra acompanhar.
+                Reconhecer o que a gente sente é o primeiro passo. O Kaco ajuda a dar nome.
             </p>
         </div>
-        <div class="home-audio-list">
-            <div class="home-audio-item" data-chars="kaco mae" style="--c:var(--c-blue)">
-                <img class="home-audio-thumb" src="img-slide/0 (1).png" alt="O Passeio Feliz">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">O Passeio Feliz</a>
-                    <span class="home-audio-desc">Um passeio com a mamãe que vira brincadeira no caminho.</span>
-                    <span class="home-audio-row">
-                        <small>Rotina · 3:12</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/o-passeio-feliz.m4a"></audio>
-            </div>
-            <div class="home-audio-item" data-chars="kaco" style="--c:var(--c-blue)">
-                <img class="home-audio-thumb" src="img-slide/0 (2).png" alt="A Mochila Esquecida">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">A Mochila Esquecida</a>
-                    <span class="home-audio-desc">Esquecer faz parte, e quase tudo tem solução com calma.</span>
-                    <span class="home-audio-row">
-                        <small>Rotina · 2:48</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/a-mochila-esquecida.m4a"></audio>
-            </div>
-            <div class="home-audio-item" data-chars="gato rato pato" style="--c:var(--c-green)">
-                <img class="home-audio-thumb" src="img-slide/0 (3).png" alt="Brincando no Parque">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">Brincando no Parque</a>
-                    <span class="home-audio-desc">Esperar a vez e dividir o balanço com a turma toda.</span>
-                    <span class="home-audio-row">
-                        <small>Aventura · 4:05</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/brincando-no-parque.m4a"></audio>
-            </div>
-            <div class="home-audio-item" data-chars="kaco" style="--c:var(--c-amber)">
-                <img class="home-audio-thumb" src="img-slide/0 (4).png" alt="Aniversário Surpresa">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">Aniversário Surpresa</a>
-                    <span class="home-audio-desc">Uma festa inesperada e o coração batendo forte de surpresa.</span>
-                    <span class="home-audio-row">
-                        <small>Emoções · 3:30</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/aniversario-surpresa.m4a"></audio>
-            </div>
-            <div class="home-audio-item" data-chars="kaco" style="--c:var(--c-amber)">
-                <img class="home-audio-thumb" src="img-slide/0 (5).png" alt="Dia de Chuva">
-                <span class="home-audio-main">
-                    <a class="home-audio-title" href="audio-historias.html">Dia de Chuva</a>
-                    <span class="home-audio-desc">O passeio foi cancelado, mas dá pra achar diversão dentro de casa.</span>
-                    <span class="home-audio-row">
-                        <small>Emoções · 2:55</small>
-                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
-                    </span>
-                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
-                </span>
-                <audio preload="metadata" src="audio/dia-de-chuva.m4a"></audio>
-            </div>
-            <!-- Mensagem quando o personagem filtrado não tem áudio (toggle em apply()).
-                 Sem card "livre" aqui (não dá pra criar áudio); só a mensagem segura a seção. -->
-            <div class="hist-empty" style="display:none"
-                 data-emoji="🎧🐵✨"
-                 data-titulo="Ainda não tem áudio-história do {nome}!"
-                 data-sub="Logo logo vem mais. 💛"></div>
-            <a class="home-audio-more" href="audio-historias.html">Ouvir todas →</a>
-        </div>
-    </section>
+        <div class="emocao-grid">
+            <article class="emocao-card">
+                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Raiva"></div>
+                <h3 class="emocao-nome">Raiva</h3>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">EMOÇÃO</span>
+                    <p>É aquela energia quente no peito quando alguma coisa nos parece injusta ou quando não conseguimos fazer o que queríamos.</p>
+                </div>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">COMO LIDAR?</span>
+                    <p>Respirar fundo. Contar até dez. Sair do lugar e voltar quando o corpo esfriar. Conversar depois, com calma.</p>
+                </div>
+                <a class="btn-saiba-mais" href="emocao-raiva.html">Saiba mais</a>
+            </article>
 
-    <section id="aprender" class="section section-light">
-        <div class="section-inner">
-            <h2 class="section-title">Aprender</h2>
-            <p class="section-text section-intro">
-                Números e continhas brincando com o Kaco, um pouquinho de cada vez, no ritmo da criança.
-            </p>
-        </div>
-        <div class="familia-cards">
-            <a class="familia-card" href="aprender.html" style="--c:var(--c-green)">
-                <span class="familia-emoji">➕</span>
-                <h3>Somar</h3>
-                <p>Juntar quantidades, um pouquinho de cada vez, em três níveis.</p>
-            </a>
-            <a class="familia-card" href="aprender.html" style="--c:var(--c-blue)">
-                <span class="familia-emoji">➖</span>
-                <h3>Subtrair</h3>
-                <p>Tirar e descobrir quanto sobra, no ritmo do Kaco.</p>
-            </a>
-        </div>
-        <div class="familia-cta">
-            <a class="familia-btn" href="aprender.html">Abrir o Aprender →</a>
+            <article class="emocao-card">
+                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Tristeza"></div>
+                <h3 class="emocao-nome">Tristeza</h3>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">EMOÇÃO</span>
+                    <p>Vem quando perdemos algo importante, quando sentimos falta de alguém, ou quando o dia não foi como esperávamos.</p>
+                </div>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">COMO LIDAR?</span>
+                    <p>Falar com quem confia. Pedir um abraço. Desenhar ou ouvir música. Tudo bem ficar triste, isso vai passar.</p>
+                </div>
+                <a class="btn-saiba-mais" href="emocao-tristeza.html">Saiba mais</a>
+            </article>
+
+            <article class="emocao-card">
+                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Alegria"></div>
+                <h3 class="emocao-nome">Alegria</h3>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">EMOÇÃO</span>
+                    <p>Aparece quando algo bom acontece. O corpo fica leve, dá vontade de pular e contar pra todo mundo.</p>
+                </div>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">COMO LIDAR?</span>
+                    <p>Aproveitar o momento. Dividir com alguém querido. Guardar essa sensação pra lembrar nos dias difíceis.</p>
+                </div>
+                <a class="btn-saiba-mais" href="emocao-alegria.html">Saiba mais</a>
+            </article>
+
+            <article class="emocao-card">
+                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Medo"></div>
+                <h3 class="emocao-nome">Medo</h3>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">EMOÇÃO</span>
+                    <p>Aparece diante do que é novo, do escuro, do barulho alto, ou de alguma situação que parece grande demais.</p>
+                </div>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">COMO LIDAR?</span>
+                    <p>Lembrar que não está sozinho. Segurar a mão de quem cuida. Falar o que está sentindo. Ir devagar, no seu ritmo.</p>
+                </div>
+                <a class="btn-saiba-mais" href="emocao-medo.html">Saiba mais</a>
+            </article>
+
+            <article class="emocao-card">
+                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Surpresa"></div>
+                <h3 class="emocao-nome">Surpresa</h3>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">EMOÇÃO</span>
+                    <p>É o susto de algo inesperado. Pode ser bom (presente, visita) ou difícil (mudança de plano).</p>
+                </div>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">COMO LIDAR?</span>
+                    <p>Parar um instante e respirar. Perguntar o que está acontecendo. Pedir tempo se precisar entender melhor.</p>
+                </div>
+                <a class="btn-saiba-mais" href="emocao-surpresa.html">Saiba mais</a>
+            </article>
+
+            <article class="emocao-card">
+                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Calma"></div>
+                <h3 class="emocao-nome">Calma</h3>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">EMOÇÃO</span>
+                    <p>O corpo solto, a respiração tranquila. É quando nada está apertando por dentro e dá pra escutar tudo com mais clareza.</p>
+                </div>
+                <div class="emocao-bloco">
+                    <span class="emocao-label">COMO LIDAR?</span>
+                    <p>Aproveitar. Olhar com atenção pra um lugar, um som, um objeto. Lembrar como se chega aqui pra voltar quando precisar.</p>
+                </div>
+                <a class="btn-saiba-mais" href="emocao-calma.html">Saiba mais</a>
+            </article>
         </div>
     </section>
 
@@ -561,97 +547,122 @@
         </div>
     </section>
 
-    <section id="emocoes" class="section section-light">
+    <!-- Áudio-histórias oculta até ter áudios. Pra reexibir: remover o style e devolver data-filter-section -->
+    <section id="audios" class="section section-tint" style="display:none">
         <div class="section-inner">
-            <h2 class="section-title">Lidando com Emoções</h2>
+            <h2 class="section-title">Áudio-histórias</h2>
             <p class="section-text section-intro">
-                Reconhecer o que a gente sente é o primeiro passo. O Kaco ajuda a dar nome.
+                Modo de escutar pra quem cansa visualmente, está aprendendo a ler, ou prefere ouvir.
+                Transcrição sempre visível pra acompanhar.
             </p>
         </div>
-        <div class="emocao-grid">
-            <article class="emocao-card">
-                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Raiva"></div>
-                <h3 class="emocao-nome">Raiva</h3>
-                <div class="emocao-bloco">
-                    <span class="emocao-label">EMOÇÃO</span>
-                    <p>É aquela energia quente no peito quando alguma coisa nos parece injusta ou quando não conseguimos fazer o que queríamos.</p>
-                </div>
-                <div class="emocao-bloco">
-                    <span class="emocao-label">COMO LIDAR?</span>
-                    <p>Respirar fundo. Contar até dez. Sair do lugar e voltar quando o corpo esfriar. Conversar depois, com calma.</p>
-                </div>
-                <a class="btn-saiba-mais" href="emocao-raiva.html">Saiba mais</a>
-            </article>
+        <div class="home-audio-list">
+            <div class="home-audio-item" data-chars="kaco mae" style="--c:var(--c-blue)">
+                <img class="home-audio-thumb" src="img-slide/0 (1).png" alt="O Passeio Feliz">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">O Passeio Feliz</a>
+                    <span class="home-audio-desc">Um passeio com a mamãe que vira brincadeira no caminho.</span>
+                    <span class="home-audio-row">
+                        <small>Rotina · 3:12</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/o-passeio-feliz.m4a"></audio>
+            </div>
+            <div class="home-audio-item" data-chars="kaco" style="--c:var(--c-blue)">
+                <img class="home-audio-thumb" src="img-slide/0 (2).png" alt="A Mochila Esquecida">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">A Mochila Esquecida</a>
+                    <span class="home-audio-desc">Esquecer faz parte, e quase tudo tem solução com calma.</span>
+                    <span class="home-audio-row">
+                        <small>Rotina · 2:48</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/a-mochila-esquecida.m4a"></audio>
+            </div>
+            <div class="home-audio-item" data-chars="gato rato pato" style="--c:var(--c-green)">
+                <img class="home-audio-thumb" src="img-slide/0 (3).png" alt="Brincando no Parque">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">Brincando no Parque</a>
+                    <span class="home-audio-desc">Esperar a vez e dividir o balanço com a turma toda.</span>
+                    <span class="home-audio-row">
+                        <small>Aventura · 4:05</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/brincando-no-parque.m4a"></audio>
+            </div>
+            <div class="home-audio-item" data-chars="kaco" style="--c:var(--c-amber)">
+                <img class="home-audio-thumb" src="img-slide/0 (4).png" alt="Aniversário Surpresa">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">Aniversário Surpresa</a>
+                    <span class="home-audio-desc">Uma festa inesperada e o coração batendo forte de surpresa.</span>
+                    <span class="home-audio-row">
+                        <small>Emoções · 3:30</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/aniversario-surpresa.m4a"></audio>
+            </div>
+            <div class="home-audio-item" data-chars="kaco" style="--c:var(--c-amber)">
+                <img class="home-audio-thumb" src="img-slide/0 (5).png" alt="Dia de Chuva">
+                <span class="home-audio-main">
+                    <a class="home-audio-title" href="audio-historias.html">Dia de Chuva</a>
+                    <span class="home-audio-desc">O passeio foi cancelado, mas dá pra achar diversão dentro de casa.</span>
+                    <span class="home-audio-row">
+                        <small>Emoções · 2:55</small>
+                        <button class="home-audio-play" type="button" aria-label="Tocar / pausar">▶</button>
+                    </span>
+                    <span class="home-audio-bar"><span class="home-audio-fill"></span></span>
+                </span>
+                <audio preload="metadata" src="audio/dia-de-chuva.m4a"></audio>
+            </div>
+            <!-- Mensagem quando o personagem filtrado não tem áudio (toggle em apply()).
+                 Sem card "livre" aqui (não dá pra criar áudio); só a mensagem segura a seção. -->
+            <div class="hist-empty" style="display:none"
+                 data-emoji="🎧🐵✨"
+                 data-titulo="Ainda não tem áudio-história do {nome}!"
+                 data-sub="Logo logo vem mais. 💛"></div>
+            <a class="home-audio-more" href="audio-historias.html">Ouvir todas →</a>
+        </div>
+    </section>
 
-            <article class="emocao-card">
-                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Tristeza"></div>
-                <h3 class="emocao-nome">Tristeza</h3>
-                <div class="emocao-bloco">
-                    <span class="emocao-label">EMOÇÃO</span>
-                    <p>Vem quando perdemos algo importante, quando sentimos falta de alguém, ou quando o dia não foi como esperávamos.</p>
-                </div>
-                <div class="emocao-bloco">
-                    <span class="emocao-label">COMO LIDAR?</span>
-                    <p>Falar com quem confia. Pedir um abraço. Desenhar ou ouvir música. Tudo bem ficar triste, isso vai passar.</p>
-                </div>
-                <a class="btn-saiba-mais" href="emocao-tristeza.html">Saiba mais</a>
-            </article>
-
-            <article class="emocao-card">
-                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Alegria"></div>
-                <h3 class="emocao-nome">Alegria</h3>
-                <div class="emocao-bloco">
-                    <span class="emocao-label">EMOÇÃO</span>
-                    <p>Aparece quando algo bom acontece. O corpo fica leve, dá vontade de pular e contar pra todo mundo.</p>
-                </div>
-                <div class="emocao-bloco">
-                    <span class="emocao-label">COMO LIDAR?</span>
-                    <p>Aproveitar o momento. Dividir com alguém querido. Guardar essa sensação pra lembrar nos dias difíceis.</p>
-                </div>
-                <a class="btn-saiba-mais" href="emocao-alegria.html">Saiba mais</a>
-            </article>
-
-            <article class="emocao-card">
-                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Medo"></div>
-                <h3 class="emocao-nome">Medo</h3>
-                <div class="emocao-bloco">
-                    <span class="emocao-label">EMOÇÃO</span>
-                    <p>Aparece diante do que é novo, do escuro, do barulho alto, ou de alguma situação que parece grande demais.</p>
-                </div>
-                <div class="emocao-bloco">
-                    <span class="emocao-label">COMO LIDAR?</span>
-                    <p>Lembrar que não está sozinho. Segurar a mão de quem cuida. Falar o que está sentindo. Ir devagar, no seu ritmo.</p>
-                </div>
-                <a class="btn-saiba-mais" href="emocao-medo.html">Saiba mais</a>
-            </article>
-
-            <article class="emocao-card">
-                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Surpresa"></div>
-                <h3 class="emocao-nome">Surpresa</h3>
-                <div class="emocao-bloco">
-                    <span class="emocao-label">EMOÇÃO</span>
-                    <p>É o susto de algo inesperado. Pode ser bom (presente, visita) ou difícil (mudança de plano).</p>
-                </div>
-                <div class="emocao-bloco">
-                    <span class="emocao-label">COMO LIDAR?</span>
-                    <p>Parar um instante e respirar. Perguntar o que está acontecendo. Pedir tempo se precisar entender melhor.</p>
-                </div>
-                <a class="btn-saiba-mais" href="emocao-surpresa.html">Saiba mais</a>
-            </article>
-
-            <article class="emocao-card">
-                <div class="char-avatar"><img src="img/personagens/KACO.jpeg" alt="Calma"></div>
-                <h3 class="emocao-nome">Calma</h3>
-                <div class="emocao-bloco">
-                    <span class="emocao-label">EMOÇÃO</span>
-                    <p>O corpo solto, a respiração tranquila. É quando nada está apertando por dentro e dá pra escutar tudo com mais clareza.</p>
-                </div>
-                <div class="emocao-bloco">
-                    <span class="emocao-label">COMO LIDAR?</span>
-                    <p>Aproveitar. Olhar com atenção pra um lugar, um som, um objeto. Lembrar como se chega aqui pra voltar quando precisar.</p>
-                </div>
-                <a class="btn-saiba-mais" href="emocao-calma.html">Saiba mais</a>
-            </article>
+    <section id="aprender" class="section section-light">
+        <div class="section-inner">
+            <h2 class="section-title">Vamos Aprender</h2>
+            <p class="section-text section-intro">
+                Números e continhas brincando com o Kaco, um pouquinho de cada vez, no ritmo da criança.
+            </p>
+        </div>
+        <div class="familia-cards">
+            <a class="familia-card" href="aprender.html" style="--c:var(--c-green)">
+                <span class="familia-emoji">➕</span>
+                <h3>Somar</h3>
+                <p>Juntar quantidades, um pouquinho de cada vez, em três níveis.</p>
+            </a>
+            <a class="familia-card" href="aprender.html" style="--c:var(--c-blue)">
+                <span class="familia-emoji">➖</span>
+                <h3>Subtrair</h3>
+                <p>Tirar e descobrir quanto sobra, no ritmo do Kaco.</p>
+            </a>
+            <div class="familia-card" style="--c:var(--c-purple)">
+                <span class="familia-emoji">✖️</span>
+                <h3>Multiplicar</h3>
+                <p>Juntar grupos iguais e ver o total crescer, com o Kaco.</p>
+            </div>
+            <div class="familia-card" style="--c:var(--c-amber)">
+                <span class="familia-emoji">➗</span>
+                <h3>Dividir</h3>
+                <p>Repartir em partes iguais, um pouquinho de cada vez.</p>
+            </div>
+        </div>
+        <div class="familia-cta">
+            <a class="familia-btn" href="aprender.html">Vem aprender com a gente →</a>
         </div>
     </section>
 
