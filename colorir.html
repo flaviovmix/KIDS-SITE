@@ -6,7 +6,7 @@
     <title>Colorir — Kaco</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Comic+Neue:ital,wght@0,400;0,700;1,400&family=Pacifico&family=Patrick+Hand&family=Luckiest+Guy&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
@@ -221,13 +221,52 @@
         .paint-app .text-tools .tt { background:#3a3f47; color:#fff; border:0; border-radius:8px;
             width:36px; height:36px; font-family:inherit; font-size:16px; cursor:pointer; }
         .paint-app .text-tools .tt.sel { background:var(--accent); }
+        /* alinhamento vertical: bloquinho que sobe/desce dentro do botão mostrando onde o texto fica */
+        .paint-app .text-tools .tt-valign { display:flex; flex-direction:column; padding:6px 0; }
+        .paint-app .text-tools .tt-valign span { display:block; width:16px; height:9px; margin:0 auto; background:#fff; border-radius:2px; }
+        .paint-app .text-tools .tt-valign.va-top    { justify-content:flex-start; }
+        .paint-app .text-tools .tt-valign.va-middle { justify-content:center; }
+        .paint-app .text-tools .tt-valign.va-bottom { justify-content:flex-end; }
         .paint-app .text-tools .tt-size { width:62px; height:36px; border-radius:8px; border:0;
             padding:0 8px; font-family:inherit; font-weight:700; font-size:14px; }
+        /* dropdown próprio (fonte/tamanho): estilizável e não rouba o foco da digitação */
+        .paint-app .text-tools .tt-dd { position:relative; }
+        .paint-app .text-tools .tt-dd-cur { position:relative; height:36px; border:0; border-radius:8px; background:#3a3f47; color:#fff;
+            font-family:inherit; font-size:15px; padding:0 28px 0 12px; cursor:pointer; white-space:nowrap; }
+        .paint-app .text-tools .tt-dd-cur::after { content:'▾'; position:absolute; right:9px; top:50%; transform:translateY(-50%); font-size:12px; opacity:.85; }
+        /* a lista é movida pro <body> (fica acima do textarea, sem scroll, opaca e clicável) */
+        .tt-dd-list { position:fixed; z-index:3000; background:#2b2f36; border-radius:14px; padding:6px;
+            box-shadow:0 16px 38px rgba(0,0,0,.45); display:flex; flex-direction:column; gap:2px;
+            font-family:'Baloo 2',system-ui,sans-serif; }
+        .tt-dd-list[hidden] { display:none; }
+        .tt-dd-opt { border:0; background:transparent; color:#fff; font-family:inherit; font-size:18px;
+            text-align:left; padding:9px 16px; border-radius:9px; cursor:pointer; white-space:nowrap; line-height:1.1; }
+        .tt-dd-opt:hover { background:#3a3f47; }
+        .tt-dd-opt.sel { background:#a23ca0; }
+        /* controle de fundo da caixa de texto */
+        .paint-app .text-tools .tt-bg-cur { width:42px; height:36px; border:0; border-radius:8px; cursor:pointer; padding:0;
+            box-shadow:inset 0 0 0 2px rgba(255,255,255,.25); }
+        .paint-app .text-tools .tt-bg-cur.is-none { background:repeating-conic-gradient(#cbd5e1 0% 25%, #fff 0% 50%) 0 / 14px 14px; }
+        .tt-bg-pop { width:208px; gap:0 !important; }
+        .tt-bg-none { border:0; border-radius:9px; background:#3a3f47; color:#fff; font-family:'Baloo 2',system-ui,sans-serif; font-size:15px;
+            padding:9px; cursor:pointer; margin-bottom:8px; }
+        .tt-bg-none:hover { background:#4a505a; }
+        .tt-bg-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; }
+        .tt-bg-grid .tt-bg-sw { width:100%; aspect-ratio:1; border:2px solid rgba(255,255,255,.18); border-radius:50%; cursor:pointer; padding:0; }
+        .tt-bg-grid .tt-bg-sw.sel { outline:2px solid #fff; outline-offset:1px; }
+        .tt-bg-op { display:flex; align-items:center; gap:8px; color:#fff; font-family:'Baloo 2',system-ui,sans-serif; font-size:13px; margin-top:12px; }
+        .tt-bg-op input { flex:1; accent-color:#a23ca0; }
+        /* controle de borda: gatilho mostra a cor como um anel (contorno) */
+        .paint-app .text-tools .tt-bd-cur { width:42px; height:36px; border:0; border-radius:8px; cursor:pointer; padding:0; background:#2b2f36; }
+        .paint-app .text-tools .tt-bd-cur.is-none { box-shadow:inset 0 0 0 2px rgba(255,255,255,.3); }
 
-        /* Campo de digitação flutuante (texto) */
-        .paint-text-input { position:fixed; z-index:1100; transform:translateY(-50%);
-            border:1px dashed #7a7f87; background:rgba(255,255,255,.96); padding:3px 7px;
-            border-radius:5px; outline:none; min-width:80px; box-shadow:0 6px 20px rgba(0,0,0,.2); }
+        /* Campo de digitação flutuante (texto) — textarea multi-linha sobre a área puxada (canto sup. esq.) */
+        .paint-text-input { position:fixed; z-index:1100; box-sizing:border-box; transform:translate(-50%,-50%);
+            border:0; background:transparent; padding:0;   /* fundo branco é pintado no canvas (cobre a caixa até a moldura); textarea recuado TEXT_PAD deixa as alças livres */
+            outline:none; min-width:8px;
+            resize:none; overflow:hidden; text-align:left; line-height:1.25;
+            font-family:'Baloo 2',system-ui,sans-serif; white-space:pre-wrap; }
+        .paint-text-input::placeholder { color:currentColor; opacity:.5; }   /* "Digite…" prevê a cor escolhida */
 
         /* prévia de pincel/borracha: círculo do tamanho exato do traço, ícone no centro (fundo definido por ferramenta no JS) */
         .tool-ring { position:fixed; z-index:1150; pointer-events:none; border-radius:50%; display:none;
@@ -310,10 +349,15 @@
 
             <!-- mini-barra de texto (aparece só com a ferramenta Texto) -->
             <div class="bar text-tools" id="textTools" hidden>
+                <span id="ttFontSlot"></span>
                 <button class="tt" id="ttBold"   type="button" title="Negrito"><b>N</b></button>
                 <button class="tt" id="ttItalic" type="button" title="Itálico"><i>I</i></button>
                 <button class="tt" id="ttUnder"  type="button" title="Sublinhado"><span style="text-decoration:underline">S</span></button>
-                <input class="tt-size" id="ttSize" type="number" min="8" max="200" value="48" title="Tamanho da fonte">
+                <button class="tt" id="ttHAlign" type="button" title="Alinhar horizontal"><i class="fa-solid fa-align-left"></i></button>
+                <button class="tt tt-valign va-top" id="ttVAlign" type="button" title="Alinhar vertical"><span></span></button>
+                <span id="ttSizeSlot"></span>
+                <span id="ttBgSlot"></span>
+                <span id="ttBorderSlot"></span>
             </div>
 
             <!-- topo-direita: cores -->
@@ -481,7 +525,16 @@ let color = [226,60,160,255];   // rgba atual
 let tool = 'bucket';
 let panX=0, panY=0, panning=false, panLast=null;
 let brushSize = 14;
-let txtBold=false, txtItalic=false, txtUnder=false, txtSize=48;   // estilo da ferramenta Texto
+let txtBold=true, txtItalic=false, txtUnder=false, txtSize=48;    // estilo da ferramenta Texto (negrito ligado por padrão)
+let txtFont="'Baloo 2'";                                          // família de fonte escolhida na mini-barra
+let txtBg={r:255,g:255,b:255,a:0.6,hex:'#ffffff'};                // fundo da caixa de texto: padrão branco 60% (null = transparente), ou {r,g,b,a}
+let txtBorder={r:0,g:0,b:0,a:0.6,hex:'#000000',width:5};          // borda da caixa: padrão preto 60% / 5px (null = sem borda), ou {r,g,b,a,width}
+let txtRadius=20;                                                 // raio dos cantos da caixa (fundo + contorno), em px
+let txtAlign='center';                                            // alinhamento horizontal do texto na caixa: left|center|right
+let txtVAlign='middle';                                           // alinhamento vertical do texto na caixa: top|middle|bottom
+function bgCss(bg){ return bg ? `rgba(${bg.r},${bg.g},${bg.b},${bg.a})` : null; }
+function boxPath(x,y,w,h,r){ ctx.beginPath(); if(r>0) ctx.roundRect(x,y,w,h,Math.min(r,w/2,h/2)); else ctx.rect(x,y,w,h); }   // caminho do box (cantos arredondados ou retos)
+const TEXT_FONTS=[{name:'Baloo',css:"'Baloo 2'"},{name:'Gibi',css:"'Comic Neue'"},{name:'Praia',css:"'Pacifico'"},{name:'Mão',css:"'Patrick Hand'"},{name:'Festa',css:"'Luckiest Guy'"}];
 
 // ---- paleta ----
 const PALETTE = ['#e63946','#f4791f','#ffb703','#ffd60a','#90be6d','#43aa8b','#4cc9f0','#3a86ff',
@@ -490,12 +543,17 @@ const PALETTE = ['#e63946','#f4791f','#ffb703','#ffd60a','#90be6d','#43aa8b','#4
 const sw = document.getElementById('swatches');
 const customBtn = document.getElementById('customColor');
 function clearColorSel(){ [...sw.children].forEach(c=>c.classList.remove('sel')); customBtn.classList.remove('sel'); }
+function onColorChange(){                                   // cor mudou: recolore o texto em digitação / a forma flutuante ao vivo
+  const c=`rgb(${color[0]},${color[1]},${color[2]})`;
+  if(txtEdit){ txtEdit.ta.style.color=c; txtEdit.ta.style.caretColor=c; }
+  if(pendingShape) renderPending();
+}
 PALETTE.forEach((hex,i)=>{
   const b=document.createElement('button');
   b.style.background=hex; b.title=hex;
   if(i===11) b.classList.add('sel');
-  b.onclick=()=>{ color=hexToRgba(hex); clearColorSel(); b.classList.add('sel');
-    if(pendingShape) renderPending(); };   // recolore a forma flutuante na hora
+  b.onmousedown=e=>e.preventDefault();                     // não tira o foco da digitação
+  b.onclick=()=>{ color=hexToRgba(hex); clearColorSel(); b.classList.add('sel'); onColorChange(); };
   sw.appendChild(b);
 });
 // cor personalizada: o botão abre o seletor PRÓPRIO (modal grande e central)
@@ -553,7 +611,7 @@ document.getElementById('cpickAdd').addEventListener('click',()=>{   // salva a 
 renderSaved();
 document.getElementById('cpickOk').addEventListener('click',()=>{
   const [r,g,b]=hsvToRgb(cpHue,cpSat,cpVal); color=[r,g,b,255];
-  clearColorSel(); customBtn.classList.add('sel'); if(pendingShape) renderPending(); fecharColorPicker(); });
+  clearColorSel(); customBtn.classList.add('sel'); onColorChange(); fecharColorPicker(); });
 
 // ---- desenho de exemplo (line-art simples desenhado no canvas) ----
 function drawSample(){
@@ -666,20 +724,38 @@ function paintLine(a,b){ ctx.strokeStyle = tool==='eraser' ? '#fff' : `rgb(${col
 // (a curva tem desenho próprio de 3 arrastos, mas no fim vira a MESMA forma flutuante)
 const SHAPES=['line','triangle','rect','rrect','ellipse','pentagon','hexagon','star','heart','arrow','speech'];
 let shaping=false, shapeStart=null, snapshot=null;
+let textDragging=false, textStart=null, textSnap=null;     // arraste que define a caixa de texto (estilo Paint)
+let textJustCommitted=false;                               // engole o clique que fechou a edição (pra a forma ficar com alças, não queimar na hora)
+let textEditorOpen=false;                                  // textarea de texto aberta agora: clique no canvas só fecha/comita (não cria 2ª caixa)
+let txtEdit=null, editDrag=null;                           // sessão de digitação ativa (geometria mutável) + arraste de alça durante a digitação
 // forma = centro (cx,cy) + tamanho (w,h) + rotação (rot); flip = diagonal da linha.
 function shapeFromPoints(a,b,type){ type=type||tool; const dx=b.x-a.x, dy=b.y-a.y;
   return { type, cx:(a.x+b.x)/2, cy:(a.y+b.y)/2,
            w:Math.abs(dx), h:Math.abs(dy), rot:0, flip:(dx*dy<0) }; }
 function drawShapeT(s){
   ctx.save(); ctx.translate(s.cx,s.cy); ctx.rotate(s.rot);   // desenha centrado e girado
-  if(s.type==='text'){                                       // texto: preenchido, sem traço
+  if(s.type==='text'){                                       // texto: multi-linha, alinhamento H/V escolhido na caixa (estilo Paint)
+    const r=s.radius||0;
+    if(s.bg){ ctx.fillStyle=bgCss(s.bg); boxPath(-s.w/2,-s.h/2,s.w,s.h,r); ctx.fill(); }   // fundo da caixa (cor/opacidade escolhidas)
+    if(s.border && s.border.width>0){ const bw=s.border.width; ctx.lineWidth=bw; ctx.strokeStyle=bgCss(s.border);   // contorno por dentro da caixa
+      boxPath(-s.w/2+bw/2,-s.h/2+bw/2, s.w-bw, s.h-bw, Math.max(0,r-bw/2)); ctx.stroke(); }
     ctx.font=textFont(s);
-    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.textAlign='left'; ctx.textBaseline='top';                              // posiciona cada linha "na mão" (alinhamento H)
     ctx.fillStyle=`rgb(${color[0]},${color[1]},${color[2]})`;
-    ctx.fillText(s.text,0,0);
-    if(s.underline){ const w=ctx.measureText(s.text).width, y=s.fontSize*0.42;   // sublinhado manual
-      ctx.strokeStyle=`rgb(${color[0]},${color[1]},${color[2]})`; ctx.lineWidth=Math.max(1,s.fontSize*0.06);
-      ctx.beginPath(); ctx.moveTo(-w/2,y); ctx.lineTo(w/2,y); ctx.stroke(); }
+    const lh=lineHeight(s), lines=s.lines||wrapText(s);
+    const innerL=-s.w/2+TEXT_PAD, innerR=s.w/2-TEXT_PAD, innerW=Math.max(0,innerR-innerL), blockH=lines.length*lh;
+    let y = s.valign==='middle' ? -blockH/2                                    // bloco de texto dentro da altura da caixa
+          : s.valign==='bottom' ? s.h/2-TEXT_PAD-blockH
+          : -s.h/2+TEXT_PAD;                                                    // top (default)
+    for(const ln of lines){ const lw=ctx.measureText(ln).width;
+      const x = s.halign==='center' ? innerL+(innerW-lw)/2
+              : s.halign==='right'  ? innerR-lw
+              : innerL;                                                        // left (default)
+      ctx.fillText(ln,x,y);
+      if(s.underline && ln){ const uy=y+s.fontSize;                            // sublinhado por linha
+        ctx.strokeStyle=`rgb(${color[0]},${color[1]},${color[2]})`; ctx.lineWidth=Math.max(1,s.fontSize*0.06);
+        ctx.beginPath(); ctx.moveTo(x,uy); ctx.lineTo(x+lw,uy); ctx.stroke(); }
+      y+=lh; }
     ctx.restore(); return;
   }
   if(s.type==='predef'){                                     // desenho pronto (line-art PNG): carimba a imagem na caixa
@@ -718,35 +794,118 @@ function drawShapeT(s){
 }
 
 // ---- texto: vira a MESMA forma flutuante (mover/girar/escalar) das demais ----
-function textFont(s){ return (s.italic?'italic ':'')+(s.bold?'700':'400')+' '+s.fontSize+"px 'Baloo 2',system-ui,sans-serif"; }
-function measureText(s){ ctx.save(); ctx.font=textFont(s);
-  s.w=Math.max(8, ctx.measureText(s.text).width); s.h=s.fontSize*1.2; ctx.restore(); }
-function makeText(text,cx,cy){ const s={ type:'text', text, cx, cy, rot:0,
-  fontSize:txtSize, bold:txtBold, italic:txtItalic, underline:txtUnder };
+function textFont(s){ return (s.italic?'italic ':'')+(s.bold?'700':'400')+' '+s.fontSize+'px '+(s.font||"'Baloo 2'")+',system-ui,sans-serif'; }
+function lineHeight(s){ return s.fontSize*1.25; }
+const TEXT_PAD=12;                                           // respiro interno da caixa (px): recua o textarea da moldura, deixando as alças (na borda) livres pra clicar
+// Quebra o texto na largura da caixa (s.w): respeita \n e parte palavras gigantes por caractere.
+function wrapText(s){
+  ctx.save(); ctx.font=textFont(s);
+  const maxW=Math.max(8, (s.w||40)-2*TEXT_PAD), out=[];
+  const breakWord=(word)=>{ let cur='';                       // palavra maior que a caixa: quebra letra a letra
+    for(const ch of word){ if(!cur || ctx.measureText(cur+ch).width<=maxW){ cur+=ch; }
+      else { out.push(cur); cur=ch; } }
+    return cur; };
+  String(s.text).split('\n').forEach(para=>{
+    let line='';
+    para.split(' ').forEach(word=>{
+      const test=line?line+' '+word:word;
+      if(ctx.measureText(test).width<=maxW){ line=test; return; }
+      if(line){ out.push(line); line=''; }
+      line = ctx.measureText(word).width<=maxW ? word : breakWord(word); });
+    out.push(line); });
+  ctx.restore();
+  return out.length?out:[''];
+}
+function measureText(s){ s.lines=wrapText(s);                 // largura (s.w) é independente
+  s.minH=s.lines.length*lineHeight(s)+2*TEXT_PAD;             // piso: altura colada no texto
+  if(s.h===undefined || s.h<s.minH) s.h=s.minH; }            // altura da caixa pode ser MAIOR (manual), nunca menor que o texto
+function makeText(text,cx,cy,w){ const s={ type:'text', text, cx, cy, rot:0,
+  fontSize:txtSize, bold:txtBold, italic:txtItalic, underline:txtUnder, font:txtFont, bg: txtBg?{...txtBg}:null, border: txtBorder?{...txtBorder}:null, radius:txtRadius,
+  halign:txtAlign, valign:txtVAlign, w:w||40 };
+  if(!w){ ctx.save(); ctx.font=textFont(s);                   // sem largura definida: usa a linha mais larga, limitada a 90% do canvas
+    let nat=0; String(text).split('\n').forEach(l=>{ nat=Math.max(nat, ctx.measureText(l).width); });
+    ctx.restore(); s.w=Math.max(40, Math.min(nat+10, cv.width*0.9)); }
   measureText(s); return s; }
-// Caixa de digitação inline sobre o canvas (no lugar do prompt): Enter cria a forma, Esc cancela.
-function openTextInput(sx, sy, cx, cy){
-  const inp=document.createElement('input');
-  inp.type='text'; inp.className='paint-text-input'; inp.placeholder='Digite…';
-  inp.style.left=sx+'px'; inp.style.top=sy+'px';
-  inp.style.font=textFont({ italic:txtItalic, bold:txtBold, fontSize:Math.min(40,txtSize) });
-  inp.style.color=`rgb(${color[0]},${color[1]},${color[2]})`;
-  document.body.appendChild(inp); setTimeout(()=>inp.focus(),0);
+// canvas -> tela (inverso de pos()): ancora a caixa de digitação sobre o ponto/forma.
+function canvasToScreen(cx,cy){ const r=cv.getBoundingClientRect();
+  const scale=Math.min(r.width/cv.width, r.height/cv.height);
+  const offX=(r.width-cv.width*scale)/2, offY=(r.height-cv.height*scale)/2;
+  return { x:r.left+offX+cx*scale, y:r.top+offY+cy*scale, scale }; }
+const DEFAULT_TEXT_W=280;
+// Caixa de digitação multi-linha sobre o canvas (estilo Paint): Enter = nova linha,
+// Ctrl+Enter / clicar fora = confirma, Esc = cancela. Reusada pra criar (sem shape) e reeditar (com shape).
+function openTextEditor(opts){
+  const reedit=!!opts.shape, s=opts.shape;
+  if(reedit){ txtFont=s.font||txtFont; txtSize=s.fontSize; txtBold=s.bold; txtItalic=s.italic; txtUnder=s.underline; txtBg=s.bg?{...s.bg}:null; txtBorder=s.border?{...s.border}:null; txtRadius=s.radius||0; txtAlign=s.halign||'left'; txtVAlign=s.valign||'top'; syncTextToolbar(); }   // reedição: a barra reflete o estilo do texto
+  const baseSnap = reedit ? pendingSnapshot : ctx.getImageData(0,0,cv.width,cv.height);   // desenho limpo (sem texto/alças)
+  const sty = reedit ? s : { italic:txtItalic, bold:txtBold, fontSize:txtSize, font:txtFont };
+  const scale = canvasToScreen(0,0).scale;
+  const ta=document.createElement('textarea');
+  ta.className='paint-text-input'; ta.value=reedit?s.text:''; ta.placeholder='Digite…'; ta.rows=1;
+  ta.style.font=textFont({ italic:sty.italic, bold:sty.bold, fontSize:Math.round(sty.fontSize*scale), font:sty.font });
+  ta.style.color=`rgb(${color[0]},${color[1]},${color[2]})`;
+  // sessão de edição: geometria MUTÁVEL da caixa — as alças mexem aqui durante a digitação
+  const ed={ ta, reedit, baseSnap, scale, fontSize:sty.fontSize,
+    cx: reedit?s.cx:opts.cx, cy: reedit?s.cy:opts.cy,
+    w: reedit?s.w:(opts.w||DEFAULT_TEXT_W), rot: reedit?s.rot:0,
+    h: reedit ? s.h : (opts.h && opts.h>20 ? opts.h : 0),                                          // altura desejada da caixa (0 = auto/cola no texto)
+    halign: reedit ? (s.halign||'left') : txtAlign,
+    valign: reedit ? (s.valign||'top') : txtVAlign,
+    taH(){ return this.ta.offsetHeight/this.scale; },                                              // altura só do texto (sem respiro)
+    minH(){ return this.taH() + 2*TEXT_PAD; },                                                     // altura mínima da caixa (cola no texto)
+    curH(){ return Math.max(this.h||0, this.minH()); },                                            // caixa pode ser MAIOR (manual), nunca menor que o texto
+    place(){ const H=this.curH(), taH=this.taH();                                                  // recua o textarea TEXT_PAD; posiciona conforme o alinhamento vertical
+      let ty = this.valign==='middle' ? 0
+             : this.valign==='bottom' ? H/2-TEXT_PAD-taH/2
+             : -H/2+TEXT_PAD+taH/2;                                                                 // top (default)
+      const ox=-ty*Math.sin(this.rot), oy=ty*Math.cos(this.rot);                                   // desloca o centro do textarea no eixo local (girado)
+      const q=canvasToScreen(this.cx+ox, this.cy+oy);
+      ta.style.left=q.x+'px'; ta.style.top=q.y+'px';
+      ta.style.width=(Math.max(8,this.w-2*TEXT_PAD)*this.scale)+'px';
+      ta.style.textAlign=this.halign;
+      ta.style.transform='translate(-50%,-50%) rotate('+this.rot+'rad)'; },                        // gira junto com a moldura
+    paint(){ const h=this.curH(); ctx.putImageData(this.baseSnap,0,0);                            // fundo da caixa + moldura + alças, atrás do textarea
+      ctx.save(); ctx.translate(this.cx,this.cy); ctx.rotate(this.rot);
+      const r=txtRadius||0;
+      ctx.fillStyle=bgCss(txtBg) || 'rgba(255,255,255,0.5)'; boxPath(-this.w/2,-h/2,this.w,h,r); ctx.fill();   // fundo escolhido, ou branco fraco só p/ legibilidade ao digitar
+      if(txtBorder && txtBorder.width>0){ const bw=txtBorder.width; ctx.lineWidth=bw; ctx.strokeStyle=bgCss(txtBorder);   // prévia do contorno
+        boxPath(-this.w/2+bw/2,-h/2+bw/2, this.w-bw, h-bw, Math.max(0,r-bw/2)); ctx.stroke(); }
+      ctx.restore();
+      drawShapeChrome(this.cx,this.cy,this.w,h,this.rot); updateTextToolsPos(); } };
+  txtEdit=ed; textEditorOpen=true;
+  ed.place(); document.body.appendChild(ta); ed.paint();
+  const grow=()=>{ ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; ed.place(); ed.paint(); };
+  ta.addEventListener('input',grow);
+  setTimeout(()=>{ ta.focus(); ta.select(); grow(); },0);
   let done=false;
-  function finish(commit){ if(done) return; done=true; const val=inp.value.trim(); inp.remove();
-    if(commit && val){ pendingSnapshot=ctx.getImageData(0,0,cv.width,cv.height);
-      pendingShape=makeText(val, cx, cy); renderPending(); } }
-  inp.addEventListener('keydown',ev=>{ ev.stopPropagation();   // não vaza Esc/Enter pro modal
-    if(ev.key==='Enter'){ ev.preventDefault(); finish(true); }
-    else if(ev.key==='Escape'){ ev.preventDefault(); finish(false); } });
-  inp.addEventListener('blur',()=>finish(true));
+  function finish(commit){ if(done) return; done=true; textEditorOpen=false; txtEdit=null; editDrag=null;
+    const val=ta.value.replace(/\s+$/,''); ta.remove();
+    ctx.putImageData(baseSnap,0,0);                           // tira a moldura de edição antes de fixar/cancelar
+    if(reedit){
+      if(commit && !val){ cancelPending(); return; }           // apagou tudo: remove o texto
+      if(commit){ s.text=val; s.cx=ed.cx; s.cy=ed.cy; s.w=ed.w; s.h=ed.curH(); s.rot=ed.rot;
+        s.bold=txtBold; s.italic=txtItalic; s.underline=txtUnder; s.fontSize=txtSize; s.font=txtFont; s.bg=txtBg?{...txtBg}:null; s.border=txtBorder?{...txtBorder}:null; s.radius=txtRadius;
+        s.halign=txtAlign; s.valign=txtVAlign; measureText(s); }   // persiste o estilo (incl. alinhamento e altura da caixa) escolhido na reedição
+      renderPending();
+    } else if(commit && val){ pendingSnapshot=baseSnap;
+      pendingShape=makeText(val, ed.cx, ed.cy, ed.w); pendingShape.rot=ed.rot;
+      pendingShape.halign=txtAlign; pendingShape.valign=txtVAlign; pendingShape.h=ed.curH(); measureText(pendingShape); renderPending(); }
+    if(pendingShape){ textJustCommitted=true; setTimeout(()=>{ textJustCommitted=false; },0); }   // mantém as alças; o clique que fechou não queima
+  }
+  ed.finish=finish;
+  ta.addEventListener('keydown',ev=>{ ev.stopPropagation();    // não vaza teclas pro app/modal
+    if(ev.key==='Escape'){ ev.preventDefault(); finish(false); }
+    else if(ev.key==='Enter' && (ev.ctrlKey||ev.metaKey)){ ev.preventDefault(); finish(true); } });   // Enter sozinho = nova linha
+  ta.addEventListener('blur',ev=>{ if(editDrag){ setTimeout(()=>ta.focus(),0); return; }              // arrastando alça: não comita
+    if(ev.relatedTarget && ev.relatedTarget.closest('.text-tools, .tt-dd-list, .colors-bar, #colorPicker')) return;   // foco foi pra UI de estilo/cor: não comita (mantém a caixa)
+    finish(true); });
 }
 
 // ---- forma flutuante: depois de desenhar fica "solta" sobre um snapshot pra mover,
 //      redimensionar (cantos) e girar (alça verde); só vira parte do desenho ao fixar
 //      (clique fora / Enter / trocar de ferramenta / salvar). ----
-let pendingShape=null, pendingSnapshot=null, dragMode=null, dragLast=null;
-const HANDLE_R=14, ROT_OFF=36;                              // raio de toque das alças / haste do giro
+let pendingShape=null, pendingSnapshot=null, dragMode=null, dragLast=null, dragMoved=false;
+const HANDLE_R=14, ROT_OFF=76;                              // raio de toque das alças / haste do giro (alta o bastante p/ a alça verde passar acima da mini-barra de estilo)
 // cursor de girar (SVG inline) + vetor de saída de cada alça (pra escolher a seta de redimensionar)
 const ROT_SVG='<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z" fill="#111" stroke="#fff" stroke-width="1"/></svg>';
 const ROTATE_CURSOR='url("data:image/svg+xml,'+encodeURIComponent(ROT_SVG)+'") 12 12, auto';
@@ -819,12 +978,11 @@ function hitHandle(s,p){ const l=toLocal(s,p), hw=s.w/2, hh=s.h/2;
   for(const [name,x,y] of pts) if(Math.hypot(l.x-x,l.y-y)<=HANDLE_R) return name;
   if(Math.abs(l.x)<=hw+HANDLE_R && Math.abs(l.y)<=hh+HANDLE_R) return 'move';
   return null; }
-function renderPending(){ ctx.putImageData(pendingSnapshot,0,0);
-  drawShapeT(pendingShape);
-  const s=pendingShape, hw=s.w/2, hh=s.h/2;
-  ctx.save(); ctx.translate(s.cx,s.cy); ctx.rotate(s.rot);
+// moldura tracejada + alças (canto/lado=tamanho, verde=girar, ✕ vermelho=apagar) de uma caixa qualquer
+function drawShapeChrome(cx,cy,w,h,rot){ const hw=w/2, hh=h/2;
+  ctx.save(); ctx.translate(cx,cy); ctx.rotate(rot);
   ctx.setLineDash([7,5]); ctx.strokeStyle='#7a7f87'; ctx.lineWidth=1;   // moldura tracejada
-  ctx.strokeRect(-hw,-hh,s.w,s.h); ctx.setLineDash([]);
+  ctx.strokeRect(-hw,-hh,w,h); ctx.setLineDash([]);
   ctx.beginPath(); ctx.moveTo(0,-hh); ctx.lineTo(0,-hh-ROT_OFF); ctx.stroke();   // haste do giro
   ctx.beginPath(); ctx.arc(0,-hh-ROT_OFF,8,0,Math.PI*2); ctx.fillStyle='#22c55e'; ctx.fill();
   ctx.lineWidth=2; ctx.strokeStyle='#fff'; ctx.stroke();                          // alça verde = girar
@@ -838,11 +996,14 @@ function renderPending(){ ctx.putImageData(pendingSnapshot,0,0);
   ctx.beginPath(); ctx.moveTo(dlx-10,dly-10); ctx.lineTo(dlx+10,dly+10);
   ctx.moveTo(dlx+10,dly-10); ctx.lineTo(dlx-10,dly+10); ctx.stroke();
   ctx.restore(); }
+function renderPending(){ ctx.putImageData(pendingSnapshot,0,0);
+  drawShapeT(pendingShape);
+  drawShapeChrome(pendingShape.cx,pendingShape.cy,pendingShape.w,pendingShape.h,pendingShape.rot); updateTextToolsPos(); }
 function commitPending(){ if(!pendingShape) return;        // fixa: redesenha SEM as alças e grava no undo
   ctx.putImageData(pendingSnapshot,0,0); drawShapeT(pendingShape);
-  pushUndo(); pendingShape=null; pendingSnapshot=null; cv.style.cursor=toolCursor(); }
+  pushUndo(); pendingShape=null; pendingSnapshot=null; cv.style.cursor=toolCursor(); updateTextToolsPos(); }
 function cancelPending(){ if(!pendingShape) return;        // descarta: volta ao snapshot anterior
-  ctx.putImageData(pendingSnapshot,0,0); pendingShape=null; pendingSnapshot=null; cv.style.cursor=toolCursor(); }
+  ctx.putImageData(pendingSnapshot,0,0); pendingShape=null; pendingSnapshot=null; cv.style.cursor=toolCursor(); updateTextToolsPos(); }
 
 // ---- curva estilo Paint: arrasta a base, depois arrasta 2x pra moldar; ao terminar
 //      vira a MESMA forma flutuante (mover/redimensionar/girar) das demais. ----
@@ -871,16 +1032,21 @@ function curveToShape(){                           // os 4 pontos da bézier vir
 
 cv.addEventListener('pointerdown',e=>{ if(tool==='hand'||e.button===1){ panning=true; panLast={x:e.clientX,y:e.clientY}; cv.setPointerCapture(e.pointerId); cv.style.cursor='grabbing'; e.preventDefault(); return; }
   const p=pos(e);
+  if(textEditorOpen){ const ed=txtEdit, hit=hitHandle({cx:ed.cx,cy:ed.cy,w:ed.w,h:ed.curH(),rot:ed.rot}, p);   // digitando: as alças já funcionam
+    if(hit==='delete'){ ed.ta.value=''; ed.finish(true); return; }                                  // ✕ = descarta o texto
+    if(hit==='rotate' || hit==='move' || HVEC[hit]){ e.preventDefault(); editDrag={mode:hit,last:p}; cv.setPointerCapture(e.pointerId); applyCursor(hit); return; }   // pega alça/move sem perder o foco
+    ed.finish(true); return; }                                                                       // clicou fora sem pegar alça → fecha/comita (independe do foco)
+  if(textJustCommitted){ textJustCommitted=false; return; }   // o clique que fechou a edição não conta: deixa a forma flutuando com as alças
   if(pendingShape){                          // forma flutuante: alças têm prioridade (qualquer ferramenta)
     const hit=hitHandle(pendingShape,p);
     if(hit==='delete'){ cancelPending(); return; }   // ✕: apaga a forma flutuante escolhida errada
-    if(hit){ dragMode=hit; dragLast=p; applyCursor(hit); cv.setPointerCapture(e.pointerId); return; }
+    if(hit){ dragMode=hit; dragLast=p; dragMoved=false; applyCursor(hit); cv.setPointerCapture(e.pointerId); return; }
     commitPending();                         // clicou fora: fixa a forma e segue pro comportamento da ferramenta
     if(tool==='text') return;                // não abre novo prompt no mesmo clique que fixou a forma
   }
-  if(tool==='text'){                         // texto: caixa de digitação inline (sem prompt)
-    openTextInput(e.clientX, e.clientY, p.x, p.y);
-    return;
+  if(tool==='text'){                         // texto: arrasta pra definir a área da caixa (estilo Paint)
+    textDragging=true; textStart=p; textSnap=ctx.getImageData(0,0,cv.width,cv.height);
+    cv.setPointerCapture(e.pointerId); return;
   }
   if(tool==='curve'){ cv.setPointerCapture(e.pointerId);   // arrasta a base, depois molda 2x
     if(curvePhase===0){ cP0={x:p.x,y:p.y}; cP3={x:p.x,y:p.y}; curveSnap=ctx.getImageData(0,0,cv.width,cv.height); }
@@ -891,25 +1057,35 @@ cv.addEventListener('pointerdown',e=>{ if(tool==='hand'||e.button===1){ panning=
   drawing=true; last=p; paintDot(p.x,p.y); cv.setPointerCapture(e.pointerId); });
 
 cv.addEventListener('pointermove',e=>{ if(panning){ panX+=e.clientX-panLast.x; panY+=e.clientY-panLast.y; panLast={x:e.clientX,y:e.clientY}; applyView(); return; }
+  if(editDrag){ const ed=txtEdit, m=editDrag.mode, pp=pos(e);                  // arrastando alça/move durante a digitação
+    if(m==='move'){ ed.cx+=pp.x-editDrag.last.x; ed.cy+=pp.y-editDrag.last.y; editDrag.last=pp; }
+    else if(m==='rotate'){ ed.rot=Math.atan2(pp.y-ed.cy,pp.x-ed.cx)+Math.PI/2; }
+    else { const eb={cx:ed.cx,cy:ed.cy,w:ed.w,h:ed.curH(),rot:ed.rot}, l=toLocal(eb,pp), hv=HVEC[m], hx=hv[0], hy=hv[1], c=Math.cos(ed.rot), sn=Math.sin(ed.rot);
+      if(hx){ const hw=ed.w/2, nhw=Math.max(20,Math.abs(l.x+hx*hw)/2), dx=hx*(nhw-hw); ed.cx+=dx*c; ed.cy+=dx*sn; ed.w=nhw*2; }          // largura: reflowa o texto
+      if(hy){ const hh=ed.curH()/2, nhh=Math.max(10,Math.abs(l.y+hy*hh)/2), dy=hy*(nhh-hh); ed.cx+=-dy*sn; ed.cy+=dy*c; ed.h=nhh*2; } }  // altura: manual (piso = texto)
+    ed.place(); ed.paint(); return; }
+  if(textEditorOpen){ const ed=txtEdit; applyCursor(hitHandle({cx:ed.cx,cy:ed.cy,w:ed.w,h:ed.curH(),rot:ed.rot}, pos(e))); return; }   // cursor das alças enquanto digita
   if(pendingShape && !dragMode && !shaping) applyCursor(hitHandle(pendingShape,pos(e)));
+  if(textDragging){ const b=pos(e); ctx.putImageData(textSnap,0,0);   // moldura tracejada da caixa que está sendo puxada
+    ctx.save(); ctx.setLineDash([7,5]); ctx.strokeStyle='#7a7f87'; ctx.lineWidth=1;
+    ctx.strokeRect(Math.min(textStart.x,b.x), Math.min(textStart.y,b.y), Math.abs(b.x-textStart.x), Math.abs(b.y-textStart.y));
+    ctx.setLineDash([]); ctx.restore(); return; }
   if(tool==='curve' && curveDrag){ const p=pos(e);
     if(curvePhase===0) cP3={x:p.x,y:p.y};
     else if(curvePhase===1) cC1={x:p.x,y:p.y};
     else if(curvePhase===2) cC2={x:p.x,y:p.y};
     drawCurvePreview(); return; }
-  if(dragMode){ const p=pos(e);
+  if(dragMode){ const p=pos(e); dragMoved=true;
     if(dragMode==='move'){ pendingShape.cx+=p.x-dragLast.x; pendingShape.cy+=p.y-dragLast.y; dragLast=p; }
     else if(dragMode==='rotate'){ pendingShape.rot=Math.atan2(p.y-pendingShape.cy,p.x-pendingShape.cx)+Math.PI/2; }
-    else if(pendingShape.type==='text'){                  // texto: escala a fonte, ancorando a alça oposta
-      const s=pendingShape, l=toLocal(s,p), h=HVEC[dragMode], hx=h[0], hy=h[1];
-      const hw=s.w/2, hh=s.h/2, ax=-hx*hw, ay=-hy*hh;     // alça oposta (fixa), em local, no tamanho atual
-      const nx=hx?Math.abs(l.x+hx*hw)/2:hw, ny=hy?Math.abs(l.y+hy*hh)/2:hh;
-      const scale = hx&&hy ? Math.hypot(nx,ny)/Math.hypot(hw,hh) : hx ? nx/hw : ny/hh;
+    else if(pendingShape.type==='text'){                  // texto: largura reflowa; altura ajusta a caixa (piso = texto); fonte só pela barra
+      const s=pendingShape, l=toLocal(s,p), hh2=HVEC[dragMode], hx=hh2[0], hy=hh2[1];
       const c=Math.cos(s.rot), sn=Math.sin(s.rot);
-      const awx=s.cx+(ax*c-ay*sn), awy=s.cy+(ax*sn+ay*c); // alça oposta no mundo (antes de mudar)
-      s.fontSize=Math.max(8, s.fontSize*scale); measureText(s);
-      const bx=-hx*s.w/2, by=-hy*s.h/2;                   // alça oposta no novo tamanho
-      s.cx=awx-(bx*c-by*sn); s.cy=awy-(bx*sn+by*c); }     // recoloca pra a alça oposta ficar parada
+      if(hx){ const hw=s.w/2, nhw=Math.max(20, Math.abs(l.x+hx*hw)/2), dx=hx*(nhw-hw);
+        s.cx+=dx*c; s.cy+=dx*sn; s.w=nhw*2; }                   // largura: reflowa o texto (ancora a borda oposta)
+      if(hy){ const hh=s.h/2, nhh=Math.max(10, Math.abs(l.y+hy*hh)/2), dy=hy*(nhh-hh);
+        s.cx+=-dy*sn; s.cy+=dy*c; s.h=nhh*2; }                  // altura: manual (ancora a borda oposta)
+      measureText(s); }                                         // recalcula linhas/piso (preserva s.h se >= piso)
     else { const s=pendingShape, l=toLocal(s,p), h=HVEC[dragMode], hx=h[0], hy=h[1];   // resize ancorado na alça oposta
       const hw=s.w/2, hh=s.h/2; let nhw=hw, nhh=hh;
       if(s.type==='predef'){                               // desenho pronto: trava a proporção (não pode esmagar)
@@ -931,6 +1107,13 @@ cv.addEventListener('pointermove',e=>{ if(panning){ panX+=e.clientX-panLast.x; p
   if(!drawing) return; const p=pos(e); paintLine(last,p); last=p; });
 
 cv.addEventListener('pointerup',e=>{ if(panning){ panning=false; cv.style.cursor=toolCursor(); return; }
+  if(editDrag){ editDrag=null; if(txtEdit) setTimeout(()=>txtEdit&&txtEdit.ta.focus(),0); return; }   // soltou a alça: volta a digitar
+  if(textDragging){ textDragging=false; const b=pos(e);
+    ctx.putImageData(textSnap,0,0); textSnap=null;            // limpa o preview; a caixa de digitação entra por cima
+    const w=Math.abs(b.x-textStart.x), h=Math.abs(b.y-textStart.y);
+    openTextEditor({ cx:(textStart.x+b.x)/2, cy:(textStart.y+b.y)/2,
+      w: w<20 ? DEFAULT_TEXT_W : w, h: h<20 ? 0 : h });       // arraste curto = caixa padrão / altura livre
+    return; }
   if(tool==='curve' && curveDrag){ const p=pos(e); curveDrag=false;
     if(curvePhase===0){ cP3={x:p.x,y:p.y};
       cC1={x:cP0.x+(cP3.x-cP0.x)/3, y:cP0.y+(cP3.y-cP0.y)/3};      // controles na linha base
@@ -942,7 +1125,9 @@ cv.addEventListener('pointerup',e=>{ if(panning){ panning=false; cv.style.cursor
       pendingShape=curveToShape(); pendingSnapshot=curveSnap;
       curvePhase=0; curveSnap=null; renderPending(); }
     return; }
-  if(dragMode){ dragMode=null; return; }                   // soltou alça: a forma continua flutuando
+  if(dragMode){ const wasMove=dragMode==='move'; dragMode=null;   // soltou alça: a forma continua flutuando
+    if(wasMove && !dragMoved && pendingShape && pendingShape.type==='text') openTextEditor({ shape:pendingShape });   // clique seco (sem arrastar) no texto = editar
+    return; }
   if(shaping){ shaping=false; const end=pos(e);
     const tiny=Math.abs(end.x-shapeStart.x)<3 && Math.abs(end.y-shapeStart.y)<3;
     if(tiny){ ctx.putImageData(snapshot,0,0); snapshot=null; return; }   // clique seco: nada a criar
@@ -961,18 +1146,159 @@ window.addEventListener('pointerup',()=>{ if(tool!=='bucket') return;
 // ---- controles ----
 // ---- mini-barra de texto (Negrito / Itálico / Sublinhado / Tamanho) ----
 const textTools=document.getElementById('textTools');
-const ttBold=document.getElementById('ttBold'), ttItalic=document.getElementById('ttItalic'),
-      ttUnder=document.getElementById('ttUnder'), ttSize=document.getElementById('ttSize');
+const ttBold=document.getElementById('ttBold'), ttItalic=document.getElementById('ttItalic'), ttUnder=document.getElementById('ttUnder');
+const ttHAlign=document.getElementById('ttHAlign'), ttVAlign=document.getElementById('ttVAlign');
+const HALIGN_ORDER=['left','center','right'], VALIGN_ORDER=['top','middle','bottom'];   // botões ciclam entre os 3 estados
+const HALIGN_ICON={left:'fa-align-left',center:'fa-align-center',right:'fa-align-right'};
+function syncAlignButtons(){ ttHAlign.querySelector('i').className='fa-solid '+HALIGN_ICON[txtAlign];   // ícone reflete o estado atual
+  ttVAlign.classList.remove('va-top','va-middle','va-bottom'); ttVAlign.classList.add('va-'+txtVAlign); }
+// dropdown próprio (estilizável + não rouba o foco da digitação): trigger + lista de opções.
+function makeDropdown(items, value, width, onPick){
+  const wrap=document.createElement('div'); wrap.className='tt-dd';
+  const cur=document.createElement('button'); cur.type='button'; cur.className='tt-dd-cur';
+  const list=document.createElement('div'); list.className='tt-dd-list'; list.hidden=true;
+  if(width){ cur.style.minWidth=width+'px'; list.style.minWidth=width+'px'; }
+  const itemOf=v=>items.find(i=>String(i.value)===String(v));
+  function renderCur(){ const it=itemOf(value); cur.textContent=it?it.label:value; cur.style.fontFamily=it&&it.font?it.font+',sans-serif':''; }
+  function markSel(){ [...list.children].forEach(o=>o.classList.toggle('sel', String(o.dataset.value)===String(value))); }
+  function close(){ list.hidden=true; wrap.classList.remove('open'); }
+  function open(){ const r=cur.getBoundingClientRect(); list.style.left=r.left+'px'; list.style.top=(r.bottom+6)+'px';   // posiciona sob o gatilho (viewport)
+    list.hidden=false; wrap.classList.add('open'); markSel(); }
+  items.forEach(it=>{ const o=document.createElement('button'); o.type='button'; o.className='tt-dd-opt'; o.dataset.value=it.value;
+    o.textContent=it.label; if(it.font) o.style.fontFamily=it.font+',sans-serif';
+    o.addEventListener('click',()=>{ value=it.value; renderCur(); close(); onPick(it.value); });
+    list.appendChild(o); });
+  cur.addEventListener('click',()=>{ list.hidden?open():close(); });
+  wrap.addEventListener('mousedown',e=>e.preventDefault());                  // gatilho não tira o foco da digitação
+  list.addEventListener('mousedown',e=>e.preventDefault());                  // lista (no body) também não tira o foco
+  document.addEventListener('pointerdown',e=>{ if(!wrap.contains(e.target) && !list.contains(e.target)) close(); });   // fecha ao clicar fora
+  wrap.appendChild(cur); document.body.appendChild(list); renderCur();       // lista no <body> p/ ficar acima do textarea (z-index 3000)
+  wrap.set=v=>{ value=v; renderCur(); };
+  return wrap;
+}
+const fontDD=makeDropdown(TEXT_FONTS.map(f=>({value:f.css,label:f.name,font:f.css})), txtFont, 150, v=>{ txtFont=v; applyTextStyle(); });
+const sizeDD=makeDropdown([12,16,20,24,32,40,48,64,80,96,128].map(n=>({value:n,label:String(n)})), txtSize, 56, v=>{ txtSize=+v; applyTextStyle(); });
+// controle de fundo: swatches (paleta) + "sem fundo" + opacidade; aplica ao vivo sem fechar a digitação
+function makeBgControl(){
+  const wrap=document.createElement('div'); wrap.className='tt-dd';
+  const cur=document.createElement('button'); cur.type='button'; cur.className='tt-bg-cur'; cur.title='Cor do fundo';
+  const pop=document.createElement('div'); pop.className='tt-dd-list tt-bg-pop'; pop.hidden=true;
+  const none=document.createElement('button'); none.type='button'; none.className='tt-bg-none'; none.textContent='Sem fundo';
+  const grid=document.createElement('div'); grid.className='tt-bg-grid';
+  const opRow=document.createElement('label'); opRow.className='tt-bg-op';
+  const op=document.createElement('input'); op.type='range'; op.min='0'; op.max='100'; op.value='100';
+  const opVal=document.createElement('span'); opRow.append('Opacidade', op, opVal);
+  const opacity=()=>(+op.value)/100;
+  function renderCur(){ cur.style.background = txtBg ? bgCss(txtBg) : ''; cur.classList.toggle('is-none', !txtBg);
+    if(txtBg) op.value=Math.round(txtBg.a*100); opVal.textContent=op.value+'%';
+    [...grid.children].forEach(b=>b.classList.toggle('sel', !!txtBg && b.dataset.hex===txtBg.hex)); }
+  PALETTE.forEach(hex=>{ const b=document.createElement('button'); b.type='button'; b.className='tt-bg-sw'; b.style.background=hex; b.dataset.hex=hex;
+    b.addEventListener('click',()=>{ const [r,g,bl]=hexToRgba(hex); txtBg={r,g,b:bl,a:opacity(),hex}; renderCur(); applyBg(); });
+    grid.appendChild(b); });
+  none.addEventListener('click',()=>{ txtBg=null; renderCur(); applyBg(); });
+  op.addEventListener('input',()=>{ if(txtBg){ txtBg.a=opacity(); } opVal.textContent=op.value+'%'; applyBg(); });
+  pop.append(none, grid, opRow);
+  function close(){ pop.hidden=true; wrap.classList.remove('open'); }
+  function open(){ const r=cur.getBoundingClientRect(); pop.style.left=Math.max(8,r.right-208)+'px'; pop.style.top=(r.bottom+6)+'px'; pop.hidden=false; wrap.classList.add('open'); renderCur(); }
+  cur.addEventListener('click',()=>{ pop.hidden?open():close(); });
+  wrap.addEventListener('mousedown',e=>e.preventDefault());
+  pop.addEventListener('mousedown',e=>{ if(e.target!==op) e.preventDefault(); });   // slider precisa do arraste
+  document.addEventListener('pointerdown',e=>{ if(!wrap.contains(e.target) && !pop.contains(e.target)) close(); });
+  wrap.appendChild(cur); document.body.appendChild(pop); renderCur();
+  wrap.set=()=>renderCur();
+  return wrap;
+}
+// controle de borda: mesma cor/opacidade do fundo + espessura do contorno
+function makeBorderControl(){
+  const wrap=document.createElement('div'); wrap.className='tt-dd';
+  const cur=document.createElement('button'); cur.type='button'; cur.className='tt-bd-cur'; cur.title='Borda da caixa';
+  const pop=document.createElement('div'); pop.className='tt-dd-list tt-bg-pop'; pop.hidden=true;
+  const none=document.createElement('button'); none.type='button'; none.className='tt-bg-none'; none.textContent='Sem borda';
+  const grid=document.createElement('div'); grid.className='tt-bg-grid';
+  const opRow=document.createElement('label'); opRow.className='tt-bg-op';
+  const op=document.createElement('input'); op.type='range'; op.min='0'; op.max='100'; op.value='100';
+  const opVal=document.createElement('span'); opRow.append('Opacidade', op, opVal);
+  const thRow=document.createElement('label'); thRow.className='tt-bg-op';
+  const th=document.createElement('input'); th.type='range'; th.min='1'; th.max='40'; th.value='4';
+  const thVal=document.createElement('span'); thRow.append('Espessura', th, thVal);
+  const raRow=document.createElement('label'); raRow.className='tt-bg-op';
+  const ra=document.createElement('input'); ra.type='range'; ra.min='0'; ra.max='80'; ra.value='0';
+  const raVal=document.createElement('span'); raRow.append('Cantos', ra, raVal);
+  const opacity=()=>(+op.value)/100, width=()=>+th.value;
+  function renderCur(){ cur.style.boxShadow = txtBorder ? 'inset 0 0 0 4px '+bgCss(txtBorder) : ''; cur.classList.toggle('is-none', !txtBorder);
+    if(txtBorder){ op.value=Math.round(txtBorder.a*100); th.value=txtBorder.width; }
+    opVal.textContent=op.value+'%'; thVal.textContent=th.value+'px';
+    ra.value=txtRadius; raVal.textContent=txtRadius+'px';                                   // cantos: propriedade do box (independe da borda)
+    [...grid.children].forEach(b=>b.classList.toggle('sel', !!txtBorder && b.dataset.hex===txtBorder.hex)); }
+  PALETTE.forEach(hex=>{ const b=document.createElement('button'); b.type='button'; b.className='tt-bg-sw'; b.style.background=hex; b.dataset.hex=hex;
+    b.addEventListener('click',()=>{ const [r,g,bl]=hexToRgba(hex); txtBorder={r,g,b:bl,a:opacity(),hex,width:width()}; renderCur(); applyBorder(); });
+    grid.appendChild(b); });
+  none.addEventListener('click',()=>{ txtBorder=null; renderCur(); applyBorder(); });
+  op.addEventListener('input',()=>{ if(txtBorder) txtBorder.a=opacity(); opVal.textContent=op.value+'%'; applyBorder(); });
+  th.addEventListener('input',()=>{ if(txtBorder) txtBorder.width=width(); thVal.textContent=th.value+'px'; applyBorder(); });
+  ra.addEventListener('input',()=>{ txtRadius=+ra.value; raVal.textContent=ra.value+'px'; applyRadius(); });
+  pop.append(none, grid, opRow, thRow, raRow);
+  function close(){ pop.hidden=true; wrap.classList.remove('open'); }
+  function open(){ const r=cur.getBoundingClientRect(); pop.style.left=Math.max(8,r.right-208)+'px'; pop.style.top=(r.bottom+6)+'px'; pop.hidden=false; wrap.classList.add('open'); renderCur(); }
+  cur.addEventListener('click',()=>{ pop.hidden?open():close(); });
+  wrap.addEventListener('mousedown',e=>e.preventDefault());
+  pop.addEventListener('mousedown',e=>{ if(e.target!==op && e.target!==th && e.target!==ra) e.preventDefault(); });   // sliders precisam do arraste
+  document.addEventListener('pointerdown',e=>{ if(!wrap.contains(e.target) && !pop.contains(e.target)) close(); });
+  wrap.appendChild(cur); document.body.appendChild(pop); renderCur();
+  wrap.set=()=>renderCur();
+  return wrap;
+}
+const bgDD=makeBgControl();
+const borderDD=makeBorderControl();
+document.getElementById('ttFontSlot').replaceWith(fontDD);
+document.getElementById('ttSizeSlot').replaceWith(sizeDD);
+document.getElementById('ttBgSlot').replaceWith(bgDD);
+document.getElementById('ttBorderSlot').replaceWith(borderDD);
+function applyBg(){                                          // fundo mudou: redesenha texto em digitação / forma flutuante
+  if(txtEdit) txtEdit.paint();
+  else if(pendingShape && pendingShape.type==='text'){ pendingShape.bg = txtBg?{...txtBg}:null; renderPending(); }
+}
+function applyBorder(){                                      // borda mudou: redesenha texto em digitação / forma flutuante
+  if(txtEdit) txtEdit.paint();
+  else if(pendingShape && pendingShape.type==='text'){ pendingShape.border = txtBorder?{...txtBorder}:null; renderPending(); }
+}
+function applyRadius(){                                      // raio dos cantos mudou: redesenha
+  if(txtEdit) txtEdit.paint();
+  else if(pendingShape && pendingShape.type==='text'){ pendingShape.radius = txtRadius; renderPending(); }
+}
 function syncTextToolbar(){ ttBold.classList.toggle('sel',txtBold); ttItalic.classList.toggle('sel',txtItalic);
-  ttUnder.classList.toggle('sel',txtUnder); ttSize.value=txtSize; }
-function applyTextStyle(){ if(pendingShape && pendingShape.type==='text'){   // estiliza o texto flutuante ao vivo
-  pendingShape.bold=txtBold; pendingShape.italic=txtItalic; pendingShape.underline=txtUnder;
-  pendingShape.fontSize=txtSize; measureText(pendingShape); renderPending(); } }
+  ttUnder.classList.toggle('sel',txtUnder); sizeDD.set(txtSize); fontDD.set(txtFont); bgDD.set(); borderDD.set(); syncAlignButtons(); }
+function applyTextStyle(){
+  if(txtEdit){                                              // digitando: aplica no textarea ao vivo, sem fechar a caixa
+    const ed=txtEdit; ed.fontSize=txtSize; ed.halign=txtAlign; ed.valign=txtVAlign;
+    ed.ta.style.font=textFont({ italic:txtItalic, bold:txtBold, fontSize:Math.round(txtSize*ed.scale), font:txtFont });
+    ed.ta.style.textDecoration = txtUnder ? 'underline' : 'none';
+    ed.ta.style.height='auto'; ed.ta.style.height=ed.ta.scrollHeight+'px'; ed.place(); ed.paint();
+  } else if(pendingShape && pendingShape.type==='text'){    // estiliza o texto flutuante ao vivo
+    pendingShape.bold=txtBold; pendingShape.italic=txtItalic; pendingShape.underline=txtUnder;
+    pendingShape.fontSize=txtSize; pendingShape.font=txtFont; pendingShape.halign=txtAlign; pendingShape.valign=txtVAlign;
+    measureText(pendingShape); renderPending();
+  } }
 ttBold.onclick   =()=>{ txtBold=!txtBold;     syncTextToolbar(); applyTextStyle(); };
 ttItalic.onclick =()=>{ txtItalic=!txtItalic; syncTextToolbar(); applyTextStyle(); };
 ttUnder.onclick  =()=>{ txtUnder=!txtUnder;   syncTextToolbar(); applyTextStyle(); };
-ttSize.oninput   =()=>{ txtSize=Math.max(8,Math.min(200,+ttSize.value||48)); applyTextStyle(); };
+ttHAlign.onclick =()=>{ txtAlign =HALIGN_ORDER[(HALIGN_ORDER.indexOf(txtAlign)+1)%3];  syncTextToolbar(); applyTextStyle(); };   // cicla esquerda→centro→direita
+ttVAlign.onclick =()=>{ txtVAlign=VALIGN_ORDER[(VALIGN_ORDER.indexOf(txtVAlign)+1)%3]; syncTextToolbar(); applyTextStyle(); };   // cicla topo→meio→base
+textTools.addEventListener('mousedown', e=>e.preventDefault());             // toda a barra mantém o foco da digitação
 syncTextToolbar();
+// Gruda a mini-barra logo acima da caixa de texto (em edição ou flutuante). Sem caixa: volta pro canto (CSS).
+function updateTextToolsPos(){
+  if(tool!=='text') return;
+  let left, top;
+  if(txtEdit){ left=txtEdit.cx - txtEdit.w/2; top=txtEdit.cy - txtEdit.curH()/2; }
+  else if(pendingShape && pendingShape.type==='text'){ left=pendingShape.cx - pendingShape.w/2; top=pendingShape.cy - pendingShape.h/2; }
+  if(left===undefined){ textTools.style.position=''; textTools.style.zIndex=''; textTools.style.left=''; textTools.style.top=''; textTools.style.transform=''; return; }   // sem caixa: volta pro canto (CSS)
+  const sp=canvasToScreen(left, top);
+  textTools.style.position='fixed'; textTools.style.zIndex='1200';   // viewport (igual canvasToScreen) e acima do textarea
+  textTools.style.left=sp.x+'px';
+  textTools.style.top=Math.max(56, sp.y - 8)+'px';                         // logo acima da borda superior da caixa
+  textTools.style.transform='translate(0,-100%)';                          // alinhada à esquerda da caixa (não centralizada sobre o giro)
+}
 
 document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>{
   if(curvePhase!==0) endCurve(false);            // descarta curva incompleta ao trocar de ferramenta
@@ -980,6 +1306,7 @@ document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>{
   tool=b.dataset.tool;
   clearTimeout(bucketUpTimer);                    // cancela o timer do balde pra ele não sobrescrever o novo cursor
   textTools.hidden = (tool!=='text');            // a mini-barra de texto só aparece na ferramenta Texto
+  updateTextToolsPos();                          // posiciona a barra (acima da caixa, se houver)
   cv.style.cursor=toolCursor();                  // balde/pincel mostram o ícone no ponteiro; borracha esconde (usa o anel)
   if(tool!=='eraser'&&tool!=='brush') toolRing.style.display='none';
   document.querySelectorAll('.tool').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); });

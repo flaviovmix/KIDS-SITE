@@ -14,7 +14,7 @@
         { label: 'Brincar', children: [
             { href: 'colorir.html',       label: 'Colorir' },
             { href: 'quebra-cabeca.html', label: 'Quebra-cabeça' },
-            { href: 'aprender.html',      label: 'Aprender' }
+            { href: 'aprender.html',      label: 'Vamos Aprender' }
         ] },
         { label: 'Mundo do Kaco', children: [
             { href: 'personagens.html',  label: 'Personagens' },
