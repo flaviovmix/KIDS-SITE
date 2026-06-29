@@ -55,6 +55,7 @@
         .pill-btn--blue   { background:linear-gradient(135deg,#38bdf8,#2563eb); box-shadow:0 12px 28px rgba(37,99,235,0.38); }
         .pill-btn--red    { background:linear-gradient(135deg,#fb7185,#e11d48); box-shadow:0 12px 28px rgba(225,29,72,0.38); }
         .pill-btn--violet { background:linear-gradient(135deg,#a78bfa,#7c3aed); box-shadow:0 12px 28px rgba(124,58,237,0.38); }
+        .pill-btn--teal   { background:linear-gradient(135deg,#2dd4bf,#0d9488); box-shadow:0 12px 28px rgba(13,148,136,0.38); }
         /* Clicar fora não fecha: o card dá uma "tremidinha" avisando. */
         @keyframes paintShake {
             10%,90% { transform:translateX(-2px); }
@@ -75,10 +76,13 @@
         /* meia-largura do canvas (proporção 760/470, travado pela altura) — usado pra
            colar o slider e as cores nas laterais do desenho em qualquer tamanho de tela */
         .paint-app { --canvas-edge:calc(50vw + min((100vh - 200px) * 0.808, 50vw - 22px) + 80px); }
-        .paint-app .canvas-wrap { background:#fff; border:6px solid #cfd8e3; border-radius:14px; line-height:0;
+        .paint-app .canvas-wrap { position:relative; background:#fff; border:6px solid #cfd8e3; border-radius:14px; line-height:0;
             box-shadow:0 8px 24px rgba(0,0,0,.12);
             height:100%; width:auto; aspect-ratio:760/470; max-width:100%; max-height:100%; }
         .paint-app canvas { display:block; width:100%; height:100%; object-fit:contain; border-radius:8px; cursor:crosshair; touch-action:none; }
+        /* camada de texto: por cima do desenho; não recebe clique (input vai pro canvas de baixo) */
+        .paint-app canvas.text-layer { position:absolute; inset:0; pointer-events:none; }
+        .paint-app canvas.layer-hidden { opacity:0; }   /* oculta a camada SEM tirar do layout (o fundo precisa receber clique) */
 
         /* barras flutuantes */
         .paint-app .bar { position:absolute; z-index:3; display:flex; align-items:center; gap:6px; flex-wrap:wrap;
@@ -104,6 +108,10 @@
         .paint-app .size-bar { position:absolute; z-index:3; top:50%; right:var(--canvas-edge); left:auto; transform:translateY(-50%);
             background:#fff; border-radius:14px; padding:12px 10px; box-shadow:0 8px 24px rgba(0,0,0,.20);
             display:flex; flex-direction:column; align-items:center; gap:8px; }
+
+        /* botão de camada (Texto): usa o visual .pill-btn; folga extra abaixo pra destacar do grupo de ações */
+        .paint-app .io-bar .layer-btn { margin-bottom:20px; }
+        .paint-app .layer-btn.off { opacity:.5; }
 
         /* controle de zoom: faixa inferior, borda direita alinhada à borda direita do canvas */
         .paint-app .zoom-bar { position:absolute; z-index:3; bottom:14px; right:max(14px, calc(100vw - var(--canvas-edge)));
@@ -313,6 +321,7 @@
             <div class="canvas-area">
                 <div class="canvas-wrap">
                     <canvas id="cv" width="760" height="470"></canvas>
+                    <canvas id="tcv" class="text-layer" width="760" height="470"></canvas>
                 </div>
             </div>
 
@@ -371,8 +380,9 @@
                 <input type="range" id="size" min="2" max="150" value="14">
             </div>
 
-            <!-- coluna à esquerda: salvar / imprimir / limpar / abrir arquivo -->
+            <!-- coluna à esquerda: texto (camada) / salvar / imprimir / limpar / abrir arquivo -->
             <div class="io-bar">
+                <button class="pill-btn pill-btn--teal layer-btn" id="layerText" type="button" data-layer="text" title="Mostrar/ocultar texto"><span class="pill-btn__icon" aria-hidden="true"><i class="fa-solid fa-eye"></i></span>Texto</button>
                 <button class="pill-btn pill-btn--green" id="save" type="button"><span class="pill-btn__icon" aria-hidden="true">💾</span>Salvar</button>
                 <button class="pill-btn pill-btn--blue" id="print" type="button"><span class="pill-btn__icon" aria-hidden="true">🖨</span>Imprimir</button>
                 <button class="pill-btn pill-btn--red" id="clear" type="button"><span class="pill-btn__icon" aria-hidden="true">🗑</span>Limpar</button>
@@ -520,6 +530,10 @@ document.addEventListener('click', e => {
 /* ===== Ferramenta de pintura (flood-fill por luminância) ===== */
 const cv = document.getElementById('cv');
 const ctx = cv.getContext('2d', { willReadFrequently:true });
+const tcv = document.getElementById('tcv');                       // camada separada só pros textos (fica POR CIMA do desenho)
+const tctx = tcv.getContext('2d');
+let texts=[];                                                     // textos fixados (objetos vivos, redesenhados — não "queimam" no desenho)
+function syncTextCanvasSize(){ tcv.width=cv.width; tcv.height=cv.height; }   // a camada de texto acompanha o tamanho do fundo
 
 let color = [226,60,160,255];   // rgba atual
 let tool = 'bucket';
@@ -527,13 +541,13 @@ let panX=0, panY=0, panning=false, panLast=null;
 let brushSize = 14;
 let txtBold=true, txtItalic=false, txtUnder=false, txtSize=48;    // estilo da ferramenta Texto (negrito ligado por padrão)
 let txtFont="'Baloo 2'";                                          // família de fonte escolhida na mini-barra
-let txtBg={r:255,g:255,b:255,a:0.6,hex:'#ffffff'};                // fundo da caixa de texto: padrão branco 60% (null = transparente), ou {r,g,b,a}
-let txtBorder={r:0,g:0,b:0,a:0.6,hex:'#000000',width:5};          // borda da caixa: padrão preto 60% / 5px (null = sem borda), ou {r,g,b,a,width}
+let txtBg=null;                                                   // fundo da caixa de texto: padrão transparente (null), ou {r,g,b,a}
+let txtBorder=null;                                               // borda da caixa: padrão sem borda (null), ou {r,g,b,a,width}
 let txtRadius=20;                                                 // raio dos cantos da caixa (fundo + contorno), em px
 let txtAlign='center';                                            // alinhamento horizontal do texto na caixa: left|center|right
 let txtVAlign='middle';                                           // alinhamento vertical do texto na caixa: top|middle|bottom
 function bgCss(bg){ return bg ? `rgba(${bg.r},${bg.g},${bg.b},${bg.a})` : null; }
-function boxPath(x,y,w,h,r){ ctx.beginPath(); if(r>0) ctx.roundRect(x,y,w,h,Math.min(r,w/2,h/2)); else ctx.rect(x,y,w,h); }   // caminho do box (cantos arredondados ou retos)
+function boxPath(g,x,y,w,h,r){ g.beginPath(); if(r>0) g.roundRect(x,y,w,h,Math.min(r,w/2,h/2)); else g.rect(x,y,w,h); }   // caminho do box (cantos arredondados ou retos) no contexto g
 const TEXT_FONTS=[{name:'Baloo',css:"'Baloo 2'"},{name:'Gibi',css:"'Comic Neue'"},{name:'Praia',css:"'Pacifico'"},{name:'Mão',css:"'Patrick Hand'"},{name:'Festa',css:"'Luckiest Guy'"}];
 
 // ---- paleta ----
@@ -545,8 +559,8 @@ const customBtn = document.getElementById('customColor');
 function clearColorSel(){ [...sw.children].forEach(c=>c.classList.remove('sel')); customBtn.classList.remove('sel'); }
 function onColorChange(){                                   // cor mudou: recolore o texto em digitação / a forma flutuante ao vivo
   const c=`rgb(${color[0]},${color[1]},${color[2]})`;
-  if(txtEdit){ txtEdit.ta.style.color=c; txtEdit.ta.style.caretColor=c; }
-  if(pendingShape) renderPending();
+  if(txtEdit){ txtEdit.ta.style.color=c; txtEdit.ta.style.caretColor=c; renderTextLayer(); }
+  if(pendingShape){ if(pendingShape.type==='text') pendingShape.color=color.slice(); renderPending(); }
 }
 PALETTE.forEach((hex,i)=>{
   const b=document.createElement('button');
@@ -615,6 +629,7 @@ document.getElementById('cpickOk').addEventListener('click',()=>{
 
 // ---- desenho de exemplo (line-art simples desenhado no canvas) ----
 function drawSample(){
+  texts.length=0; syncTextCanvasSize(); renderTextLayer();    // zera a camada de texto
   ctx.fillStyle='#fff'; ctx.fillRect(0,0,cv.width,cv.height);
   ctx.strokeStyle='#000'; ctx.lineWidth=4; ctx.lineJoin='round';
   // sol
@@ -642,16 +657,23 @@ function drawSample(){
 
 // ---- undo / redo ----
 const undoStack=[], redoStack=[];
+function cloneTexts(arr){ return arr.map(s=>JSON.parse(JSON.stringify(s))); }   // cópia profunda (shapes são dados puros)
+function snapState(){ return { img: ctx.getImageData(0,0,cv.width,cv.height), texts: cloneTexts(texts) }; }   // estado = desenho (bitmap, inclui formas) + textos (camada)
+function restoreState(st){ ctx.putImageData(st.img,0,0); texts=cloneTexts(st.texts); renderTextLayer(); }
 function pushUndo(){ if(undoStack.length>=25) undoStack.shift();
-  undoStack.push(ctx.getImageData(0,0,cv.width,cv.height)); redoStack.length=0; }  // ação nova invalida o redo
+  undoStack.push(snapState()); redoStack.length=0; }  // ação nova invalida o redo
 document.getElementById('undo').onclick=()=>{
   if(curvePhase!==0){ endCurve(false); return; } // desfaz a curva em andamento
-  if(pendingShape){ cancelPending(); return; }   // desfaz primeiro a forma que está flutuando
+  if(pendingShape){                               // desfaz primeiro a forma que está flutuando
+    if(pendingShape.type==='text' && pendingShape._fromLayer){   // texto levantado da camada: devolve (não apaga)
+      texts.push(pendingShape); pendingShape=null; pendingSnapshot=null; renderTextLayer(); cv.style.cursor=toolCursor(); updateTextToolsPos(); }
+    else cancelPending();
+    return; }
   if(undoStack.length>1){ redoStack.push(undoStack.pop());            // guarda o estado atual pro redo
-    ctx.putImageData(undoStack[undoStack.length-1],0,0); } };
+    restoreState(undoStack[undoStack.length-1]); } };
 document.getElementById('redo').onclick=()=>{
-  if(redoStack.length){ const img=redoStack.pop(); undoStack.push(img);
-    ctx.putImageData(img,0,0); } };
+  if(redoStack.length){ const st=redoStack.pop(); undoStack.push(st);
+    restoreState(st); } };
 
 // ---- coords (canvas escalado com object-fit:contain: desconta a margem
 //      letterbox e a escala pra mapear o clique no pixel certo do buffer) ----
@@ -732,65 +754,63 @@ let txtEdit=null, editDrag=null;                           // sessão de digita�
 function shapeFromPoints(a,b,type){ type=type||tool; const dx=b.x-a.x, dy=b.y-a.y;
   return { type, cx:(a.x+b.x)/2, cy:(a.y+b.y)/2,
            w:Math.abs(dx), h:Math.abs(dy), rot:0, flip:(dx*dy<0) }; }
-function drawShapeT(s){
-  ctx.save(); ctx.translate(s.cx,s.cy); ctx.rotate(s.rot);   // desenha centrado e girado
-  if(s.type==='text'){                                       // texto: multi-linha, alinhamento H/V escolhido na caixa (estilo Paint)
-    const r=s.radius||0;
-    if(s.bg){ ctx.fillStyle=bgCss(s.bg); boxPath(-s.w/2,-s.h/2,s.w,s.h,r); ctx.fill(); }   // fundo da caixa (cor/opacidade escolhidas)
-    if(s.border && s.border.width>0){ const bw=s.border.width; ctx.lineWidth=bw; ctx.strokeStyle=bgCss(s.border);   // contorno por dentro da caixa
-      boxPath(-s.w/2+bw/2,-s.h/2+bw/2, s.w-bw, s.h-bw, Math.max(0,r-bw/2)); ctx.stroke(); }
-    ctx.font=textFont(s);
-    ctx.textAlign='left'; ctx.textBaseline='top';                              // posiciona cada linha "na mão" (alinhamento H)
-    ctx.fillStyle=`rgb(${color[0]},${color[1]},${color[2]})`;
-    const lh=lineHeight(s), lines=s.lines||wrapText(s);
-    const innerL=-s.w/2+TEXT_PAD, innerR=s.w/2-TEXT_PAD, innerW=Math.max(0,innerR-innerL), blockH=lines.length*lh;
-    let y = s.valign==='middle' ? -blockH/2                                    // bloco de texto dentro da altura da caixa
-          : s.valign==='bottom' ? s.h/2-TEXT_PAD-blockH
-          : -s.h/2+TEXT_PAD;                                                    // top (default)
-    for(const ln of lines){ const lw=ctx.measureText(ln).width;
-      const x = s.halign==='center' ? innerL+(innerW-lw)/2
-              : s.halign==='right'  ? innerR-lw
-              : innerL;                                                        // left (default)
-      ctx.fillText(ln,x,y);
-      if(s.underline && ln){ const uy=y+s.fontSize;                            // sublinhado por linha
-        ctx.strokeStyle=`rgb(${color[0]},${color[1]},${color[2]})`; ctx.lineWidth=Math.max(1,s.fontSize*0.06);
-        ctx.beginPath(); ctx.moveTo(x,uy); ctx.lineTo(x+lw,uy); ctx.stroke(); }
-      y+=lh; }
-    ctx.restore(); return;
-  }
+// desenha UM texto no contexto g (camada de texto). cor = a do próprio texto (s.color), não a cor atual do balde/pincel.
+function drawText(s,g){ g.save(); g.translate(s.cx,s.cy); g.rotate(s.rot);
+  const r=s.radius||0, col=s.color||color;
+  if(s.bg){ g.fillStyle=bgCss(s.bg); boxPath(g,-s.w/2,-s.h/2,s.w,s.h,r); g.fill(); }   // fundo da caixa (cor/opacidade escolhidas)
+  if(s.border && s.border.width>0){ const bw=s.border.width; g.lineWidth=bw; g.strokeStyle=bgCss(s.border);   // contorno por dentro da caixa
+    boxPath(g,-s.w/2+bw/2,-s.h/2+bw/2, s.w-bw, s.h-bw, Math.max(0,r-bw/2)); g.stroke(); }
+  g.font=textFont(s); g.textAlign='left'; g.textBaseline='top';                          // posiciona cada linha "na mão" (alinhamento H)
+  g.fillStyle=`rgb(${col[0]},${col[1]},${col[2]})`;
+  const lh=lineHeight(s), lines=s.lines||wrapText(s);
+  const innerL=-s.w/2+TEXT_PAD, innerR=s.w/2-TEXT_PAD, innerW=Math.max(0,innerR-innerL), blockH=lines.length*lh;
+  let y = s.valign==='middle' ? -blockH/2                                                // bloco de texto dentro da altura da caixa
+        : s.valign==='bottom' ? s.h/2-TEXT_PAD-blockH
+        : -s.h/2+TEXT_PAD;                                                                // top (default)
+  for(const ln of lines){ const lw=g.measureText(ln).width;
+    const x = s.halign==='center' ? innerL+(innerW-lw)/2 : s.halign==='right' ? innerR-lw : innerL;
+    g.fillText(ln,x,y);
+    if(s.underline && ln){ const uy=y+s.fontSize;                                         // sublinhado por linha
+      g.strokeStyle=`rgb(${col[0]},${col[1]},${col[2]})`; g.lineWidth=Math.max(1,s.fontSize*0.06);
+      g.beginPath(); g.moveTo(x,uy); g.lineTo(x+lw,uy); g.stroke(); }
+    y+=lh; }
+  g.restore(); }
+function drawShapeT(s, g){ g=g||ctx;
+  if(s.type==='text'){ drawText(s, g); return; }             // texto mora na camada de texto
+  g.save(); g.translate(s.cx,s.cy); g.rotate(s.rot);         // desenha centrado e girado
   if(s.type==='predef'){                                     // desenho pronto (line-art PNG): carimba a imagem na caixa
     const p=PREDEF[s.draw];
-    if(p && p.img) ctx.drawImage(p.img, -s.w/2, -s.h/2, s.w, s.h);
-    ctx.restore(); return;
+    if(p && p.img) g.drawImage(p.img, -s.w/2, -s.h/2, s.w, s.h);
+    g.restore(); return;
   }
-  ctx.strokeStyle=`rgb(${color[0]},${color[1]},${color[2]})`;
-  ctx.lineWidth=brushSize; ctx.lineCap='round'; ctx.lineJoin='round';
+  g.strokeStyle=`rgb(${color[0]},${color[1]},${color[2]})`;
+  g.lineWidth=brushSize; g.lineCap='round'; g.lineJoin='round';
   const hw=s.w/2, hh=s.h/2;
-  ctx.beginPath();
-  if(s.type==='line'){ if(s.flip){ ctx.moveTo(-hw,hh); ctx.lineTo(hw,-hh); } else { ctx.moveTo(-hw,-hh); ctx.lineTo(hw,hh); } }
-  else if(s.type==='triangle'){ ctx.moveTo(0,-hh); ctx.lineTo(-hw,hh); ctx.lineTo(hw,hh); ctx.closePath(); }
-  else if(s.type==='rect'){ ctx.rect(-hw,-hh,s.w,s.h); }
-  else if(s.type==='rrect'){ ctx.roundRect(-hw,-hh,s.w,s.h, Math.min(hw,hh)*0.35); }
-  else if(s.type==='ellipse'){ ctx.ellipse(0,0,hw,hh,0,0,Math.PI*2); }
+  g.beginPath();
+  if(s.type==='line'){ if(s.flip){ g.moveTo(-hw,hh); g.lineTo(hw,-hh); } else { g.moveTo(-hw,-hh); g.lineTo(hw,hh); } }
+  else if(s.type==='triangle'){ g.moveTo(0,-hh); g.lineTo(-hw,hh); g.lineTo(hw,hh); g.closePath(); }
+  else if(s.type==='rect'){ g.rect(-hw,-hh,s.w,s.h); }
+  else if(s.type==='rrect'){ g.roundRect(-hw,-hh,s.w,s.h, Math.min(hw,hh)*0.35); }
+  else if(s.type==='ellipse'){ g.ellipse(0,0,hw,hh,0,0,Math.PI*2); }
   else if(s.type==='pentagon' || s.type==='hexagon'){ const n=s.type==='pentagon'?5:6;   // polígono regular na caixa
-    for(let i=0;i<n;i++){ const a=-Math.PI/2 + i*2*Math.PI/n, x=Math.cos(a)*hw, y=Math.sin(a)*hh; i?ctx.lineTo(x,y):ctx.moveTo(x,y); } ctx.closePath(); }
+    for(let i=0;i<n;i++){ const a=-Math.PI/2 + i*2*Math.PI/n, x=Math.cos(a)*hw, y=Math.sin(a)*hh; i?g.lineTo(x,y):g.moveTo(x,y); } g.closePath(); }
   else if(s.type==='star'){ const sp=5;   // estrela de 5 pontas (raio externo/interno)
-    for(let i=0;i<sp*2;i++){ const a=-Math.PI/2 + i*Math.PI/sp, rad=(i%2?0.45:1), x=Math.cos(a)*hw*rad, y=Math.sin(a)*hh*rad; i?ctx.lineTo(x,y):ctx.moveTo(x,y); } ctx.closePath(); }
-  else if(s.type==='heart'){ ctx.moveTo(0,hh*0.9);
-    ctx.bezierCurveTo(-hw*1.05,-hh*0.1, -hw*0.55,-hh, 0,-hh*0.35);
-    ctx.bezierCurveTo( hw*0.55,-hh,  hw*1.05,-hh*0.1, 0,hh*0.9); ctx.closePath(); }
+    for(let i=0;i<sp*2;i++){ const a=-Math.PI/2 + i*Math.PI/sp, rad=(i%2?0.45:1), x=Math.cos(a)*hw*rad, y=Math.sin(a)*hh*rad; i?g.lineTo(x,y):g.moveTo(x,y); } g.closePath(); }
+  else if(s.type==='heart'){ g.moveTo(0,hh*0.9);
+    g.bezierCurveTo(-hw*1.05,-hh*0.1, -hw*0.55,-hh, 0,-hh*0.35);
+    g.bezierCurveTo( hw*0.55,-hh,  hw*1.05,-hh*0.1, 0,hh*0.9); g.closePath(); }
   else if(s.type==='arrow'){ const ah=hh*0.5;   // seta-bloco apontando pra direita (gire pela alça)
-    ctx.moveTo(-hw,-ah); ctx.lineTo(hw*0.3,-ah); ctx.lineTo(hw*0.3,-hh);
-    ctx.lineTo(hw,0); ctx.lineTo(hw*0.3,hh); ctx.lineTo(hw*0.3,ah); ctx.lineTo(-hw,ah); ctx.closePath(); }
+    g.moveTo(-hw,-ah); g.lineTo(hw*0.3,-ah); g.lineTo(hw*0.3,-hh);
+    g.lineTo(hw,0); g.lineTo(hw*0.3,hh); g.lineTo(hw*0.3,ah); g.lineTo(-hw,ah); g.closePath(); }
   else if(s.type==='speech'){ const bb=hh*0.5, r=Math.min(hw,hh)*0.22;   // balão (corpo arredondado + rabicho)
-    ctx.moveTo(-hw+r,-hh); ctx.lineTo(hw-r,-hh); ctx.arcTo(hw,-hh,hw,-hh+r,r);
-    ctx.lineTo(hw,bb-r); ctx.arcTo(hw,bb,hw-r,bb,r);
-    ctx.lineTo(-hw*0.1,bb); ctx.lineTo(-hw*0.45,hh); ctx.lineTo(-hw*0.5,bb);
-    ctx.lineTo(-hw+r,bb); ctx.arcTo(-hw,bb,-hw,bb-r,r);
-    ctx.lineTo(-hw,-hh+r); ctx.arcTo(-hw,-hh,-hw+r,-hh,r); ctx.closePath(); }
+    g.moveTo(-hw+r,-hh); g.lineTo(hw-r,-hh); g.arcTo(hw,-hh,hw,-hh+r,r);
+    g.lineTo(hw,bb-r); g.arcTo(hw,bb,hw-r,bb,r);
+    g.lineTo(-hw*0.1,bb); g.lineTo(-hw*0.45,hh); g.lineTo(-hw*0.5,bb);
+    g.lineTo(-hw+r,bb); g.arcTo(-hw,bb,-hw,bb-r,r);
+    g.lineTo(-hw,-hh+r); g.arcTo(-hw,-hh,-hw+r,-hh,r); g.closePath(); }
   else if(s.type==='curve'){ const q=s.pts;   // bézier guardada normalizada (-1..1) na caixa
-    ctx.moveTo(q[0].x*hw,q[0].y*hh); ctx.bezierCurveTo(q[1].x*hw,q[1].y*hh,q[2].x*hw,q[2].y*hh,q[3].x*hw,q[3].y*hh); }
-  ctx.stroke(); ctx.restore();
+    g.moveTo(q[0].x*hw,q[0].y*hh); g.bezierCurveTo(q[1].x*hw,q[1].y*hh,q[2].x*hw,q[2].y*hh,q[3].x*hw,q[3].y*hh); }
+  g.stroke(); g.restore();
 }
 
 // ---- texto: vira a MESMA forma flutuante (mover/girar/escalar) das demais ----
@@ -821,7 +841,7 @@ function measureText(s){ s.lines=wrapText(s);                 // largura (s.w) �
   if(s.h===undefined || s.h<s.minH) s.h=s.minH; }            // altura da caixa pode ser MAIOR (manual), nunca menor que o texto
 function makeText(text,cx,cy,w){ const s={ type:'text', text, cx, cy, rot:0,
   fontSize:txtSize, bold:txtBold, italic:txtItalic, underline:txtUnder, font:txtFont, bg: txtBg?{...txtBg}:null, border: txtBorder?{...txtBorder}:null, radius:txtRadius,
-  halign:txtAlign, valign:txtVAlign, w:w||40 };
+  halign:txtAlign, valign:txtVAlign, color: color.slice(), w:w||40 };
   if(!w){ ctx.save(); ctx.font=textFont(s);                   // sem largura definida: usa a linha mais larga, limitada a 90% do canvas
     let nat=0; String(text).split('\n').forEach(l=>{ nat=Math.max(nat, ctx.measureText(l).width); });
     ctx.restore(); s.w=Math.max(40, Math.min(nat+10, cv.width*0.9)); }
@@ -836,8 +856,7 @@ const DEFAULT_TEXT_W=280;
 // Ctrl+Enter / clicar fora = confirma, Esc = cancela. Reusada pra criar (sem shape) e reeditar (com shape).
 function openTextEditor(opts){
   const reedit=!!opts.shape, s=opts.shape;
-  if(reedit){ txtFont=s.font||txtFont; txtSize=s.fontSize; txtBold=s.bold; txtItalic=s.italic; txtUnder=s.underline; txtBg=s.bg?{...s.bg}:null; txtBorder=s.border?{...s.border}:null; txtRadius=s.radius||0; txtAlign=s.halign||'left'; txtVAlign=s.valign||'top'; syncTextToolbar(); }   // reedição: a barra reflete o estilo do texto
-  const baseSnap = reedit ? pendingSnapshot : ctx.getImageData(0,0,cv.width,cv.height);   // desenho limpo (sem texto/alças)
+  if(reedit){ txtFont=s.font||txtFont; txtSize=s.fontSize; txtBold=s.bold; txtItalic=s.italic; txtUnder=s.underline; txtBg=s.bg?{...s.bg}:null; txtBorder=s.border?{...s.border}:null; txtRadius=s.radius||0; txtAlign=s.halign||'left'; txtVAlign=s.valign||'top'; if(s.color) color=s.color.slice(); syncTextToolbar(); }   // reedição: a barra reflete o estilo do texto
   const sty = reedit ? s : { italic:txtItalic, bold:txtBold, fontSize:txtSize, font:txtFont };
   const scale = canvasToScreen(0,0).scale;
   const ta=document.createElement('textarea');
@@ -845,7 +864,7 @@ function openTextEditor(opts){
   ta.style.font=textFont({ italic:sty.italic, bold:sty.bold, fontSize:Math.round(sty.fontSize*scale), font:sty.font });
   ta.style.color=`rgb(${color[0]},${color[1]},${color[2]})`;
   // sessão de edição: geometria MUTÁVEL da caixa — as alças mexem aqui durante a digitação
-  const ed={ ta, reedit, baseSnap, scale, fontSize:sty.fontSize,
+  const ed={ ta, reedit, scale, fontSize:sty.fontSize,
     cx: reedit?s.cx:opts.cx, cy: reedit?s.cy:opts.cy,
     w: reedit?s.w:(opts.w||DEFAULT_TEXT_W), rot: reedit?s.rot:0,
     h: reedit ? s.h : (opts.h && opts.h>20 ? opts.h : 0),                                          // altura desejada da caixa (0 = auto/cola no texto)
@@ -864,14 +883,7 @@ function openTextEditor(opts){
       ta.style.width=(Math.max(8,this.w-2*TEXT_PAD)*this.scale)+'px';
       ta.style.textAlign=this.halign;
       ta.style.transform='translate(-50%,-50%) rotate('+this.rot+'rad)'; },                        // gira junto com a moldura
-    paint(){ const h=this.curH(); ctx.putImageData(this.baseSnap,0,0);                            // fundo da caixa + moldura + alças, atrás do textarea
-      ctx.save(); ctx.translate(this.cx,this.cy); ctx.rotate(this.rot);
-      const r=txtRadius||0;
-      ctx.fillStyle=bgCss(txtBg) || 'rgba(255,255,255,0.5)'; boxPath(-this.w/2,-h/2,this.w,h,r); ctx.fill();   // fundo escolhido, ou branco fraco só p/ legibilidade ao digitar
-      if(txtBorder && txtBorder.width>0){ const bw=txtBorder.width; ctx.lineWidth=bw; ctx.strokeStyle=bgCss(txtBorder);   // prévia do contorno
-        boxPath(-this.w/2+bw/2,-h/2+bw/2, this.w-bw, h-bw, Math.max(0,r-bw/2)); ctx.stroke(); }
-      ctx.restore();
-      drawShapeChrome(this.cx,this.cy,this.w,h,this.rot); updateTextToolsPos(); } };
+    paint(){ renderTextLayer(); updateTextToolsPos(); } };   // redesenha a camada de texto (o aid de edição é desenhado lá quando txtEdit está ativo)
   txtEdit=ed; textEditorOpen=true;
   ed.place(); document.body.appendChild(ta); ed.paint();
   const grow=()=>{ ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; ed.place(); ed.paint(); };
@@ -880,16 +892,16 @@ function openTextEditor(opts){
   let done=false;
   function finish(commit){ if(done) return; done=true; textEditorOpen=false; txtEdit=null; editDrag=null;
     const val=ta.value.replace(/\s+$/,''); ta.remove();
-    ctx.putImageData(baseSnap,0,0);                           // tira a moldura de edição antes de fixar/cancelar
     if(reedit){
       if(commit && !val){ cancelPending(); return; }           // apagou tudo: remove o texto
       if(commit){ s.text=val; s.cx=ed.cx; s.cy=ed.cy; s.w=ed.w; s.h=ed.curH(); s.rot=ed.rot;
         s.bold=txtBold; s.italic=txtItalic; s.underline=txtUnder; s.fontSize=txtSize; s.font=txtFont; s.bg=txtBg?{...txtBg}:null; s.border=txtBorder?{...txtBorder}:null; s.radius=txtRadius;
-        s.halign=txtAlign; s.valign=txtVAlign; measureText(s); }   // persiste o estilo (incl. alinhamento e altura da caixa) escolhido na reedição
+        s.halign=txtAlign; s.valign=txtVAlign; s.color=color.slice(); measureText(s); }   // persiste o estilo (incl. cor/alinhamento/altura) escolhido na reedição
       renderPending();
-    } else if(commit && val){ pendingSnapshot=baseSnap;
+    } else if(commit && val){
       pendingShape=makeText(val, ed.cx, ed.cy, ed.w); pendingShape.rot=ed.rot;
-      pendingShape.halign=txtAlign; pendingShape.valign=txtVAlign; pendingShape.h=ed.curH(); measureText(pendingShape); renderPending(); }
+      pendingShape.halign=txtAlign; pendingShape.valign=txtVAlign; pendingShape.h=ed.curH(); pendingSnapshot=null; measureText(pendingShape); renderPending();
+    } else { renderTextLayer(); }                              // cancelou/sem texto: limpa o aid de edição da camada
     if(pendingShape){ textJustCommitted=true; setTimeout(()=>{ textJustCommitted=false; },0); }   // mantém as alças; o clique que fechou não queima
   }
   ed.finish=finish;
@@ -979,31 +991,61 @@ function hitHandle(s,p){ const l=toLocal(s,p), hw=s.w/2, hh=s.h/2;
   if(Math.abs(l.x)<=hw+HANDLE_R && Math.abs(l.y)<=hh+HANDLE_R) return 'move';
   return null; }
 // moldura tracejada + alças (canto/lado=tamanho, verde=girar, ✕ vermelho=apagar) de uma caixa qualquer
-function drawShapeChrome(cx,cy,w,h,rot){ const hw=w/2, hh=h/2;
-  ctx.save(); ctx.translate(cx,cy); ctx.rotate(rot);
-  ctx.setLineDash([7,5]); ctx.strokeStyle='#7a7f87'; ctx.lineWidth=1;   // moldura tracejada
-  ctx.strokeRect(-hw,-hh,w,h); ctx.setLineDash([]);
-  ctx.beginPath(); ctx.moveTo(0,-hh); ctx.lineTo(0,-hh-ROT_OFF); ctx.stroke();   // haste do giro
-  ctx.beginPath(); ctx.arc(0,-hh-ROT_OFF,8,0,Math.PI*2); ctx.fillStyle='#22c55e'; ctx.fill();
-  ctx.lineWidth=2; ctx.strokeStyle='#fff'; ctx.stroke();                          // alça verde = girar
-  ctx.fillStyle='#fff'; ctx.strokeStyle='#7a7f87'; ctx.lineWidth=1.5;            // alças de canto + lado = tamanho
+function drawShapeChrome(cx,cy,w,h,rot,g){ g=g||ctx; const hw=w/2, hh=h/2;
+  g.save(); g.translate(cx,cy); g.rotate(rot);
+  g.setLineDash([7,5]); g.strokeStyle='#7a7f87'; g.lineWidth=1;   // moldura tracejada
+  g.strokeRect(-hw,-hh,w,h); g.setLineDash([]);
+  g.beginPath(); g.moveTo(0,-hh); g.lineTo(0,-hh-ROT_OFF); g.stroke();   // haste do giro
+  g.beginPath(); g.arc(0,-hh-ROT_OFF,8,0,Math.PI*2); g.fillStyle='#22c55e'; g.fill();
+  g.lineWidth=2; g.strokeStyle='#fff'; g.stroke();                          // alça verde = girar
+  g.fillStyle='#fff'; g.strokeStyle='#7a7f87'; g.lineWidth=1.5;            // alças de canto + lado = tamanho
   [[-hw,-hh],[hw,-hh],[hw,hh],[-hw,hh],[0,-hh],[0,hh],[hw,0],[-hw,0]].forEach(([x,y])=>{
-    ctx.beginPath(); ctx.rect(x-7,y-7,14,14); ctx.fill(); ctx.stroke(); });
+    g.beginPath(); g.rect(x-7,y-7,14,14); g.fill(); g.stroke(); });
   const dlx=hw+24, dly=-hh-24;                                                   // botão ✕ vermelho GIGANTE = apagar a forma
-  ctx.beginPath(); ctx.arc(dlx,dly,26,0,Math.PI*2); ctx.fillStyle='#ef4444'; ctx.fill();
-  ctx.lineWidth=3; ctx.strokeStyle='#fff'; ctx.stroke();
-  ctx.lineCap='round'; ctx.lineWidth=5;
-  ctx.beginPath(); ctx.moveTo(dlx-10,dly-10); ctx.lineTo(dlx+10,dly+10);
-  ctx.moveTo(dlx+10,dly-10); ctx.lineTo(dlx-10,dly+10); ctx.stroke();
-  ctx.restore(); }
-function renderPending(){ ctx.putImageData(pendingSnapshot,0,0);
+  g.beginPath(); g.arc(dlx,dly,26,0,Math.PI*2); g.fillStyle='#ef4444'; g.fill();
+  g.lineWidth=3; g.strokeStyle='#fff'; g.stroke();
+  g.lineCap='round'; g.lineWidth=5;
+  g.beginPath(); g.moveTo(dlx-10,dly-10); g.lineTo(dlx+10,dly+10);
+  g.moveTo(dlx+10,dly-10); g.lineTo(dlx-10,dly+10); g.stroke();
+  g.restore(); }
+// redesenha a camada de texto: todos os textos fixados + (se houver) o texto flutuante/em edição com as alças.
+function renderTextLayer(){ tctx.clearRect(0,0,tcv.width,tcv.height);
+  for(const s of texts) drawText(s, tctx);
+  if(txtEdit){                                               // digitando: caixa-aid (fundo/borda) + alças; o texto vem do textarea por cima
+    const ed=txtEdit, h=ed.curH(), r=txtRadius||0;
+    tctx.save(); tctx.translate(ed.cx,ed.cy); tctx.rotate(ed.rot);
+    tctx.fillStyle=bgCss(txtBg) || 'rgba(255,255,255,0.5)'; boxPath(tctx,-ed.w/2,-h/2,ed.w,h,r); tctx.fill();
+    if(txtBorder && txtBorder.width>0){ const bw=txtBorder.width; tctx.lineWidth=bw; tctx.strokeStyle=bgCss(txtBorder);
+      boxPath(tctx,-ed.w/2+bw/2,-h/2+bw/2, ed.w-bw, h-bw, Math.max(0,r-bw/2)); tctx.stroke(); }
+    tctx.restore();
+    drawShapeChrome(ed.cx,ed.cy,ed.w,h,ed.rot, tctx);
+  } else if(pendingShape && pendingShape.type==='text'){     // texto flutuante (selecionado, não editando): texto + alças
+    drawText(pendingShape, tctx);
+    drawShapeChrome(pendingShape.cx,pendingShape.cy,pendingShape.w,pendingShape.h,pendingShape.rot, tctx);
+  }
+}
+function renderPending(){ if(pendingShape && pendingShape.type==='text'){ renderTextLayer(); updateTextToolsPos(); return; }   // texto: só a camada de texto
+  ctx.putImageData(pendingSnapshot,0,0);
   drawShapeT(pendingShape);
   drawShapeChrome(pendingShape.cx,pendingShape.cy,pendingShape.w,pendingShape.h,pendingShape.rot); updateTextToolsPos(); }
 function commitPending(){ if(!pendingShape) return;        // fixa: redesenha SEM as alças e grava no undo
-  ctx.putImageData(pendingSnapshot,0,0); drawShapeT(pendingShape);
+  if(pendingShape.type==='text'){ texts.push(pendingShape); pendingShape=null; pendingSnapshot=null;   // texto fixado entra na camada (não queima no desenho)
+    renderTextLayer(); pushUndo(); cv.style.cursor=toolCursor(); updateTextToolsPos(); return; }
+  ctx.putImageData(pendingSnapshot,0,0); drawShapeT(pendingShape);   // formas/predef: queimam no fundo (dá pra pintar por cima/dentro)
   pushUndo(); pendingShape=null; pendingSnapshot=null; cv.style.cursor=toolCursor(); updateTextToolsPos(); }
-function cancelPending(){ if(!pendingShape) return;        // descarta: volta ao snapshot anterior
-  ctx.putImageData(pendingSnapshot,0,0); pendingShape=null; pendingSnapshot=null; cv.style.cursor=toolCursor(); updateTextToolsPos(); }
+function cancelPending(){ if(!pendingShape) return;        // descarta a forma flutuante
+  if(pendingShape.type==='text'){ pendingShape=null; pendingSnapshot=null; renderTextLayer(); }   // texto: só limpa a camada
+  else { ctx.putImageData(pendingSnapshot,0,0); pendingShape=null; pendingSnapshot=null; }   // forma: volta ao snapshot do fundo
+  cv.style.cursor=toolCursor(); updateTextToolsPos(); }
+// ---- seleção de texto já fixado (na camada): clicar com a ferramenta Texto "levanta" o texto pra editar/mover ----
+function pointInText(s,p){ const l=toLocal(s,p); return Math.abs(l.x)<=s.w/2 && Math.abs(l.y)<=s.h/2; }
+function textAt(p){ for(let i=texts.length-1;i>=0;i--) if(pointInText(texts[i],p)) return i; return -1; }   // topo primeiro
+function liftText(i){ const s=texts.splice(i,1)[0];        // tira da camada e vira forma flutuante (com alças)
+  pendingShape=s; pendingShape._fromLayer=true; pendingSnapshot=null;   // marca: veio da camada (desfazer devolve, não apaga)
+  txtFont=s.font||txtFont; txtSize=s.fontSize; txtBold=s.bold; txtItalic=s.italic; txtUnder=s.underline;
+  txtBg=s.bg?{...s.bg}:null; txtBorder=s.border?{...s.border}:null; txtRadius=s.radius||0;
+  txtAlign=s.halign||'left'; txtVAlign=s.valign||'top'; if(s.color) color=s.color.slice();
+  syncTextToolbar(); renderTextLayer(); cv.style.cursor=toolCursor(); updateTextToolsPos(); }
 
 // ---- curva estilo Paint: arrasta a base, depois arrasta 2x pra moldar; ao terminar
 //      vira a MESMA forma flutuante (mover/redimensionar/girar) das demais. ----
@@ -1042,9 +1084,10 @@ cv.addEventListener('pointerdown',e=>{ if(tool==='hand'||e.button===1){ panning=
     if(hit==='delete'){ cancelPending(); return; }   // ✕: apaga a forma flutuante escolhida errada
     if(hit){ dragMode=hit; dragLast=p; dragMoved=false; applyCursor(hit); cv.setPointerCapture(e.pointerId); return; }
     commitPending();                         // clicou fora: fixa a forma e segue pro comportamento da ferramenta
-    if(tool==='text') return;                // não abre novo prompt no mesmo clique que fixou a forma
+    if(tool==='text'){ const ti=textAt(p); if(ti>=0) liftText(ti); return; }   // pode ter caído sobre outro texto → seleciona ele
   }
-  if(tool==='text'){                         // texto: arrasta pra definir a área da caixa (estilo Paint)
+  if(tool==='text'){                         // texto: clicar num existente seleciona; senão arrasta pra criar (estilo Paint)
+    const ti=textAt(p); if(ti>=0){ liftText(ti); return; }   // clicou num texto já fixado → vira forma flutuante (mover/editar)
     textDragging=true; textStart=p; textSnap=ctx.getImageData(0,0,cv.width,cv.height);
     cv.setPointerCapture(e.pointerId); return;
   }
@@ -1162,8 +1205,13 @@ function makeDropdown(items, value, width, onPick){
   function renderCur(){ const it=itemOf(value); cur.textContent=it?it.label:value; cur.style.fontFamily=it&&it.font?it.font+',sans-serif':''; }
   function markSel(){ [...list.children].forEach(o=>o.classList.toggle('sel', String(o.dataset.value)===String(value))); }
   function close(){ list.hidden=true; wrap.classList.remove('open'); }
-  function open(){ const r=cur.getBoundingClientRect(); list.style.left=r.left+'px'; list.style.top=(r.bottom+6)+'px';   // posiciona sob o gatilho (viewport)
-    list.hidden=false; wrap.classList.add('open'); markSel(); }
+  function open(){ const r=cur.getBoundingClientRect();
+    list.hidden=false; wrap.classList.add('open'); markSel();                 // mostra primeiro pra medir a altura real
+    list.style.left=r.left+'px';
+    const h=list.offsetHeight, vh=window.innerHeight;
+    if(r.bottom+6+h > vh && r.top-6-h > 0) list.style.top=(r.top-6-h)+'px';   // não cabe embaixo (e cabe em cima) → abre pra cima
+    else list.style.top=(r.bottom+6)+'px';                                    // padrão: sob o gatilho
+  }
   items.forEach(it=>{ const o=document.createElement('button'); o.type='button'; o.className='tt-dd-opt'; o.dataset.value=it.value;
     o.textContent=it.label; if(it.font) o.style.fontFamily=it.font+',sans-serif';
     o.addEventListener('click',()=>{ value=it.value; renderCur(); close(); onPick(it.value); });
@@ -1358,10 +1406,21 @@ syncSizeFill();
 document.getElementById('clear').onclick=()=>{ pendingShape=null; pendingSnapshot=null;
   curvePhase=0; curveDrag=false; curveSnap=null;
   if(loadedImg) drawImg(loadedImg); else if(blankMode) blankCanvas(); else drawSample(); };
+// achata as camadas VISÍVEIS (desenho + texto) num único canvas pra exportar/imprimir
+function flattenCanvas(){ const c=document.createElement('canvas'); c.width=cv.width; c.height=cv.height;
+  const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height);   // base branca (caso o desenho esteja oculto)
+  [cv,tcv].forEach(cnv=>{ if(!cnv.classList.contains('layer-hidden')) x.drawImage(cnv,0,0); });
+  return c; }
 document.getElementById('save').onclick=()=>{ if(curvePhase!==0) endCurve(true); if(pendingShape) commitPending(); const a=document.createElement('a');
-  a.download='colorir.png'; a.href=cv.toDataURL('image/png'); a.click(); };
+  a.download='colorir.png'; a.href=flattenCanvas().toDataURL('image/png'); a.click(); };
 document.getElementById('print').onclick=()=>{ if(curvePhase!==0) endCurve(true); if(pendingShape) commitPending(); const w=window.open('');
-  w.document.write('<img src="'+cv.toDataURL()+'" style="max-width:100%">'); w.document.close(); w.focus(); setTimeout(()=>w.print(),300); };
+  w.document.write('<img src="'+flattenCanvas().toDataURL()+'" style="max-width:100%">'); w.document.close(); w.focus(); setTimeout(()=>w.print(),300); };
+// ---- camadas: ocultar/exibir (olho) ----
+const layerCanvas={ text:tcv };
+document.querySelectorAll('.layer-btn').forEach(b=>{ b.onclick=()=>{
+  const cnv=layerCanvas[b.dataset.layer], hidden=cnv.classList.toggle('layer-hidden');   // opacity:0 esconde sem matar o clique do fundo
+  b.classList.toggle('off', hidden);
+  b.querySelector('i').className='fa-solid '+(hidden?'fa-eye-slash':'fa-eye'); }; });
 
 // ---- upload de arte real ----
 let loadedImg=null;
@@ -1374,6 +1433,7 @@ function drawImg(img){ // encaixa mantendo proporção, fundo branco
   if(wrap) wrap.style.aspectRatio = cv.width + ' / ' + cv.height;
   ctx.fillStyle='#fff'; ctx.fillRect(0,0,cv.width,cv.height);
   ctx.drawImage(img,0,0,cv.width,cv.height);
+  texts.length=0; syncTextCanvasSize(); renderTextLayer();    // camada de texto acompanha o novo tamanho e zera
   undoStack.length=0; pushUndo();
 }
 function blankCanvas(){ // tela branca no tamanho padrão (card "desenhe ou carregue")
@@ -1381,6 +1441,7 @@ function blankCanvas(){ // tela branca no tamanho padrão (card "desenhe ou carr
   cv.width=760; cv.height=470;
   const wrap=cv.closest('.canvas-wrap'); if(wrap) wrap.style.aspectRatio='760 / 470';
   ctx.fillStyle='#fff'; ctx.fillRect(0,0,cv.width,cv.height);
+  texts.length=0; syncTextCanvasSize(); renderTextLayer();    // camada de texto acompanha o tamanho e zera
   undoStack.length=0; pushUndo();
 }
 document.getElementById('upload').onchange=e=>{ const f=e.target.files[0]; if(!f) return;
