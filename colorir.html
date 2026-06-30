@@ -181,6 +181,7 @@
             transition:transform .12s ease, color .12s ease; }
         .paint-app button.tool:hover { transform:translateY(-2px); }
         .paint-app button.tool i { font-size:34px; }
+        .paint-app button.tool svg { width:38px; height:38px; }   /* seta-bloco (SVG) no mesmo tamanho visual dos ícones */
         .paint-app button.tool.sel { color:var(--accent); }
         .paint-app button.act { width:56px; height:56px; padding:0; display:inline-grid; place-items:center;
             background:none; color:#2b2f36; border:0; font-family:inherit; font-weight:700; font-size:32px;
@@ -189,9 +190,13 @@
         /* botão "Desenhos prontos" (galeria) + painel de desenhos pré-definidos */
         .paint-app .gallery-btn i { font-size:32px; }
         .paint-app .gallery-btn.on { color:var(--accent); }
+        /* botão de balões: caret indicando que abre opções */
+        .paint-app #balloonBtn, .paint-app #galleryBtn { position:relative; }
+        .paint-app .tool-caret { position:absolute; right:-16px; top:50%; transform:translateY(-50%); font-size:32px; line-height:1; color:#9aa3af; pointer-events:none; }
+        .paint-app #balloonBtn.sel .tool-caret, .paint-app #galleryBtn.on .tool-caret { color:var(--accent); }
         .paint-app .predef-panel { position:absolute; z-index:5; top:78px; left:50%; transform:translateX(-50%);
             background:#fff; border-radius:16px; padding:14px; box-shadow:0 12px 30px rgba(0,0,0,.25);
-            display:grid; grid-template-columns:repeat(3,86px); gap:12px; max-width:92vw; max-height:70vh; overflow:auto;
+            display:flex; flex-wrap:wrap; justify-content:center; gap:12px; width:310px; max-width:92vw; max-height:70vh; overflow:auto;
             transform-origin:top center; animation:predefPop .26s cubic-bezier(.34,1.45,.5,1) backwards; }
         .paint-app .predef-panel[hidden] { display:none; }
         /* abertura elegante: o painel "salta" do botão (escala+fade) e os cards sobem em cascata */
@@ -199,7 +204,7 @@
                                to   { opacity:1; transform:translateX(-50%) translateY(0)     scale(1);  } }
         @keyframes predefItemUp { from { opacity:0; transform:translateY(8px) scale(.95); }
                                   to   { opacity:1; transform:none; } }
-        .paint-app .predef-item { display:flex; flex-direction:column; align-items:center; gap:6px;
+        .paint-app .predef-item { width:86px; display:flex; flex-direction:column; align-items:center; gap:6px;
             border:2px solid #e3e8ef; border-radius:12px; background:#fff; padding:8px 6px; cursor:pointer;
             transition:transform .12s ease, border-color .12s ease; font-family:inherit;
             animation:predefItemUp .3s ease backwards; }
@@ -209,8 +214,10 @@
         .paint-app .predef-item:nth-child(4){ animation-delay:.23s; }
         .paint-app .predef-item:nth-child(5){ animation-delay:.28s; }
         .paint-app .predef-item:nth-child(6){ animation-delay:.33s; }
+        .paint-app .predef-item:nth-child(7){ animation-delay:.38s; }
         .paint-app .predef-item:hover { transform:translateY(-2px); border-color:var(--accent); }
         .paint-app .predef-item img { width:62px; height:62px; object-fit:contain; }
+        .paint-app .predef-item svg { width:60px; height:60px; color:#2b2f36; }   /* prévia dos balões (SVG) */
         .paint-app .predef-item span { font-size:13px; font-weight:700; color:#334; }
         /* slider vertical: fill por gradiente (enche de baixo até o thumb), thumb redondo custom */
         .paint-app input[type=range] { -webkit-appearance:none; appearance:none; cursor:pointer;
@@ -336,7 +343,8 @@
                     <button class="tool" data-tool="brush" title="Pincel"><i class="fa-solid fa-paintbrush"></i></button>
                     <button class="tool" data-tool="eraser" title="Borracha"><i class="fa-solid fa-eraser"></i></button>
                     <span class="bar-sep"></span>
-                    <button class="act gallery-btn" id="galleryBtn" type="button" title="Desenhos prontos"><i class="fa-solid fa-stamp"></i></button>
+                    <button class="act gallery-btn" id="galleryBtn" type="button" title="Desenhos prontos"><i class="fa-solid fa-stamp"></i><span class="tool-caret" aria-hidden="true">▾</span></button>
+                    <button class="tool" id="balloonBtn" type="button" title="Balões"><i class="fa-regular fa-comment"></i><span class="tool-caret" aria-hidden="true">▾</span></button>
                     <button class="tool shape" data-tool="line" title="Linha"><i class="fa-solid fa-slash"></i></button>
                     <button class="tool shape" data-tool="curve" title="Curva"><i class="fa-solid fa-bezier-curve"></i></button>
                     <button class="tool shape" data-tool="triangle" title="Triângulo">△</button>
@@ -347,14 +355,16 @@
                     <button class="tool shape" data-tool="hexagon" title="Hexágono">⬡</button>
                     <button class="tool shape" data-tool="star" title="Estrela"><i class="fa-regular fa-star"></i></button>
                     <button class="tool shape" data-tool="heart" title="Coração"><i class="fa-regular fa-heart"></i></button>
-                    <button class="tool shape" data-tool="arrow" title="Seta"><i class="fa-solid fa-arrow-right"></i></button>
-                    <button class="tool shape" data-tool="speech" title="Balão de fala"><i class="fa-regular fa-comment"></i></button>
+                    <button class="tool shape" data-tool="arrow" title="Seta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M1.5 8.5H13V2l9.5 10L13 22v-6.5H1.5z"/></svg></button>
                     <button class="tool shape" data-tool="text" title="Texto (clique pra escrever)"><i class="fa-solid fa-font"></i></button>
                 </div>
             </div>
 
             <!-- painel de desenhos prontos (flor, etc.): clicar carimba a figura no centro pra mover/redimensionar/colorir -->
             <div class="predef-panel" id="predefPanel" hidden></div>
+
+            <!-- painel de balões: escolhe o modelo (fala/retângulo/oval/pensamento/grito) e desenha arrastando -->
+            <div class="predef-panel" id="balloonPanel" hidden></div>
 
             <!-- mini-barra de texto (aparece só com a ferramenta Texto) -->
             <div class="bar text-tools" id="textTools" hidden>
@@ -744,7 +754,7 @@ function paintLine(a,b){ ctx.strokeStyle = tool==='eraser' ? '#fff' : `rgb(${col
 
 // ---- formas prontas (linha/triângulo/quadrado/círculo): arrasta do início ao fim ----
 // (a curva tem desenho próprio de 3 arrastos, mas no fim vira a MESMA forma flutuante)
-const SHAPES=['line','triangle','rect','rrect','ellipse','pentagon','hexagon','star','heart','arrow','speech'];
+const SHAPES=['line','triangle','rect','rrect','ellipse','pentagon','hexagon','star','heart','arrow','speech','rectspeech','oval','funbubble','cloudspeech','burst','thought'];
 let shaping=false, shapeStart=null, snapshot=null;
 let textDragging=false, textStart=null, textSnap=null;     // arraste que define a caixa de texto (estilo Paint)
 let textJustCommitted=false;                               // engole o clique que fechou a edição (pra a forma ficar com alças, não queimar na hora)
@@ -775,6 +785,54 @@ function drawText(s,g){ g.save(); g.translate(s.cx,s.cy); g.rotate(s.rot);
       g.beginPath(); g.moveTo(x,uy); g.lineTo(x+lw,uy); g.stroke(); }
     y+=lh; }
   g.restore(); }
+// nuvem: contorno ondulado por curvas quadráticas (sem linhas internas). Se `tip`, um gomo vira rabicho pontudo.
+function cloudPath(g, hw, hh, tip){
+  const N=9, rx=hw*0.66, ry=hh*0.56, bulge=Math.min(hw,hh)*0.34;
+  const pts=[]; for(let i=0;i<N;i++){ const a=i/N*2*Math.PI - Math.PI/2; pts.push({x:Math.cos(a)*rx, y:Math.sin(a)*ry}); }
+  let tailSeg=-1;
+  if(tip){ let bestDot=-Infinity; for(let i=0;i<N;i++){ const p=pts[i], q=pts[(i+1)%N], mx=(p.x+q.x)/2, my=(p.y+q.y)/2, L=Math.hypot(mx,my)||1;
+    const dot=(tip.x*mx+tip.y*my)/L; if(dot>bestDot){ bestDot=dot; tailSeg=i; } } }   // gomo mais virado pra ponta
+  g.moveTo(pts[0].x, pts[0].y);
+  for(let i=0;i<N;i++){ const p=pts[i], q=pts[(i+1)%N];
+    if(i===tailSeg){ g.lineTo(tip.x,tip.y); g.lineTo(q.x,q.y); }   // esse gomo vira o rabicho pontudo
+    else { const mx=(p.x+q.x)/2, my=(p.y+q.y)/2, L=Math.hypot(mx,my)||1;
+      g.quadraticCurveTo(mx+mx/L*bulge, my+my/L*bulge, q.x, q.y); } }   // empurra o controle pra fora (radial) = bolha
+  g.closePath();
+}
+// balão de fala: retângulo (arredondado por rf) + rabicho saindo do lado mais próximo da ponta (tx,ty pode ficar fora da caixa)
+function speechBalloonPath(g, hw, hh, tx, ty, rf){
+  const r=Math.max(2, Math.min(hw,hh)*(rf||0.28)), nh=Math.min(hw,hh)*0.18;     // raio do canto + meia-base do rabicho
+  const nx=tx/hw, ny=ty/hh;
+  const side = Math.abs(nx)>=Math.abs(ny) ? (nx>=0?'R':'L') : (ny>=0?'B':'T');   // lado por onde o rabicho sai
+  const bcx=Math.max(-hw+r+nh, Math.min(hw-r-nh, tx));                     // base presa entre os cantos (borda horizontal)
+  const bcy=Math.max(-hh+r+nh, Math.min(hh-r-nh, ty));                     // base presa entre os cantos (borda vertical)
+  g.moveTo(-hw+r,-hh);
+  if(side==='T'){ g.lineTo(bcx-nh,-hh); g.lineTo(tx,ty); g.lineTo(bcx+nh,-hh); }   // rabicho no topo
+  g.lineTo(hw-r,-hh); g.arcTo(hw,-hh,hw,-hh+r,r);
+  if(side==='R'){ g.lineTo(hw,bcy-nh); g.lineTo(tx,ty); g.lineTo(hw,bcy+nh); }     // rabicho na direita
+  g.lineTo(hw,hh-r); g.arcTo(hw,hh,hw-r,hh,r);
+  if(side==='B'){ g.lineTo(bcx+nh,hh); g.lineTo(tx,ty); g.lineTo(bcx-nh,hh); }     // rabicho embaixo
+  g.lineTo(-hw+r,hh); g.arcTo(-hw,hh,-hw,hh-r,r);
+  if(side==='L'){ g.lineTo(-hw,bcy+nh); g.lineTo(tx,ty); g.lineTo(-hw,bcy-nh); }   // rabicho na esquerda
+  g.lineTo(-hw,-hh+r); g.arcTo(-hw,-hh,-hw+r,-hh,r);
+  g.closePath();
+}
+// balão de 4 cantos LIVRES (inclinado/divertido): cantos arredondados + rabicho na borda mais virada pra ponta
+function balloonQuadPath(g, C, tx, ty, r, nh){
+  const n=C.length, cx=(C[0].x+C[1].x+C[2].x+C[3].x)/4, cy=(C[0].y+C[1].y+C[2].y+C[3].y)/4;
+  let best=0, bestDot=-Infinity;                                   // borda mais virada pra ponta
+  for(let i=0;i<n;i++){ const a=C[i], b=C[(i+1)%n], mx=(a.x+b.x)/2, my=(a.y+b.y)/2, dx=mx-cx, dy=my-cy, L=Math.hypot(dx,dy)||1;
+    const dot=((tx-cx)*dx+(ty-cy)*dy)/L; if(dot>bestDot){ bestDot=dot; best=i; } }
+  g.moveTo((C[n-1].x+C[0].x)/2,(C[n-1].y+C[0].y)/2);              // começa no meio da última borda
+  for(let i=0;i<n;i++){ const A=C[i], B=C[(i+1)%n];
+    g.arcTo(A.x,A.y, B.x,B.y, r);                                  // arredonda o canto A indo pra B
+    if(i===best){                                                  // emenda o rabicho na borda A->B
+      const eL=Math.hypot(B.x-A.x,B.y-A.y)||1, ux=(B.x-A.x)/eL, uy=(B.y-A.y)/eL, lo=r+nh, hi=eL-r-nh;
+      let t=(tx-A.x)*ux+(ty-A.y)*uy; t = hi>lo ? Math.max(lo,Math.min(hi,t)) : eL/2;
+      g.lineTo(A.x+ux*(t-nh), A.y+uy*(t-nh)); g.lineTo(tx,ty); g.lineTo(A.x+ux*(t+nh), A.y+uy*(t+nh)); }
+  }
+  g.closePath();
+}
 function drawShapeT(s, g){ g=g||ctx;
   if(s.type==='text'){ drawText(s, g); return; }             // texto mora na camada de texto
   g.save(); g.translate(s.cx,s.cy); g.rotate(s.rot);         // desenha centrado e girado
@@ -789,7 +847,7 @@ function drawShapeT(s, g){ g=g||ctx;
   g.beginPath();
   if(s.type==='line'){ if(s.flip){ g.moveTo(-hw,hh); g.lineTo(hw,-hh); } else { g.moveTo(-hw,-hh); g.lineTo(hw,hh); } }
   else if(s.type==='triangle'){ g.moveTo(0,-hh); g.lineTo(-hw,hh); g.lineTo(hw,hh); g.closePath(); }
-  else if(s.type==='rect'){ g.rect(-hw,-hh,s.w,s.h); }
+  else if(s.type==='rect'){ const rad=Math.min(hw,hh)*(s.aRad??0); if(rad>0) g.roundRect(-hw,-hh,s.w,s.h,rad); else g.rect(-hw,-hh,s.w,s.h); }   // canto arredondável pela alça laranja
   else if(s.type==='rrect'){ g.roundRect(-hw,-hh,s.w,s.h, Math.min(hw,hh)*0.35); }
   else if(s.type==='ellipse'){ g.ellipse(0,0,hw,hh,0,0,Math.PI*2); }
   else if(s.type==='pentagon' || s.type==='hexagon'){ const n=s.type==='pentagon'?5:6;   // polígono regular na caixa
@@ -799,15 +857,38 @@ function drawShapeT(s, g){ g=g||ctx;
   else if(s.type==='heart'){ g.moveTo(0,hh*0.9);
     g.bezierCurveTo(-hw*1.05,-hh*0.1, -hw*0.55,-hh, 0,-hh*0.35);
     g.bezierCurveTo( hw*0.55,-hh,  hw*1.05,-hh*0.1, 0,hh*0.9); g.closePath(); }
-  else if(s.type==='arrow'){ const ah=hh*0.5;   // seta-bloco apontando pra direita (gire pela alça)
-    g.moveTo(-hw,-ah); g.lineTo(hw*0.3,-ah); g.lineTo(hw*0.3,-hh);
-    g.lineTo(hw,0); g.lineTo(hw*0.3,hh); g.lineTo(hw*0.3,ah); g.lineTo(-hw,ah); g.closePath(); }
-  else if(s.type==='speech'){ const bb=hh*0.5, r=Math.min(hw,hh)*0.22;   // balão (corpo arredondado + rabicho)
-    g.moveTo(-hw+r,-hh); g.lineTo(hw-r,-hh); g.arcTo(hw,-hh,hw,-hh+r,r);
-    g.lineTo(hw,bb-r); g.arcTo(hw,bb,hw-r,bb,r);
-    g.lineTo(-hw*0.1,bb); g.lineTo(-hw*0.45,hh); g.lineTo(-hw*0.5,bb);
-    g.lineTo(-hw+r,bb); g.arcTo(-hw,bb,-hw,bb-r,r);
-    g.lineTo(-hw,-hh+r); g.arcTo(-hw,-hh,-hw+r,-hh,r); g.closePath(); }
+  else if(s.type==='arrow'){ const ah=hh*(s.aBody??0.38), bx=hw*(s.aNeck??0.1);   // seta-bloco; pescoço ajustável: aBody=espessura do corpo, aNeck=onde a cabeça começa
+    g.moveTo(-hw,-ah); g.lineTo(bx,-ah); g.lineTo(bx,-hh);
+    g.lineTo(hw,0); g.lineTo(bx,hh); g.lineTo(bx,ah); g.lineTo(-hw,ah); g.closePath(); }
+  else if(s.type==='speech'){ const tx=hw*(s.aTailX??-0.4), ty=hh*(s.aTailY??1.35);   // balão de FALA arredondado (rabicho na ponta livre)
+    speechBalloonPath(g, hw, hh, tx, ty); }
+  else if(s.type==='rectspeech'){ const tx=hw*(s.aTailX??-0.4), ty=hh*(s.aTailY??1.35);   // balão RETANGULAR (cantos quase retos)
+    speechBalloonPath(g, hw, hh, tx, ty, 0.06); }
+  else if(s.type==='oval'){ const tx=hw*(s.aTailX??-0.4), ty=hh*(s.aTailY??1.35);   // balão OVAL (elipse) + rabicho na direção da ponta
+    const a=Math.atan2(ty/Math.max(1,hh), tx/Math.max(1,hw)), d=0.3;
+    g.ellipse(0,0,Math.max(2,hw),Math.max(2,hh),0, a+d, a-d+2*Math.PI);   // arco grande (deixa um vão na direção da ponta)
+    g.lineTo(tx,ty); g.lineTo(hw*Math.cos(a+d), hh*Math.sin(a+d)); g.closePath(); }
+  else if(s.type==='funbubble'){ const tx=hw*(s.aTailX??-0.4), ty=hh*(s.aTailY??1.35);   // balão INCLINADO/divertido: canto sup. ESQUERDO mais alto que o direito
+    const C=[{x:-hw,y:-hh},{x:hw,y:-hh*0.45},{x:hw,y:hh*0.72},{x:-hw,y:hh*0.55}];
+    balloonQuadPath(g, C, tx, ty, Math.min(hw,hh)*0.22, Math.min(hw,hh)*0.2); }
+  else if(s.type==='cloudspeech'){ const tx=hw*(s.aTailX??-0.4), ty=hh*(s.aTailY??1.35);   // NUVEM com rabicho pontudo
+    cloudPath(g, hw, hh, {x:tx, y:ty}); }
+  else if(s.type==='burst'){ const N=12, ro=1, ri=0.74;   // GRITO/explosão: zigue-zague; 1 spike vira o rabicho (ponta de fala puxável)
+    const tx=hw*(s.aTailX??-0.4), ty=hh*(s.aTailY??1.35), tipA=Math.atan2(ty/Math.max(1,hh), tx/Math.max(1,hw));
+    let bestI=0, bestD=Infinity;
+    for(let i=0;i<N*2;i+=2){ const a=-Math.PI/2+i*Math.PI/N; let d=Math.abs(a-tipA)%(2*Math.PI); if(d>Math.PI)d=2*Math.PI-d; if(d<bestD){bestD=d;bestI=i;} }
+    for(let i=0;i<N*2;i++){ const a=-Math.PI/2+i*Math.PI/N, rad=(i%2?ri:ro);
+      const x = i===bestI? tx : Math.cos(a)*hw*rad, y = i===bestI? ty : Math.sin(a)*hh*rad;
+      i?g.lineTo(x,y):g.moveTo(x,y); }
+    g.closePath(); }
+  else if(s.type==='thought'){ cloudPath(g, hw, hh);   // PENSAMENTO: corpo nuvem + bolhas saindo em direção à ponta
+    const tx=hw*(s.aTailX??-0.4), ty=hh*(s.aTailY??1.35), m=Math.min(hw,hh);
+    const a=Math.atan2(ty/Math.max(1,hh), tx/Math.max(1,hw));
+    const ex=Math.cos(a)*hw*0.8, ey=Math.sin(a)*hh*0.72;        // ponto na borda da nuvem em direção à ponta
+    const b1x=ex+(tx-ex)*0.45, b1y=ey+(ty-ey)*0.45, r1=m*0.13;  // bolha maior
+    const b2x=ex+(tx-ex)*0.8,  b2y=ey+(ty-ey)*0.8,  r2=m*0.08;  // bolha menor
+    g.moveTo(b1x+r1,b1y); g.arc(b1x,b1y,r1,0,Math.PI*2);
+    g.moveTo(b2x+r2,b2y); g.arc(b2x,b2y,r2,0,Math.PI*2); }
   else if(s.type==='curve'){ const q=s.pts;   // bézier guardada normalizada (-1..1) na caixa
     g.moveTo(q[0].x*hw,q[0].y*hh); g.bezierCurveTo(q[1].x*hw,q[1].y*hh,q[2].x*hw,q[2].y*hh,q[3].x*hw,q[3].y*hh); }
   g.stroke(); g.restore();
@@ -972,6 +1053,7 @@ const HVEC={ e:[1,0], w:[-1,0], n:[0,-1], s:[0,1], ne:[1,-1], nw:[-1,-1], se:[1,
 function applyCursor(mode){                                 // troca o cursor pra deixar claro a ação
   if(!mode){ cv.style.cursor=toolCursor(); return; }
   if(mode==='rotate'){ cv.style.cursor=ROTATE_CURSOR; return; }
+  if(mode==='adjust'){ cv.style.cursor='default'; return; }
   if(mode==='delete'){ cv.style.cursor='pointer'; return; }
   if(mode==='move'){ cv.style.cursor='move'; return; }
   const [vx,vy]=HVEC[mode], r=pendingShape?pendingShape.rot:0;            // gira o vetor da alça pra tela
@@ -983,6 +1065,8 @@ function toLocal(s,p){ const dx=p.x-s.cx, dy=p.y-s.cy;      // ponteiro no espa�
   const c=Math.cos(-s.rot), sn=Math.sin(-s.rot);
   return { x:dx*c - dy*sn, y:dx*sn + dy*c }; }
 function hitHandle(s,p){ const l=toLocal(s,p), hw=s.w/2, hh=s.h/2;
+  if(ADJUSTABLE[s.type]){ const ap=adjustPos(s);                          // alça de ajuste (laranja) — tem prioridade
+    if(ap && Math.hypot(l.x-ap.x, l.y-ap.y)<=HANDLE_R) return 'adjust'; }
   if(Math.hypot(l.x-(hw+24), l.y+hh+24)<=28) return 'delete';            // ✕ vermelho gigante fora do canto sup. direito
   if(Math.hypot(l.x, l.y+hh+ROT_OFF)<=HANDLE_R) return 'rotate';
   const pts=[['nw',-hw,-hh],['ne',hw,-hh],['se',hw,hh],['sw',-hw,hh],     // cantos (largura+altura)
@@ -1024,10 +1108,28 @@ function renderTextLayer(){ tctx.clearRect(0,0,tcv.width,tcv.height);
     drawShapeChrome(pendingShape.cx,pendingShape.cy,pendingShape.w,pendingShape.h,pendingShape.rot, tctx);
   }
 }
+// alça laranja (losango) de AJUSTE — formas que dá pra remodelar (seta, balão de fala, quadrado)
+const ADJUSTABLE={ arrow:1, speech:1, rectspeech:1, oval:1, funbubble:1, cloudspeech:1, burst:1, thought:1, rect:1 };
+const TAILED={ speech:1, rectspeech:1, oval:1, funbubble:1, cloudspeech:1, burst:1, thought:1 };   // balões com ponta de rabicho/bolhas livre
+function adjustPos(s){ const hw=s.w/2, hh=s.h/2;                         // posição local da alça por tipo
+  if(s.type==='arrow')  return { x:hw*(s.aNeck??0.1),    y:-hh*(s.aBody??0.38) };   // pescoço da seta
+  if(TAILED[s.type])    return { x:hw*(s.aTailX??-0.4), y:hh*(s.aTailY??1.35) };    // PONTA do rabicho/bolhas (livre, até fora da caixa)
+  if(s.type==='rect')   return { x:-hw+Math.max(Math.min(hw,hh)*(s.aRad??0),18), y:-hh };   // sobre a borda de cima
+  return null; }
+function applyAdjust(s,l){ const hw=s.w/2, hh=s.h/2, cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+  if(s.type==='arrow'){  s.aNeck=cl(l.x/hw,-0.85,0.92); s.aBody=cl(-l.y/hh,0.12,0.96); }   // x=cabeça, y=espessura
+  else if(TAILED[s.type]){ s.aTailX=cl(l.x/hw,-2.2,2.2); s.aTailY=cl(l.y/hh,-2.2,2.2); }  // ponta: livre em volta (aponta pra qualquer lado)
+  else if(s.type==='rect'){ s.aRad=cl((l.x+hw)/Math.min(hw,hh),0,1); } }                      // arredondamento do canto
+function drawAdjustHandle(s,g){ g=g||ctx; const ap=adjustPos(s); if(!ap) return;
+  g.save(); g.translate(s.cx,s.cy); g.rotate(s.rot); g.translate(ap.x,ap.y); g.rotate(Math.PI/4);   // quadrado girado 45° = losango
+  g.fillStyle='#f59e0b'; g.strokeStyle='#fff'; g.lineWidth=2;
+  g.beginPath(); g.rect(-7,-7,14,14); g.fill(); g.stroke(); g.restore(); }
 function renderPending(){ if(pendingShape && pendingShape.type==='text'){ renderTextLayer(); updateTextToolsPos(); return; }   // texto: só a camada de texto
   ctx.putImageData(pendingSnapshot,0,0);
   drawShapeT(pendingShape);
-  drawShapeChrome(pendingShape.cx,pendingShape.cy,pendingShape.w,pendingShape.h,pendingShape.rot); updateTextToolsPos(); }
+  drawShapeChrome(pendingShape.cx,pendingShape.cy,pendingShape.w,pendingShape.h,pendingShape.rot);
+  if(ADJUSTABLE[pendingShape.type]) drawAdjustHandle(pendingShape);   // alça extra de remodelagem
+  updateTextToolsPos(); }
 function commitPending(){ if(!pendingShape) return;        // fixa: redesenha SEM as alças e grava no undo
   if(pendingShape.type==='text'){ texts.push(pendingShape); pendingShape=null; pendingSnapshot=null;   // texto fixado entra na camada (não queima no desenho)
     renderTextLayer(); pushUndo(); cv.style.cursor=toolCursor(); updateTextToolsPos(); return; }
@@ -1121,6 +1223,7 @@ cv.addEventListener('pointermove',e=>{ if(panning){ panX+=e.clientX-panLast.x; p
   if(dragMode){ const p=pos(e); dragMoved=true;
     if(dragMode==='move'){ pendingShape.cx+=p.x-dragLast.x; pendingShape.cy+=p.y-dragLast.y; dragLast=p; }
     else if(dragMode==='rotate'){ pendingShape.rot=Math.atan2(p.y-pendingShape.cy,p.x-pendingShape.cx)+Math.PI/2; }
+    else if(dragMode==='adjust'){ applyAdjust(pendingShape, toLocal(pendingShape,p)); }   // remodela (seta/balão/quadrado)
     else if(pendingShape.type==='text'){                  // texto: largura reflowa; altura ajusta a caixa (piso = texto); fonte só pela barra
       const s=pendingShape, l=toLocal(s,p), hh2=HVEC[dragMode], hx=hh2[0], hy=hh2[1];
       const c=Math.cos(s.rot), sn=Math.sin(s.rot);
@@ -1348,16 +1451,46 @@ function updateTextToolsPos(){
   textTools.style.transform='translate(0,-100%)';                          // alinhada à esquerda da caixa (não centralizada sobre o giro)
 }
 
-document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>{
+function selectTool(t, btn){                      // troca a ferramenta ativa (usado pela barra e pelo seletor de balões)
   if(curvePhase!==0) endCurve(false);            // descarta curva incompleta ao trocar de ferramenta
   if(pendingShape) commitPending();              // fixa a forma flutuante ao trocar de ferramenta
-  tool=b.dataset.tool;
+  tool=t;
   clearTimeout(bucketUpTimer);                    // cancela o timer do balde pra ele não sobrescrever o novo cursor
   textTools.hidden = (tool!=='text');            // a mini-barra de texto só aparece na ferramenta Texto
   updateTextToolsPos();                          // posiciona a barra (acima da caixa, se houver)
   cv.style.cursor=toolCursor();                  // balde/pincel mostram o ícone no ponteiro; borracha esconde (usa o anel)
   if(tool!=='eraser'&&tool!=='brush') toolRing.style.display='none';
-  document.querySelectorAll('.tool').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); });
+  document.querySelectorAll('.tool').forEach(x=>x.classList.remove('sel')); if(btn) btn.classList.add('sel');
+}
+document.querySelectorAll('.tool[data-tool]').forEach(b=>b.onclick=()=>selectTool(b.dataset.tool, b));   // balloonBtn (sem data-tool) tem handler próprio
+// ---- seletor de balões: 1 botão abre um painel com os modelos ----
+const balloonBtn=document.getElementById('balloonBtn'), balloonPanel=document.getElementById('balloonPanel');
+const SV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">';
+function burstIconPath(){ let d='', n=10, cx=12, cy=12; for(let i=0;i<n*2;i++){ const a=-Math.PI/2+i*Math.PI/n, r=(i%2?6.5:11);
+  d+=(i?'L':'M')+(cx+Math.cos(a)*r).toFixed(1)+' '+(cy+Math.sin(a)*r).toFixed(1); } return d+'Z'; }
+const BALLOONS=[
+  { type:'speech',     name:'Fala',       icon:SV+'<path d="M4 4h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-4 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>' },
+  { type:'rectspeech', name:'Retângulo',  icon:SV+'<path d="M2 4h20v12h-8l-4 4v-4H2z"/></svg>' },
+  { type:'oval',       name:'Oval',       icon:SV+'<ellipse cx="12" cy="9.5" rx="10" ry="7"/><path d="M9 16l-2 6 6-5"/></svg>' },
+  { type:'funbubble',  name:'Divertido',  icon:SV+'<path d="M3 8l18-4 1 11-9 1-3 4-1-4-6-1z"/></svg>' },
+  { type:'thought',    name:'Pensamento', icon:SV+'<ellipse cx="12" cy="9" rx="9" ry="6.5"/><circle cx="6.5" cy="18" r="1.7"/><circle cx="3.5" cy="21.5" r="1"/></svg>' },
+  { type:'cloudspeech',name:'Nuvem',      icon:SV+'<path d="M2.25 15a4.5 4.5 0 0 0 4.5 4.5H18a3.75 3.75 0 0 0 1.332-7.257 3 3 0 0 0-3.758-3.848 5.25 5.25 0 0 0-10.233 2.33A4.502 4.502 0 0 0 2.25 15z"/><path d="M9 19.4l-1.7 4 3.3-2.5"/></svg>' },
+  { type:'burst',      name:'Grito',      icon:SV+'<path d="'+burstIconPath()+'"/></svg>' },
+];
+BALLOONS.forEach(bl=>{ const b=document.createElement('button'); b.type='button'; b.className='predef-item';
+  b.innerHTML=bl.icon+'<span>'+bl.name+'</span>';
+  b.onclick=()=>{ selectTool(bl.type, balloonBtn); balloonPanel.hidden=true; };
+  balloonPanel.appendChild(b); });
+function positionPanelUnder(panel, btn){                       // abre o painel centralizado logo abaixo do botão que o chamou
+  const app=document.querySelector('.paint-app'), ar=app.getBoundingClientRect(), br=btn.getBoundingClientRect();
+  let cx=(br.left+br.width/2)-ar.left, half=(panel.offsetWidth||310)/2;
+  cx=Math.max(half+8, Math.min(cx, ar.width-half-8));          // não deixa o painel vazar pelas bordas do app
+  panel.style.left=cx+'px'; panel.style.top=(br.bottom-ar.top+10)+'px'; }
+balloonBtn.onclick=e=>{ e.stopPropagation(); if(typeof closePredef==='function') closePredef();
+  const show=balloonPanel.hidden; balloonPanel.hidden=!show;
+  if(show) positionPanelUnder(balloonPanel, balloonBtn); };
+balloonPanel.addEventListener('click',e=>e.stopPropagation());
+document.addEventListener('click',()=>{ if(!balloonPanel.hidden) balloonPanel.hidden=true; });   // clicar fora fecha
 cv.style.cursor=toolCursor();                    // ferramenta inicial (balde) já entra com o ícone
 
 /* ===== Desenhos prontos (galeria): carimba uma figura pronta (line-art PNG) como forma flutuante ===== */
@@ -1392,7 +1525,7 @@ Object.keys(PREDEF).forEach(id=>{ const p=PREDEF[id];
   b.innerHTML='<img alt="" src="'+p.src+'"><span>'+p.name+'</span>';
   b.onclick=()=>{ insertPredef(id); closePredef(); };
   predefPanel.appendChild(b); });
-function openPredef(){ predefPanel.hidden=false; galleryBtn.classList.add('on'); }
+function openPredef(){ if(balloonPanel) balloonPanel.hidden=true; predefPanel.hidden=false; positionPanelUnder(predefPanel, galleryBtn); galleryBtn.classList.add('on'); }
 function closePredef(){ predefPanel.hidden=true; galleryBtn.classList.remove('on'); }
 galleryBtn.onclick=e=>{ e.stopPropagation(); predefPanel.hidden ? openPredef() : closePredef(); };
 predefPanel.addEventListener('click',e=>e.stopPropagation());
