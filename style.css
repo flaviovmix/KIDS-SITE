@@ -2315,10 +2315,10 @@ body {
 @media (max-width: 860px) { .familia-cards { grid-template-columns: repeat(2, 1fr); max-width: 700px; } }
 @media (max-width: 540px) { .familia-cards { grid-template-columns: 1fr; max-width: 400px; } }
 
-/* Aprender: 4 operações por linha (a base .familia-cards é 3, usada pela seção Família). */
-#aprender .familia-cards { grid-template-columns: repeat(4, 1fr); max-width: 1100px; }
-@media (max-width: 860px) { #aprender .familia-cards { grid-template-columns: repeat(2, 1fr); max-width: 700px; } }
-@media (max-width: 540px) { #aprender .familia-cards { grid-template-columns: 1fr; max-width: 400px; } }
+/* Aprender / Alimentação / Exercitar: 4 cards por linha (a base .familia-cards é 3, usada pela seção Família). */
+#aprender .familia-cards, #alimentacao .familia-cards, #exercitar .familia-cards { grid-template-columns: repeat(4, 1fr); max-width: 1320px; }
+@media (max-width: 860px) { #aprender .familia-cards, #alimentacao .familia-cards, #exercitar .familia-cards { grid-template-columns: repeat(2, 1fr); max-width: 700px; } }
+@media (max-width: 540px) { #aprender .familia-cards, #alimentacao .familia-cards, #exercitar .familia-cards { grid-template-columns: 1fr; max-width: 400px; } }
 
 .familia-cta { text-align: center; }
 
