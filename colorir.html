@@ -348,8 +348,7 @@
                     <button class="tool shape" data-tool="line" title="Linha"><i class="fa-solid fa-slash"></i></button>
                     <button class="tool shape" data-tool="curve" title="Curva"><i class="fa-solid fa-bezier-curve"></i></button>
                     <button class="tool shape" data-tool="triangle" title="Triângulo">△</button>
-                    <button class="tool shape" data-tool="rect" title="Quadrado"><i class="fa-regular fa-square"></i></button>
-                    <button class="tool shape" data-tool="rrect" title="Retângulo arredondado">▢</button>
+                    <button class="tool shape" data-tool="rect" title="Quadrado (arraste o ponto laranja pra arredondar os cantos)">▢</button>
                     <button class="tool shape" data-tool="ellipse" title="Círculo"><i class="fa-regular fa-circle"></i></button>
                     <button class="tool shape" data-tool="pentagon" title="Pentágono">⬠</button>
                     <button class="tool shape" data-tool="hexagon" title="Hexágono">⬡</button>
@@ -754,7 +753,7 @@ function paintLine(a,b){ ctx.strokeStyle = tool==='eraser' ? '#fff' : `rgb(${col
 
 // ---- formas prontas (linha/triângulo/quadrado/círculo): arrasta do início ao fim ----
 // (a curva tem desenho próprio de 3 arrastos, mas no fim vira a MESMA forma flutuante)
-const SHAPES=['line','triangle','rect','rrect','ellipse','pentagon','hexagon','star','heart','arrow','speech','rectspeech','oval','funbubble','cloudspeech','burst','thought'];
+const SHAPES=['line','triangle','rect','ellipse','pentagon','hexagon','star','heart','arrow','speech','rectspeech','oval','funbubble','cloudspeech','burst','thought'];
 let shaping=false, shapeStart=null, snapshot=null;
 let textDragging=false, textStart=null, textSnap=null;     // arraste que define a caixa de texto (estilo Paint)
 let textJustCommitted=false;                               // engole o clique que fechou a edição (pra a forma ficar com alças, não queimar na hora)
@@ -848,7 +847,6 @@ function drawShapeT(s, g){ g=g||ctx;
   if(s.type==='line'){ if(s.flip){ g.moveTo(-hw,hh); g.lineTo(hw,-hh); } else { g.moveTo(-hw,-hh); g.lineTo(hw,hh); } }
   else if(s.type==='triangle'){ g.moveTo(0,-hh); g.lineTo(-hw,hh); g.lineTo(hw,hh); g.closePath(); }
   else if(s.type==='rect'){ const rad=Math.min(hw,hh)*(s.aRad??0); if(rad>0) g.roundRect(-hw,-hh,s.w,s.h,rad); else g.rect(-hw,-hh,s.w,s.h); }   // canto arredondável pela alça laranja
-  else if(s.type==='rrect'){ g.roundRect(-hw,-hh,s.w,s.h, Math.min(hw,hh)*0.35); }
   else if(s.type==='ellipse'){ g.ellipse(0,0,hw,hh,0,0,Math.PI*2); }
   else if(s.type==='pentagon' || s.type==='hexagon'){ const n=s.type==='pentagon'?5:6;   // polígono regular na caixa
     for(let i=0;i<n;i++){ const a=-Math.PI/2 + i*2*Math.PI/n, x=Math.cos(a)*hw, y=Math.sin(a)*hh; i?g.lineTo(x,y):g.moveTo(x,y); } g.closePath(); }
@@ -891,6 +889,7 @@ function drawShapeT(s, g){ g=g||ctx;
     g.moveTo(b2x+r2,b2y); g.arc(b2x,b2y,r2,0,Math.PI*2); }
   else if(s.type==='curve'){ const q=s.pts;   // bézier guardada normalizada (-1..1) na caixa
     g.moveTo(q[0].x*hw,q[0].y*hh); g.bezierCurveTo(q[1].x*hw,q[1].y*hh,q[2].x*hw,q[2].y*hh,q[3].x*hw,q[3].y*hh); }
+  if(TAILED[s.type]){ g.fillStyle='#fff'; g.fill(); }        // balões: corpo branco (opaco); o contorno segue pintável pela cor atual
   g.stroke(); g.restore();
 }
 
@@ -998,7 +997,7 @@ function openTextEditor(opts){
 //      redimensionar (cantos) e girar (alça verde); só vira parte do desenho ao fixar
 //      (clique fora / Enter / trocar de ferramenta / salvar). ----
 let pendingShape=null, pendingSnapshot=null, dragMode=null, dragLast=null, dragMoved=false;
-const HANDLE_R=14, ROT_OFF=76;                              // raio de toque das alças / haste do giro (alta o bastante p/ a alça verde passar acima da mini-barra de estilo)
+const HANDLE_R=14, ROT_OFF=34;                              // raio de toque das alças / haste do giro (curta: a barra de estilo agora fica abaixo da caixa)
 // cursor de girar (SVG inline) + vetor de saída de cada alça (pra escolher a seta de redimensionar)
 const ROT_SVG='<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z" fill="#111" stroke="#fff" stroke-width="1"/></svg>';
 const ROTATE_CURSOR='url("data:image/svg+xml,'+encodeURIComponent(ROT_SVG)+'") 12 12, auto';
@@ -1082,9 +1081,11 @@ function drawShapeChrome(cx,cy,w,h,rot,g){ g=g||ctx; const hw=w/2, hh=h/2;
   g.beginPath(); g.moveTo(0,-hh); g.lineTo(0,-hh-ROT_OFF); g.stroke();   // haste do giro
   g.beginPath(); g.arc(0,-hh-ROT_OFF,8,0,Math.PI*2); g.fillStyle='#22c55e'; g.fill();
   g.lineWidth=2; g.strokeStyle='#fff'; g.stroke();                          // alça verde = girar
-  g.fillStyle='#fff'; g.strokeStyle='#7a7f87'; g.lineWidth=1.5;            // alças de canto + lado = tamanho
-  [[-hw,-hh],[hw,-hh],[hw,hh],[-hw,hh],[0,-hh],[0,hh],[hw,0],[-hw,0]].forEach(([x,y])=>{
-    g.beginPath(); g.rect(x-7,y-7,14,14); g.fill(); g.stroke(); });
+  g.strokeStyle='#7a7f87'; g.lineWidth=1.5;                               // alças de tamanho
+  g.fillStyle='#9ca3af';                                                  // CANTO (cinza) = mantém a proporção
+  [[-hw,-hh],[hw,-hh],[hw,hh],[-hw,hh]].forEach(([x,y])=>{ g.beginPath(); g.rect(x-7,y-7,14,14); g.fill(); g.stroke(); });
+  g.fillStyle='#fff';                                                     // LADO (branco) = livre, pode distorcer
+  [[0,-hh],[0,hh],[hw,0],[-hw,0]].forEach(([x,y])=>{ g.beginPath(); g.rect(x-7,y-7,14,14); g.fill(); g.stroke(); });
   const dlx=hw+24, dly=-hh-24;                                                   // botão ✕ vermelho GIGANTE = apagar a forma
   g.beginPath(); g.arc(dlx,dly,26,0,Math.PI*2); g.fillStyle='#ef4444'; g.fill();
   g.lineWidth=3; g.strokeStyle='#fff'; g.stroke();
@@ -1217,8 +1218,11 @@ cv.addEventListener('pointermove',e=>{ if(panning){ panX+=e.clientX-panLast.x; p
     ctx.setLineDash([]); ctx.restore(); return; }
   if(tool==='curve' && curveDrag){ const p=pos(e);
     if(curvePhase===0) cP3={x:p.x,y:p.y};
-    else if(curvePhase===1) cC1={x:p.x,y:p.y};
-    else if(curvePhase===2) cC2={x:p.x,y:p.y};
+    else if(curvePhase===1){                                   // 1ª puxada: os 2 controles bombam juntos (arco simétrico, nunca meio-S)
+      const midx=(cP0.x+cP3.x)/2, midy=(cP0.y+cP3.y)/2, ox=(p.x-midx)*4/3, oy=(p.y-midy)*4/3;
+      cC1={x:cP0.x+(cP3.x-cP0.x)/3+ox, y:cP0.y+(cP3.y-cP0.y)/3+oy};
+      cC2={x:cP0.x+2*(cP3.x-cP0.x)/3+ox, y:cP0.y+2*(cP3.y-cP0.y)/3+oy}; }
+    else if(curvePhase===2) cC2={x:p.x,y:p.y};                 // 2ª puxada: ajusta só a outra ponta (pode virar S)
     drawCurvePreview(); return; }
   if(dragMode){ const p=pos(e); dragMoved=true;
     if(dragMode==='move'){ pendingShape.cx+=p.x-dragLast.x; pendingShape.cy+=p.y-dragLast.y; dragLast=p; }
@@ -1241,7 +1245,11 @@ cv.addEventListener('pointermove',e=>{ if(panning){ panX+=e.clientX-panLast.x; p
         else if(hx){ nhw=Math.abs(l.x+hx*hw)/2; nhh=nhw/ar; }                    // lado E/W: a altura acompanha
         else { nhh=Math.abs(l.y+hy*hh)/2; nhw=nhh*ar; }                          // lado N/S: a largura acompanha
         nhw=Math.max(4,nhw); nhh=Math.max(4,nhh);
-      } else {                                             // formas normais: cada eixo livre (pode distorcer)
+      } else if(hx&&hy){                                   // CANTO: trava a proporção atual da forma (não distorce)
+        const ar=hw/hh, cw=Math.abs(l.x+hx*hw)/2, ch=Math.abs(l.y+hy*hh)/2;
+        if(cw/hw>=ch/hh){ nhw=cw; nhh=cw/ar; } else { nhh=ch; nhw=ch*ar; }   // segue o eixo dominante
+        nhw=Math.max(4,nhw); nhh=Math.max(4,nhh);
+      } else {                                             // LADO: um eixo só, livre (pode distorcer)
         if(hx) nhw=Math.max(4, Math.abs(l.x+hx*hw)/2);
         if(hy) nhh=Math.max(4, Math.abs(l.y+hy*hh)/2);
       }
@@ -1265,8 +1273,8 @@ cv.addEventListener('pointerup',e=>{ if(panning){ panning=false; cv.style.cursor
       cC1={x:cP0.x+(cP3.x-cP0.x)/3, y:cP0.y+(cP3.y-cP0.y)/3};      // controles na linha base
       cC2={x:cP0.x+2*(cP3.x-cP0.x)/3, y:cP0.y+2*(cP3.y-cP0.y)/3};
       curvePhase=1; drawCurvePreview(); }
-    else if(curvePhase===1){ cC1={x:p.x,y:p.y}; curvePhase=2; drawCurvePreview(); }
-    else if(curvePhase===2){ cC2={x:p.x,y:p.y};                    // curva pronta: vira forma flutuante
+    else if(curvePhase===1){ curvePhase=2; drawCurvePreview(); }   // soltou a 1ª puxada: arco simétrico feito; espera o 2º ajuste
+    else if(curvePhase===2){                                       // soltou a 2ª puxada: curva pronta, vira forma flutuante
       ctx.putImageData(curveSnap,0,0);                             // limpa o preview (as alças entram no renderPending)
       pendingShape=curveToShape(); pendingSnapshot=curveSnap;
       curvePhase=0; curveSnap=null; renderPending(); }
@@ -1439,16 +1447,18 @@ textTools.addEventListener('mousedown', e=>e.preventDefault());             // t
 syncTextToolbar();
 // Gruda a mini-barra logo acima da caixa de texto (em edição ou flutuante). Sem caixa: volta pro canto (CSS).
 function updateTextToolsPos(){
-  if(tool!=='text') return;
-  let left, top;
-  if(txtEdit){ left=txtEdit.cx - txtEdit.w/2; top=txtEdit.cy - txtEdit.curH()/2; }
-  else if(pendingShape && pendingShape.type==='text'){ left=pendingShape.cx - pendingShape.w/2; top=pendingShape.cy - pendingShape.h/2; }
-  if(left===undefined){ textTools.style.position=''; textTools.style.zIndex=''; textTools.style.left=''; textTools.style.top=''; textTools.style.transform=''; return; }   // sem caixa: volta pro canto (CSS)
-  const sp=canvasToScreen(left, top);
+  let left, bottom;
+  if(tool==='text'){                                                        // fora da ferramenta Texto nunca há caixa
+    if(txtEdit){ left=txtEdit.cx - txtEdit.w/2; bottom=txtEdit.cy + txtEdit.curH()/2; }
+    else if(pendingShape && pendingShape.type==='text'){ left=pendingShape.cx - pendingShape.w/2; bottom=pendingShape.cy + pendingShape.h/2; }
+  }
+  if(left===undefined){ textTools.hidden=true; textTools.style.position=''; textTools.style.zIndex=''; textTools.style.left=''; textTools.style.top=''; textTools.style.transform=''; return; }   // sem caixa na tela: nem aparece
+  textTools.hidden=false;
+  const sp=canvasToScreen(left, bottom);                                    // canto inferior-esquerdo da caixa
   textTools.style.position='fixed'; textTools.style.zIndex='1200';   // viewport (igual canvasToScreen) e acima do textarea
   textTools.style.left=sp.x+'px';
-  textTools.style.top=Math.max(56, sp.y - 8)+'px';                         // logo acima da borda superior da caixa
-  textTools.style.transform='translate(0,-100%)';                          // alinhada à esquerda da caixa (não centralizada sobre o giro)
+  textTools.style.top=(sp.y + 8)+'px';                                      // logo abaixo da borda inferior da caixa
+  textTools.style.transform='translate(0,0)';                              // alinhada à esquerda da caixa, pendurada por baixo
 }
 
 function selectTool(t, btn){                      // troca a ferramenta ativa (usado pela barra e pelo seletor de balões)
@@ -1456,8 +1466,7 @@ function selectTool(t, btn){                      // troca a ferramenta ativa (u
   if(pendingShape) commitPending();              // fixa a forma flutuante ao trocar de ferramenta
   tool=t;
   clearTimeout(bucketUpTimer);                    // cancela o timer do balde pra ele não sobrescrever o novo cursor
-  textTools.hidden = (tool!=='text');            // a mini-barra de texto só aparece na ferramenta Texto
-  updateTextToolsPos();                          // posiciona a barra (acima da caixa, se houver)
+  updateTextToolsPos();                          // a barra só aparece quando há caixa de texto na tela (e a posiciona)
   cv.style.cursor=toolCursor();                  // balde/pincel mostram o ícone no ponteiro; borracha esconde (usa o anel)
   if(tool!=='eraser'&&tool!=='brush') toolRing.style.display='none';
   document.querySelectorAll('.tool').forEach(x=>x.classList.remove('sel')); if(btn) btn.classList.add('sel');
